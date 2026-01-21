@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Upload Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .test-box {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px solid #0ff;
+    }
+    button {
+      background: #0ff;
+      color: #111;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    button:hover { background: #8fff00; }
+    #log {
+      background: #000;
+      color: #0f0;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .success { color: #0f0; }
+    .error { color: #f44; }
+    .info { color: #0ff; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Quick Upload Test</h1>
+  
+  <div class="test-box">
+    <h3>Test Upload</h3>
+    <input type="file" id="testFile" accept="image/*">
+    <br><br>
+    <button onclick="testUpload()">Test Upload to Supabase</button>
+    <button onclick="checkBucket()">Check Bucket</button>
+    <button onclick="clearLog()">Clear Log</button>
+  </div>
+  
+  <div class="test-box">
+    <h3>Console Log</h3>
+    <div id="log"></div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-storage.js"></script>
+  
+  <script>
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+      logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    async function checkBucket() {
+      log('🔍 Checking bucket...', 'info');
+      try {
+        if (!window.supabaseStorage || !window.supabaseClient) {
+          throw new Error('Supabase Storage not initialized');
+        }
+        
+        // Try direct access method
+        const supabase = window.supabaseClient;
+        log('Trying to access bucket directly...', 'info');
+        
+        const { data, error } = await supabase.storage
+          .from('listings')
+          .list('', { limit: 1 });
+        
+        if (error) {
+          if (error.message.includes('not found') || error.message.includes('Bucket')) {
+            log('❌ Bucket "listings" NOT found!', 'error');
+            log('Please create it in Supabase Dashboard → Storage', 'error');
+            log(`Error: ${error.message}`, 'error');
+          } else {
+            log(`⚠️ Bucket access error: ${error.message}`, 'error');
+            log('Bucket might exist but has permission issues', 'error');
+          }
+        } else {
+          log('✅ Bucket "listings" exists and is accessible!', 'success');
+          log(`Bucket contains ${data?.length || 0} items`, 'info');
+        }
+      } catch (error) {
+        log(`❌ Error: ${error.message}`, 'error');
+        log(`Stack: ${error.stack}`, 'error');
+      }
+    }
+
+    async function testUpload() {
+      const fileInput = document.getElementById('testFile');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        log('⚠️ Please select a file first', 'error');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      log(`📤 Starting upload: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`, 'info');
+      
+      try {
+        // Test direct upload
+        const supabase = window.supabaseClient;
+        if (!supabase) {
+          throw new Error('Supabase client not initialized');
+        }
+
+        const testPath = `test/${Date.now()}_${file.name}`;
+        log(`📂 Upload path: listings/${testPath}`, 'info');
+        
+        log('⏳ Uploading...', 'info');
+        const { data, error } = await supabase.storage
+          .from('listings')
+          .upload(testPath, file, {
+            contentType: file.type,
+            upsert: false
+          });
+        
+        if (error) {
+          log(`❌ Upload error: ${error.message}`, 'error');
+          log(`Error code: ${error.statusCode || 'N/A'}`, 'error');
+          log(`Full error: ${JSON.stringify(error, null, 2)}`, 'error');
+          return;
+        }
+        
+        log('✅ Upload successful!', 'success');
+        log(`File path: ${data.path}`, 'success');
+        
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('listings')
+          .getPublicUrl(testPath);
+        
+        log(`🔗 Public URL: ${urlData.publicUrl}`, 'success');
+        
+        // Try to delete test file
+        try {
+          await supabase.storage.from('listings').remove([testPath]);
+          log('🗑️ Test file deleted', 'info');
+        } catch (e) {
+          log(`⚠️ Could not delete test file: ${e.message}`, 'error');
+        }
+        
+      } catch (error) {
+        log(`❌ Exception: ${error.message}`, 'error');
+        log(`Stack: ${error.stack}`, 'error');
+      }
+    }
+
+    // Auto-check on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        log('🚀 Page loaded, checking setup...', 'info');
+        checkBucket();
+      }, 500);
+    });
+  </script>
+</body>
+</html>
+

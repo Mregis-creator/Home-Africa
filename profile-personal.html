@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Profile - HOME AFRICA</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+  <style>
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+      padding-top: 80px;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, rgba(255,0,136,0.3) 0%, rgba(0,136,255,0.3) 100%) !important;
+      border-bottom: 3px solid #ff0088;
+      box-shadow: 0 2px 12px rgba(255,0,136,0.2);
+      position: relative;
+      z-index: 1000;
+    }
+
+    .profile-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .profile-header {
+      background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%);
+      border: 2px solid #ff0088;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 24px 0 rgba(255,0,136,0.2);
+    }
+
+    .profile-cover {
+      height: 200px;
+      background: linear-gradient(135deg, #0ff 0%, #8fff00 100%);
+      border-radius: 12px;
+      margin-bottom: -80px;
+      position: relative;
+    }
+
+    .profile-avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #0ff;
+      background: linear-gradient(135deg, #0ff 0%, #8fff00 100%);
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(0,255,255,0.4);
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #0ff;
+    }
+
+    .stat-label {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+    }
+
+    .profile-card {
+      background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%);
+      border: 2px solid #ff0088;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 24px 0 rgba(255,0,136,0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      border: none;
+      color: #111;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(0,255,255,0.4);
+    }
+
+    .btn-outline-primary {
+      border: 2px solid #0ff;
+      color: #0ff;
+      background: transparent;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .btn-outline-primary:hover {
+      background: #0ff;
+      color: #111;
+      transform: scale(1.05);
+    }
+
+    .nav-tabs {
+      border-bottom: 2px solid rgba(255,0,136,0.3);
+    }
+
+    .nav-tabs .nav-link {
+      color: rgba(255,255,255,0.7);
+      border: none;
+      padding: 1rem 2rem;
+    }
+
+    .nav-tabs .nav-link.active {
+      color: #0ff;
+      background: transparent;
+      border-bottom: 3px solid #0ff;
+    }
+
+    .post-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    .post-card:hover {
+      border-color: #0ff;
+      box-shadow: 0 4px 20px rgba(0,255,255,0.2);
+    }
+
+    .text-white {
+      color: #fff !important;
+    }
+
+    .text-cyan {
+      color: #0ff !important;
+    }
+
+    .text-lime {
+      color: #8fff00 !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="network.html">Network</a></li>
+          <li class="nav-item"><a class="nav-link" href="messages.html">Messages</a></li>
+          <li class="nav-item"><a class="nav-link active" href="profile-personal.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="create-post.html"><i class="bi bi-plus-circle"></i> Create Post</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Container -->
+  <div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-cover" id="profileCover"></div>
+      <div class="text-center" style="margin-top: 80px;">
+        <img src="images/hero-bg.jpeg" alt="Profile" class="profile-avatar" id="profileAvatar" />
+        <h2 class="text-white mt-3" id="profileName">Your Name</h2>
+        <p class="text-white-50" id="profileTitle">Your Title</p>
+        <p class="text-white-50" id="profileLocation"><i class="bi bi-geo-alt"></i> Location</p>
+        
+        <div class="mt-3">
+          <button class="btn btn-primary me-2" onclick="editProfile()">
+            <i class="bi bi-pencil"></i> Edit Profile
+          </button>
+          <button class="btn btn-outline-primary" onclick="shareProfile()">
+            <i class="bi bi-share"></i> Share Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile Stats -->
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-number" id="partnersCount">0</div>
+          <div class="stat-label">Partners</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="followingCount">0</div>
+          <div class="stat-label">Following</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="postsCount">0</div>
+          <div class="stat-label">Posts</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="listingsCount">0</div>
+          <div class="stat-label">Listings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Content Tabs -->
+    <div class="profile-card">
+      <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button">
+            <i class="bi bi-file-post"></i> Posts
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button">
+            <i class="bi bi-info-circle"></i> About
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="partners-tab" data-bs-toggle="tab" data-bs-target="#partners" type="button">
+            <i class="bi bi-people"></i> Partners
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">
+            <i class="bi bi-activity"></i> Activity
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-4" id="profileTabContent">
+        <!-- Posts Tab -->
+        <div class="tab-pane fade show active" id="posts" role="tabpanel">
+          <div id="postsList">
+            <!-- Posts will be loaded here -->
+            <div class="text-center text-white-50 py-5">
+              <i class="bi bi-file-post" style="font-size: 3rem;"></i>
+              <p class="mt-3">No posts yet. <a href="create-post.html" class="text-cyan">Create your first post!</a></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- About Tab -->
+        <div class="tab-pane fade" id="about" role="tabpanel">
+          <div id="aboutContent">
+            <h4 class="text-white mb-3">About</h4>
+            <p class="text-white-50" id="profileBio">No bio added yet.</p>
+            
+            <h5 class="text-white mt-4 mb-3">Contact Information</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <p class="text-white-50"><i class="bi bi-envelope"></i> <span id="profileEmail">Email</span></p>
+                <p class="text-white-50"><i class="bi bi-telephone"></i> <span id="profilePhone">Phone</span></p>
+                <p class="text-white-50"><i class="bi bi-globe"></i> <span id="profileWebsite">Website</span></p>
+              </div>
+            </div>
+
+            <h5 class="text-white mt-4 mb-3">Specialties</h5>
+            <div id="specialtiesList" class="d-flex flex-wrap gap-2">
+              <!-- Specialties will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Partners Tab -->
+        <div class="tab-pane fade" id="partners" role="tabpanel">
+          <div id="partnersList">
+            <!-- Partners will be loaded here -->
+            <div class="text-center text-white-50 py-5">
+              <i class="bi bi-people" style="font-size: 3rem;"></i>
+              <p class="mt-3">No Partners yet. Start connecting!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div class="tab-pane fade" id="activity" role="tabpanel">
+          <div id="activityList">
+            <!-- Activity feed will be loaded here -->
+            <div class="text-center text-white-50 py-5">
+              <i class="bi bi-activity" style="font-size: 3rem;"></i>
+              <p class="mt-3">Loading activity...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light pt-4 pb-3 mt-5">
+    <div class="container">
+      <div class="text-center">
+        <p>&copy; 2025 HOME AFRICA. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <!-- Profile Script -->
+  <script src="js/profile-personal.js"></script>
+  
+  <!-- Activity Feed Script -->
+  <script src="js/activity-feed.js"></script>
+  
+  <!-- Footer Fix -->
+  <script src="js/footer-fix.js"></script>
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+
+  <script>
+    // Initialize particles
+    particlesJS('particles-js', {
+      particles: { number: { value: 50 }, color: { value: '#ff0088' } },
+      interactivity: { events: { onhover: { enable: true, mode: 'repulse' } } }
+    });
+
+    function editProfile() {
+      window.location.href = 'profile-edit.html';
+    }
+
+    function shareProfile() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Check out my profile on HOME AFRICA',
+          url: window.location.href
+        });
+      } else {
+        // Fallback: Copy to clipboard
+        navigator.clipboard.writeText(window.location.href);
+        alert('Profile link copied to clipboard!');
+      }
+    }
+  </script>
+</body>
+</html>
+

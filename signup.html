@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - HOME AFRICA</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+  <!-- ✨ Custom Styles -->
+  <style>
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      z-index: -1;
+      pointer-events: none;
+      display: block;
+    }
+
+    .particles-js-canvas-el {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: -1 !important;
+      display: block !important;
+    }
+    /* Splash Screen Styles */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.7s;
+      animation: splashFadeIn 1.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes splashFadeIn {
+      0% { opacity: 0; transform: scale(1.08) translateY(40px); }
+      60% { opacity: 1; transform: scale(1.01) translateY(-10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    #splash-screen img {
+      max-width: 40vw;
+      max-height: 40vh;
+      border-radius: 50%;
+      box-shadow: 0 0 60px #0ff, 0 0 120px #8fff00;
+      opacity: 0;
+      transform: scale(0.7) rotate(-10deg);
+      animation: logoPopIn 2.2s 3.3s cubic-bezier(0.4,0,0.4,1) forwards;
+    }
+    @keyframes logoPopIn {
+      0% { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+      60% { opacity: 1; transform: scale(1.08) rotate(6deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    #splash-screen h1 {
+      margin-top: 2rem;
+      font-size: 3.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.2em;
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+      animation: textSlideIn 1.1s 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    #splash-screen h2 {
+      color: #fff;
+      margin-top: 1.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: textSlideIn 1s 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes textSlideIn {
+      0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Colorful gradient overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+    }
+
+    .navbar .container {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+      animation: glow-pulse 2s infinite;
+      box-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+    }
+
+    .navbar-brand img:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% {
+        box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+      }
+      50% {
+        box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+      }
+    }
+
+    .content-wrapper {
+      flex: 1;
+      padding-top: 3rem;
+      padding-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .hero {
+      color: white;
+      text-align: center;
+      padding-top: 2rem;
+      padding-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: bold;
+    }
+
+    /* Updated signup form styling - matching signin style */
+    .signup-form {
+      background: linear-gradient(120deg, rgba(0,0,0,0.92) 60%, rgba(0,255,136,0.18) 100%);
+      border: 2px solid #0ff;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      padding: 2rem 2rem 1rem 2rem;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .signup-form h2 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .signup-form p.lead {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-control::placeholder {
+      color: #ccc;
+    }
+
+    .form-control:focus {
+      border-color: #0ff;
+      box-shadow: 0 0 0 0.2rem rgba(0,255,136,0.25);
+      background: rgba(0,255,136,0.05);
+      color: #fff;
+    }
+
+    .btn-success {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      border: none;
+      font-weight: bold;
+      box-shadow: 0 2px 8px 0 rgba(0,255,136,0.15);
+      transition: background 0.3s, color 0.3s;
+      width: 100%;
+    }
+    .btn-success:hover, .btn-success:focus {
+      background: linear-gradient(90deg, #8fff00 0%, #0ff 100%);
+      color: #111;
+    }
+
+    .bottom-link {
+      margin-top: 1rem;
+      text-align: center;
+      color: #0ff;
+      text-shadow: 0 0 6px #8fff00;
+      font-size: 0.95rem;
+    }
+
+    .bottom-link a {
+      color: #8fff00;
+      text-shadow: 0 0 6px #0ff;
+      text-decoration: none;
+    }
+
+    .bottom-link a:hover {
+      color: #0ff;
+      text-shadow: 0 0 8px #8fff00;
+    }
+
+    /* Product category checkboxes styling */
+    .product-category-checkbox {
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+    .product-category-checkbox:hover {
+      background: rgba(0,255,136,0.15);
+      border-color: rgba(0,255,136,0.4);
+      transform: translateY(-2px);
+    }
+    .product-category-checkbox.other-category {
+      background: rgba(255,0,136,0.08);
+      border-color: rgba(255,0,136,0.2);
+    }
+    .product-category-checkbox.other-category:hover {
+      background: rgba(255,0,136,0.15);
+      border-color: rgba(255,0,136,0.4);
+    }
+    .product-category-checkbox .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      margin-top: 0.25em;
+      cursor: pointer;
+    }
+    .product-category-checkbox .form-check-input:checked {
+      background-color: #00ff88;
+      border-color: #00ff88;
+    }
+    .product-category-checkbox.other-category .form-check-input:checked {
+      background-color: #ff0088;
+      border-color: #ff0088;
+    }
+    .product-category-checkbox .form-check-label {
+      cursor: pointer;
+      font-weight: 500;
+      margin-left: 8px;
+      color: #fff;
+    }
+    .product-category-checkbox .form-check-label i {
+      margin-right: 6px;
+      color: #00ff88;
+    }
+    .product-category-checkbox.other-category .form-check-label i {
+      color: #ff0088;
+    }
+
+    /* Unified Footer Styles - Responsive */
+    footer.bg-dark {
+      background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
+      border-top: 2px solid #0ff;
+      box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .footer-link {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+    .footer-link:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+    /* Add padding to body to prevent content from being hidden behind fixed footer */
+    body {
+      padding-bottom: 250px;
+    }
+    @media (max-width: 768px) {
+      footer.bg-dark {
+        position: relative;
+      }
+      body {
+        padding-bottom: 0;
+      }
+      footer.bg-dark .row > div {
+        margin-bottom: 1.5rem;
+      }
+    }
+    @media (min-width: 769px) {
+      footer.bg-dark .container {
+        max-width: 1200px;
+      }
+    }
+    .bi {
+      color: #0ff;
+      font-size: 1.3rem;
+      transition: color 0.2s, text-shadow 0.2s;
+      text-shadow: 0 0 8px #8fff00;
+    }
+    .bi:hover {
+      color: #8fff00;
+      text-shadow: 0 0 12px #0ff;
+    }
+
+    @media (max-width: 576px) {
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🌌 Particle Background -->
+  <div id="particles-js"></div>
+  
+  <!-- Splash Screen Overlay -->
+  <div id="splash-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
+    <div style="text-align:center;">
+      <img src="images/hero-bg.jpeg" alt="HOME AFRICA" style="max-width:40vw;max-height:40vh;border-radius:50%;box-shadow:0 0 60px #0ff,0 0 120px #8fff00;">
+      <h1 style="margin-top:2rem;font-size:3.5rem;font-weight:bold;background:linear-gradient(90deg,#0ff 10%,#8fff00 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.2em;">HOME AFRICA</h1>
+      <h2 style="color:#fff;margin-top:1.5rem;">Beyond Horizons</h2>
+    </div>
+  </div>
+  <div id="main-content" style="display:none;">
+  <!-- 🚀 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link active" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link active" href="land.html">Land Plots</a></li>
+          <li class="nav-item"><a class="nav-link active" href="post.html">Post your property</a></li>
+          <li class="nav-item"><a class="nav-link active" href="about.html">About Us</a></li>
+          <li class="nav-item">
+            <a class="nav-link active nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
+              <i class="bi bi-robot"></i> Ask Rejo
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🌄 Main Content -->
+  <div class="content-wrapper">
+    <section class="hero">
+      <div class="container">
+        <h1>Create Your HOME AFRICA Account</h1>
+        <p class="lead">Start your journey to owning or renting property in Rwanda!</p>
+      </div>
+    </section>
+
+    <!-- ✨ Updated Sign-Up Form Section -->
+    <section class="signup-form mt-4">
+      <h2><i class="bi bi-person-plus-fill"></i> Merchant Account</h2>
+      
+      <!-- Sign-in Method Toggle -->
+      <div class="mb-3 text-center">
+        <div class="btn-group" role="group">
+          <input type="radio" class="btn-check" name="signupMethod" id="methodPassword" checked>
+          <label class="btn btn-outline-primary" for="methodPassword">
+            <i class="bi bi-key"></i> Password
+          </label>
+          <input type="radio" class="btn-check" name="signupMethod" id="methodEmailLink">
+          <label class="btn btn-outline-primary" for="methodEmailLink">
+            <i class="bi bi-envelope"></i> Email Link (Passwordless)
+          </label>
+        </div>
+      </div>
+      
+      <form id="signupForm" action="#" method="POST" novalidate>
+        <div class="mb-3">
+          <label for="signupName" class="form-label">Full Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="signupName"
+            placeholder="Enter your full name"
+            required
+            autofocus
+          />
+          <div class="invalid-feedback">
+            Please enter your full name.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="signupEmail" class="form-label">Email Address</label>
+          <input
+            type="email"
+            class="form-control"
+            id="signupEmail"
+            placeholder="you@example.com"
+            required
+          />
+          <div class="invalid-feedback">
+            Please enter a valid email address.
+          </div>
+        </div>
+
+        <div class="mb-3" id="passwordFieldGroup">
+          <label for="signupPassword" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="signupPassword"
+            placeholder="Create a password (min 6 characters)"
+            required
+          />
+          <div class="invalid-feedback">
+            Password is required (minimum 6 characters).
+          </div>
+        </div>
+        
+        <!-- Email Link Info (shown when passwordless selected) -->
+        <div class="alert alert-info" id="emailLinkInfo" style="display: none;">
+          <i class="bi bi-info-circle"></i> <strong>Passwordless Sign-up:</strong> We'll send you a secure link to your email. Click the link to complete registration - no password needed!
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-box-seam"></i> What do you typically sell? *</label>
+          <div class="form-text mb-2">Select all product categories you deal with:</div>
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <div class="form-check product-category-checkbox">
+                <input class="form-check-input" type="checkbox" id="categoryApartment" value="apartment" />
+                <label class="form-check-label" for="categoryApartment">
+                  <i class="bi bi-house-door"></i> Apartments
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check product-category-checkbox">
+                <input class="form-check-input" type="checkbox" id="categoryCar" value="car" />
+                <label class="form-check-label" for="categoryCar">
+                  <i class="bi bi-car-front"></i> Cars
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check product-category-checkbox">
+                <input class="form-check-input" type="checkbox" id="categoryLand" value="land" />
+                <label class="form-check-label" for="categoryLand">
+                  <i class="bi bi-geo-alt"></i> Land Plots
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check product-category-checkbox">
+                <input class="form-check-input" type="checkbox" id="categoryDrivingSchool" value="drivingSchool" />
+                <label class="form-check-label" for="categoryDrivingSchool">
+                  <i class="bi bi-mortarboard"></i> Driving Schools
+                </label>
+              </div>
+            </div>
+            <div class="col-md-12 mb-2">
+              <div class="form-check product-category-checkbox other-category">
+                <input class="form-check-input" type="checkbox" id="categoryOther" value="other" />
+                <label class="form-check-label" for="categoryOther">
+                  <i class="bi bi-three-dots"></i> Other
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="invalid-feedback" id="categoryError" style="display:none;">
+            Please select at least one product category.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Sign Up Now</button>
+      </form>
+
+      <div class="bottom-link">
+        Already have an account? <a href="signin.html">Log In</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- 💫 Scripts -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <!-- EmailJS for email notifications -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="js/email-notifications.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/supabase-merchants.js"></script>
+  <script>
+    // Wait for Supabase to load
+    async function waitForSupabase() {
+      return new Promise((resolve, reject) => {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        
+        const checkSupabase = setInterval(() => {
+          attempts++;
+          if (window.supabaseClient && window.supabaseClient.auth) {
+            clearInterval(checkSupabase);
+            resolve(window.supabaseClient);
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkSupabase);
+            reject(new Error('Supabase client not loaded. Please refresh the page.'));
+          }
+        }, 100);
+      });
+    }
+
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: "#0ff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.3 },
+        size: { value: 3 },
+        move: { enable: true, speed: 1 }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          repulse: { distance: 100 },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+
+    // Hide splash screen immediately (splash only on index page)
+    window.addEventListener('DOMContentLoaded', function() {
+      const splashScreen = document.getElementById('splash-screen');
+      if (splashScreen) {
+        splashScreen.style.display = 'none';
+      }
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.style.display = '';
+      }
+      
+      // Handle Supabase Auth magic link callback
+      handleSupabaseMagicLink();
+      
+      // Toggle password field based on signup method
+      document.getElementById('methodPassword')?.addEventListener('change', function() {
+        document.getElementById('passwordFieldGroup').style.display = 'block';
+        document.getElementById('signupPassword').required = true;
+        document.getElementById('emailLinkInfo').style.display = 'none';
+      });
+      
+      document.getElementById('methodEmailLink')?.addEventListener('change', function() {
+        document.getElementById('passwordFieldGroup').style.display = 'none';
+        document.getElementById('signupPassword').required = false;
+        document.getElementById('emailLinkInfo').style.display = 'block';
+      });
+    });
+    
+    // Handle email link sign-in callback
+    async function handleSupabaseMagicLink() {
+      const supabase = await waitForSupabase();
+      if (!supabase) return;
+      
+      // Check if this is a magic link callback
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email');
+      
+      // Check for Supabase Auth session (from magic link)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (session && email) {
+        try {
+          const user = session.user;
+          
+          // Get merchant data from URL or localStorage
+          const name = localStorage.getItem('pendingMerchantName') || urlParams.get('name') || user.user_metadata?.full_name || user.email?.split('@')[0];
+          const phone = localStorage.getItem('pendingMerchantPhone') || '';
+          const categoriesJson = localStorage.getItem('pendingMerchantCategories') || urlParams.get('categories') || user.user_metadata?.merchant_categories || '["apartment"]';
+          const selectedCategories = typeof categoriesJson === 'string' ? JSON.parse(categoriesJson) : categoriesJson;
+          
+          // Create merchant in Supabase
+          const merchantData = {
+            merchantName: name,
+            merchantEmail: email,
+            merchantContact: phone || email,
+            email: email,
+            categories: selectedCategories,
+            verified: false,
+            rating: 0,
+            totalReviews: 0,
+            totalListings: 0,
+            userId: user.id
+          };
+          
+          // Save to Supabase (primary database)
+          try {
+            if (window.supabaseMerchants) {
+              await window.supabaseMerchants.createMerchant(user.id, merchantData);
+              console.log('✅ Merchant saved to Supabase');
+            }
+          } catch (supabaseError) {
+            console.error('⚠️ Supabase save failed:', supabaseError);
+            throw supabaseError;
+          }
+          
+          // Sync user to Supabase users table with merchant role
+          try {
+            await supabase
+              .from('users')
+              .upsert({
+                id: user.id,
+                email: user.email,
+                full_name: name,
+                role: 'merchant',
+                created_at: user.created_at || new Date().toISOString()
+              }, {
+                onConflict: 'id'
+              });
+            console.log('✅ User synced to Supabase users table');
+          } catch (syncError) {
+            console.warn('⚠️ User sync failed:', syncError);
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('merchantRegistered', 'true');
+          localStorage.setItem('isMerchant', 'true');
+          localStorage.setItem('merchantCategories', JSON.stringify(selectedCategories));
+          localStorage.setItem('merchantName', name);
+          localStorage.setItem('merchantEmail', email);
+          localStorage.setItem('merchantId', user.id);
+          localStorage.setItem('currentUser', JSON.stringify({
+            id: user.id,
+            email: user.email,
+            user_metadata: user.user_metadata
+          }));
+          
+          // Clean up
+          localStorage.removeItem('pendingMerchantName');
+          localStorage.removeItem('pendingMerchantPhone');
+          localStorage.removeItem('pendingMerchantCategories');
+          
+          // Send welcome email
+          if (window.emailNotifications) {
+            try {
+              await window.emailNotifications.sendWelcomeEmail(email, name, true); // true = isMerchant
+              console.log('✅ Welcome email sent');
+            } catch (emailError) {
+              console.warn('⚠️ Welcome email failed (stored in database):', emailError);
+            }
+          }
+          
+          // Show success and redirect
+          alert('✅ Account created successfully! You can now access the admin panel.');
+          window.location.href = 'admin.html';
+          
+        } catch (error) {
+          console.error('Magic link sign-in error:', error);
+          alert('Error completing sign-in: ' + error.message);
+        }
+      }
+    }
+
+            // Bootstrap form validation with Supabase Auth
+    (function () {
+      'use strict';
+      const form = document.querySelector('#signupForm');
+      const categoryCheckboxes = form.querySelectorAll('input[type="checkbox"][id^="category"]');
+      const categoryError = document.getElementById('categoryError');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      
+      // Clear error when any checkbox is checked
+      categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          if (categoryError) {
+            categoryError.style.display = 'none';
+          }
+        });
+      });
+      
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        
+        // Check if at least one category is selected
+        let hasCategory = false;
+        categoryCheckboxes.forEach(checkbox => {
+          if (checkbox.checked) {
+            hasCategory = true;
+          }
+        });
+        
+        if (!hasCategory) {
+          event.stopPropagation();
+          if (categoryError) {
+            categoryError.style.display = 'block';
+          }
+          form.classList.add('was-validated');
+          return;
+        }
+        
+        if (!form.checkValidity()) {
+          event.stopPropagation();
+          form.classList.add('was-validated');
+          return;
+        }
+        
+        // Check signup method
+        const useEmailLink = document.getElementById('methodEmailLink').checked;
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const phone = document.getElementById('signupPhone')?.value.trim() || '';
+        
+        // Save selected categories
+        const selectedCategories = [];
+        categoryCheckboxes.forEach(checkbox => {
+          if (checkbox.checked) {
+            selectedCategories.push(checkbox.value);
+          }
+        });
+        
+        // Disable submit button and show loading
+        submitBtn.disabled = true;
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ' + (useEmailLink ? 'Sending Email Link...' : 'Creating Account...');
+        
+        try {
+          if (useEmailLink) {
+            // Passwordless sign-up with Supabase Auth Magic Link
+            const supabase = await waitForSupabase();
+            if (!supabase) {
+              throw new Error('Supabase client not loaded. Please refresh the page.');
+            }
+            
+            // Store merchant data for after signup
+            localStorage.setItem('pendingMerchantName', name);
+            localStorage.setItem('pendingMerchantPhone', phone);
+            localStorage.setItem('pendingMerchantCategories', JSON.stringify(selectedCategories));
+            
+            // Send magic link via Supabase Auth
+            const { data, error } = await supabase.auth.signInWithOtp({
+              email: email,
+              options: {
+                data: {
+                  full_name: name,
+                  role: 'merchant',
+                  merchant_categories: selectedCategories
+                },
+                emailRedirectTo: window.location.origin + '/signup.html?email=' + encodeURIComponent(email)
+              }
+            });
+            
+            if (error) throw error;
+            
+            alert('✅ Check your email! We sent you a secure sign-in link. Click the link in the email to complete your registration.');
+            
+            // Show instructions
+            const emailLinkInfo = document.getElementById('emailLinkInfo');
+            emailLinkInfo.innerHTML = '<i class="bi bi-envelope-check"></i> <strong>Email Sent!</strong> Check your inbox at ' + email + ' and click the link to complete registration.';
+            emailLinkInfo.className = 'alert alert-success';
+            emailLinkInfo.style.display = 'block';
+            
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            
+          } else {
+            // Traditional password sign-up - Using Supabase Auth
+            const supabase = await waitForSupabase();
+            if (!supabase) {
+              throw new Error('Supabase client not loaded. Please refresh the page.');
+            }
+            
+            // Create user in Supabase Auth
+            const { data: authData, error: signUpError } = await supabase.auth.signUp({
+              email: email,
+              password: password,
+              options: {
+                data: {
+                  full_name: name,
+                  role: 'merchant'
+                }
+              }
+            });
+            
+            if (signUpError) {
+              throw signUpError;
+            }
+            
+            if (!authData.user) {
+              throw new Error('Sign up failed. Please try again.');
+            }
+            
+            const user = authData.user;
+            console.log('✅ User created in Supabase Auth:', user);
+            
+            // Create merchant document in Supabase
+            const merchantData = {
+              merchantName: name,
+              merchantEmail: email,
+              merchantContact: phone || email,
+              email: email,
+              categories: selectedCategories,
+              verified: false,
+              rating: 0,
+              totalReviews: 0,
+              totalListings: 0,
+              userId: user.id
+            };
+            
+            // Save to Supabase (primary database) - FREE ACCESS: No payment required
+            try {
+              if (window.supabaseMerchants) {
+                await window.supabaseMerchants.createMerchant(user.id, merchantData);
+                console.log('✅ Merchant saved to Supabase');
+              }
+            } catch (supabaseError) {
+              console.error('❌ Failed to save merchant to Supabase:', supabaseError);
+            }
+            
+            // Sync user to Supabase users table with merchant role
+            try {
+              await supabase
+                .from('users')
+                .upsert({
+                  id: user.id,
+                  email: user.email,
+                  full_name: name,
+                  role: 'merchant',
+                  created_at: user.created_at || new Date().toISOString()
+                }, {
+                  onConflict: 'id'
+                });
+              console.log('✅ User synced to Supabase users table');
+            } catch (syncError) {
+              console.warn('⚠️ User sync failed:', syncError);
+            }
+            
+            // Save to localStorage for backward compatibility
+            localStorage.setItem('merchantRegistered', 'true');
+            localStorage.setItem('isMerchant', 'true');
+            localStorage.setItem('merchantCategories', JSON.stringify(selectedCategories));
+            localStorage.setItem('merchantName', name);
+            localStorage.setItem('merchantEmail', email);
+            localStorage.setItem('merchantId', user.id);
+            localStorage.setItem('currentUser', JSON.stringify({
+              id: user.id,
+              email: user.email,
+              user_metadata: user.user_metadata
+            }));
+            
+            // Send welcome email
+            if (window.emailNotifications) {
+              try {
+                await window.emailNotifications.sendWelcomeEmail(email, name, true); // true = isMerchant
+                console.log('✅ Welcome email sent');
+              } catch (emailError) {
+                console.warn('⚠️ Welcome email failed (stored in database):', emailError);
+              }
+            }
+            
+            // Show success message
+            alert('Account created successfully! You can now log in.');
+            
+            // Check if redirected from post page
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectPage = urlParams.get('redirect') || 'signin.html';
+            
+            // Redirect to login page (user needs to confirm email if required)
+            if (redirectPage === 'post.html') {
+              window.location.href = 'signin.html?registered=true&redirect=post.html';
+            } else {
+              window.location.href = redirectPage;
+            }
+          }
+        } catch (error) {
+          console.error('Registration error:', error);
+          
+          let errorMessage = 'Registration failed. Please try again.';
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              errorMessage = 'This email is already registered. Please sign in instead.';
+              break;
+            case 'auth/invalid-email':
+              errorMessage = 'Invalid email address.';
+              break;
+            case 'auth/weak-password':
+              errorMessage = 'Password should be at least 6 characters.';
+              break;
+            case 'auth/operation-not-allowed':
+              errorMessage = 'Email link authentication not enabled. Please contact support.';
+              break;
+            default:
+              errorMessage = error.message || 'Registration failed. Please try again.';
+          }
+          
+          alert(errorMessage);
+          
+          // Re-enable submit button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }
+        
+        form.classList.add('was-validated');
+      }, false);
+    })();
+  </script>
+  <!-- 🌍 Footer -->
+<footer class="bg-dark text-light pt-4 pb-3 mt-5">
+  <div class="container">
+    <div class="row">
+      <!-- Brand Info -->
+      <div class="col-md-3 mb-3">
+        <h5>🏠 HOME AFRICA</h5>
+        <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="col-md-3 mb-3">
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
+          <li><a href="apartment.html" class="footer-link">Apartments</a></li>
+          <li><a href="land.html" class="footer-link">Land</a></li>
+          <li><a href="cars.html" class="footer-link">Cars</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="col-md-3 mb-3">
+        <h6>Contact Us</h6>
+        <ul class="list-unstyled">
+          <li>Phone: +250 788 123 456</li>
+          <li>Email: info@home.africa</li>
+          <li>Address: Kigali, Rwanda</li>
+        </ul>
+      </div>
+
+      <!-- Social Links -->
+      <div class="col-md-3 mb-3">
+        <h6>Follow Us</h6>
+        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
+        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
+        <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
+        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <hr style="border-color: rgba(255,255,255,0.1)" />
+    <div class="text-center small">
+      &copy; 2025 HOME AFRICA. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-merchants.js"></script>
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+  </div>
+</body>
+</html>

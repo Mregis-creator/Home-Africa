@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explore Marketplace | HOME AFRICA</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- Custom Styles -->
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+      position: relative;
+      z-index: 1000;
+    }
+    .navbar .container {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+      animation: glow-pulse 2s infinite;
+      box-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+    }
+    .navbar-brand img:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+    }
+    @keyframes glow-pulse {
+      0%, 100% {
+        box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+      }
+      50% {
+        box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+      }
+    }
+    .hero-section {
+      background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,136,255,0.15) 50%, rgba(255,0,136,0.1) 100%);
+      padding: 60px 0;
+      margin-bottom: 40px;
+      border-bottom: 3px solid rgba(0,255,255,0.3);
+      position: relative;
+      z-index: 1;
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+    }
+    .hero-section h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.38), 0 1px 0 #222, 0 0 8px rgba(0,255,255,0.3), 0 0 12px rgba(143,255,0,0.2);
+    }
+    .hero-section .lead {
+      color: rgba(255,255,255,0.95);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .controls-bar {
+      background: rgba(0,0,0,0.5);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(0,255,255,0.3);
+      box-shadow: 0 4px 20px rgba(0,255,136,0.1);
+      position: relative;
+      z-index: 1;
+    }
+    .category-filter {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .category-btn {
+      padding: 10px 20px;
+      border: 2px solid rgba(0,255,255,0.4);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,255,136,0.1);
+    }
+    .category-btn:hover {
+      border-color: #0ff;
+      background: rgba(0,255,255,0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,255,255,0.3);
+    }
+    .category-btn.active {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      border-color: transparent;
+      color: #222;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,255,255,0.4), 0 0 20px rgba(143,255,0,0.3);
+    }
+    .search-controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-input-group {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+    .search-input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #0ff;
+      z-index: 10;
+    }
+    .search-input-group input {
+      padding-left: 45px;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid rgba(0,255,255,0.3);
+      color: white;
+      border-radius: 25px;
+    }
+    .search-input-group input:focus {
+      border-color: #0ff;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
+      background: rgba(0,0,0,0.7);
+    }
+    .filter-select {
+      background: rgba(0,0,0,0.5);
+      border: 2px solid rgba(0,255,255,0.3);
+      color: white;
+      border-radius: 10px;
+      padding: 8px 15px;
+      min-width: 150px;
+    }
+    .filter-select:focus {
+      border-color: #0ff;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
+    }
+    .view-toggle {
+      display: flex;
+      gap: 5px;
+      background: rgba(0,0,0,0.5);
+      padding: 5px;
+      border-radius: 10px;
+      border: 2px solid rgba(0,255,255,0.3);
+    }
+    .view-toggle-btn {
+      padding: 8px 15px;
+      background: transparent;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .view-toggle-btn.active {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      font-weight: bold;
+    }
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .listings-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+    .listing-card {
+      background: rgba(0,0,0,0.6);
+      border-radius: 15px;
+      overflow: hidden;
+      border: 2px solid rgba(0,255,255,0.3);
+      transition: all 0.3s;
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0,255,136,0.1);
+      position: relative;
+      z-index: 1;
+    }
+    .listing-card:hover {
+      transform: translateY(-5px);
+      border-color: #0ff;
+      box-shadow: 0 10px 30px rgba(0,255,255,0.4), 0 0 40px rgba(143,255,0,0.2);
+    }
+    .listing-card.list-view {
+      display: flex;
+      flex-direction: row;
+    }
+    .listing-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: linear-gradient(120deg, rgba(0,255,136,0.2) 0%, rgba(0,136,255,0.2) 50%, rgba(255,0,136,0.15) 100%);
+    }
+    .listing-card.list-view .listing-image {
+      width: 300px;
+      height: 200px;
+      flex-shrink: 0;
+    }
+    .listing-content {
+      padding: 20px;
+    }
+    .listing-category {
+      display: inline-block;
+      padding: 5px 12px;
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .listing-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .listing-location {
+      color: #0ff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .listing-price {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(0,255,255,0.3);
+    }
+    .listing-meta {
+      display: flex;
+      gap: 15px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(0,255,255,0.2);
+    }
+    .listing-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+    }
+    .no-results i {
+      font-size: 4rem;
+      color: rgba(0,255,255,0.3);
+      margin-bottom: 20px;
+    }
+    .loading-spinner {
+      text-align: center;
+      padding: 60px;
+      color: white;
+    }
+    .results-count {
+      color: white;
+      padding: 15px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid rgba(0,255,255,0.3);
+      box-shadow: 0 2px 10px rgba(0,255,136,0.1);
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 768px) {
+      .listings-grid {
+        grid-template-columns: 1fr;
+      }
+      .listing-card.list-view {
+        flex-direction: column;
+      }
+      .listing-card.list-view .listing-image {
+        width: 100%;
+      }
+      .search-controls {
+        flex-direction: column;
+      }
+      .search-input-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particle Background -->
+  <div id="particles-js"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation" title="Toggle menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="explore.html">Explore</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land Plots</a></li>
+          <li class="nav-item"><a class="nav-link" href="post.html">Post</a></li>
+          <li class="nav-item"><a class="nav-link" href="signin.html">Log In</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <h1><i class="bi bi-shop"></i> Explore Marketplace</h1>
+      <p class="lead text-white">Discover properties, vehicles, land, and services from merchants and users across Rwanda</p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container" style="position: relative; z-index: 1;">
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <!-- Category Filters -->
+      <div class="category-filter">
+        <button class="category-btn active" data-category="all" title="Show all listings">
+          <i class="bi bi-grid"></i> All
+        </button>
+        <button class="category-btn" data-category="apartment" title="Show apartments only">
+          <i class="bi bi-house"></i> Apartments
+        </button>
+        <button class="category-btn" data-category="car" title="Show cars only">
+          <i class="bi bi-car-front"></i> Cars
+        </button>
+        <button class="category-btn" data-category="land" title="Show land plots only">
+          <i class="bi bi-geo-alt"></i> Land
+        </button>
+        <button class="category-btn" data-category="drivingSchool" title="Show driving schools only">
+          <i class="bi bi-sign-stop"></i> Driving Schools
+        </button>
+      </div>
+
+      <!-- Search and Filters -->
+      <div class="search-controls">
+        <div class="search-input-group">
+          <i class="bi bi-search"></i>
+          <input type="text" id="searchInput" class="form-control" placeholder="Search listings...">
+        </div>
+        <select id="sortSelect" class="filter-select" title="Sort listings">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="popular">Most Popular</option>
+        </select>
+        <select id="priceFilter" class="filter-select" title="Filter by price range">
+          <option value="">All Prices</option>
+          <option value="0-5000000">Under RWF 5M</option>
+          <option value="5000000-20000000">RWF 5M - 20M</option>
+          <option value="20000000-50000000">RWF 20M - 50M</option>
+          <option value="50000000-">Above RWF 50M</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-toggle-btn active" id="gridViewBtn" onclick="setViewMode('grid')" title="Grid view">
+            <i class="bi bi-grid-3x3-gap"></i>
+          </button>
+          <button class="view-toggle-btn" id="listViewBtn" onclick="setViewMode('list')" title="List view">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Count -->
+    <div id="resultsCount" class="results-count" style="display: none;">
+      <i class="bi bi-info-circle"></i> <span id="resultsNumber">0</span> listings found
+    </div>
+
+    <!-- Listings Container -->
+    <div id="listingsContainer">
+      <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading marketplace...</p>
+      </div>
+      <div id="listingsGrid" class="listings-grid" style="display: none;"></div>
+      <div id="noResults" class="no-results" style="display: none;">
+        <i class="bi bi-inbox"></i>
+        <h3>No listings found</h3>
+        <p>Try adjusting your filters or search terms</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light pt-4 pb-3 mt-5" style="position:relative;z-index:1;">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2025 HOME AFRICA. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-listings.js"></script>
+  <script src="js/footer-fix.js"></script>
+
+  <script>
+    // Initialize particles
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: '#0ff' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.3 },
+        size: { value: 3 },
+        move: { enable: true, speed: 1 }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: { onhover: { enable: true, mode: 'repulse' } }
+      },
+      retina_detect: true
+    });
+
+    // State
+    let allListings = [];
+    let filteredListings = [];
+    let currentCategory = 'all';
+    let currentView = 'grid';
+    let currentSort = 'newest';
+    let currentPriceFilter = '';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      loadAllListings();
+      setupEventListeners();
+      loadViewPreference();
+    });
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Category buttons
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentCategory = this.dataset.category;
+          filterAndRender();
+        });
+      });
+
+      // Search input
+      const searchInput = document.getElementById('searchInput');
+      let searchTimeout;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          filterAndRender();
+        }, 300);
+      });
+
+      // Sort select
+      document.getElementById('sortSelect').addEventListener('change', function() {
+        currentSort = this.value;
+        filterAndRender();
+      });
+
+      // Price filter
+      document.getElementById('priceFilter').addEventListener('change', function() {
+        currentPriceFilter = this.value;
+        filterAndRender();
+      });
+    }
+
+    // Load all listings
+    async function loadAllListings() {
+      try {
+        allListings = [];
+        
+        // Load from Supabase (primary)
+        if (window.supabaseListings) {
+          try {
+            const types = ['apartment', 'car', 'land', 'drivingSchool'];
+            for (const type of types) {
+              try {
+                const listings = await window.supabaseListings.getListings(type);
+                listings.forEach(listing => {
+                  allListings.push({
+                    ...listing,
+                    category: type,
+                    categoryLabel: getCategoryLabel(type)
+                  });
+                });
+              } catch (err) {
+                console.warn(`Failed to load ${type} from Supabase:`, err);
+              }
+            }
+            console.log(`✅ Loaded ${allListings.length} listings from Supabase`);
+          } catch (supabaseError) {
+            console.error('❌ Failed to load listings from Supabase:', supabaseError);
+            // Show error message to user
+            const listingsContainer = document.getElementById('listingsContainer');
+            if (listingsContainer) {
+              listingsContainer.innerHTML = '<div class="alert alert-danger">Failed to load listings. Please refresh the page.</div>';
+            }
+          }
+        }
+
+        // Hide loading spinner
+        document.getElementById('loadingSpinner').style.display = 'none';
+        
+        // Render listings
+        filterAndRender();
+      } catch (error) {
+        console.error('Error loading listings:', error);
+        document.getElementById('loadingSpinner').innerHTML = '<p class="text-danger">Error loading listings. Please refresh the page.</p>';
+      }
+    }
+
+    // Get category label
+    function getCategoryLabel(category) {
+      const labels = {
+        apartment: 'Apartment',
+        car: 'Car',
+        land: 'Land',
+        drivingSchool: 'Driving School'
+      };
+      return labels[category] || category;
+    }
+
+    // Filter and render listings
+    function filterAndRender() {
+      filteredListings = [...allListings];
+
+      // Filter by category
+      if (currentCategory !== 'all') {
+        filteredListings = filteredListings.filter(l => l.category === currentCategory);
+      }
+
+      // Filter by search
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      if (searchTerm) {
+        filteredListings = filteredListings.filter(l => {
+          const title = (l.title || '').toLowerCase();
+          const location = (l.location || '').toLowerCase();
+          const description = (l.description || '').toLowerCase();
+          return title.includes(searchTerm) || location.includes(searchTerm) || description.includes(searchTerm);
+        });
+      }
+
+      // Filter by price
+      if (currentPriceFilter) {
+        const [min, max] = currentPriceFilter.split('-').map(v => v ? parseInt(v) : null);
+        filteredListings = filteredListings.filter(l => {
+          const price = parseFloat(l.price) || 0;
+          if (min !== null && max !== null) {
+            return price >= min && price <= max;
+          } else if (min !== null) {
+            return price >= min;
+          } else if (max !== null) {
+            return price <= max;
+          }
+          return true;
+        });
+      }
+
+      // Sort listings
+      filteredListings.sort((a, b) => {
+        switch (currentSort) {
+          case 'newest':
+            return (b.createdAtSeconds || 0) - (a.createdAtSeconds || 0);
+          case 'oldest':
+            return (a.createdAtSeconds || 0) - (b.createdAtSeconds || 0);
+          case 'price-low':
+            return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+          case 'price-high':
+            return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+          case 'popular':
+            return (b.views || 0) - (a.views || 0);
+          default:
+            return 0;
+        }
+      });
+
+      // Update results count
+      document.getElementById('resultsNumber').textContent = filteredListings.length;
+      document.getElementById('resultsCount').style.display = 'block';
+
+      // Render listings
+      renderListings();
+    }
+
+    // Render listings
+    function renderListings() {
+      const grid = document.getElementById('listingsGrid');
+      const noResults = document.getElementById('noResults');
+
+      if (filteredListings.length === 0) {
+        grid.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      noResults.style.display = 'none';
+      grid.className = `listings-grid ${currentView === 'list' ? 'list-view' : ''}`;
+
+      grid.innerHTML = filteredListings.map(listing => {
+        const imageUrl = listing.images && listing.images.length > 0 
+          ? listing.images[0] 
+          : 'https://via.placeholder.com/400x200?text=' + encodeURIComponent(listing.categoryLabel);
+        
+        const price = listing.price ? `RWF ${parseFloat(listing.price).toLocaleString()}` : 'Price on request';
+        const location = listing.location || 'Location not specified';
+        const detailUrl = getDetailUrl(listing.category, listing.id);
+
+        return `
+          <div class="listing-card ${currentView === 'list' ? 'list-view' : ''}" onclick="window.location.href='${detailUrl}'">
+            <img src="${imageUrl}" alt="${listing.title}" class="listing-image" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
+            <div class="listing-content">
+              <span class="listing-category">${listing.categoryLabel}</span>
+              <h3 class="listing-title">${listing.title || 'Untitled'}</h3>
+              <div class="listing-location">
+                <i class="bi bi-geo-alt"></i> ${location}
+              </div>
+              <div class="listing-price">${price}</div>
+              ${getListingMeta(listing)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Get listing meta info
+    function getListingMeta(listing) {
+      const meta = [];
+      
+      if (listing.category === 'apartment') {
+        if (listing.metadata?.rooms) meta.push(`<span class="listing-meta-item"><i class="bi bi-door-open"></i> ${listing.metadata.rooms} Rooms</span>`);
+        if (listing.metadata?.status) meta.push(`<span class="listing-meta-item"><i class="bi bi-tag"></i> ${listing.metadata.status}</span>`);
+      } else if (listing.category === 'car') {
+        if (listing.metadata?.transmission) meta.push(`<span class="listing-meta-item"><i class="bi bi-gear"></i> ${listing.metadata.transmission}</span>`);
+        if (listing.metadata?.fuel) meta.push(`<span class="listing-meta-item"><i class="bi bi-fuel-pump"></i> ${listing.metadata.fuel}</span>`);
+      } else if (listing.category === 'land') {
+        if (listing.metadata?.size) meta.push(`<span class="listing-meta-item"><i class="bi bi-rulers"></i> ${listing.metadata.size}</span>`);
+      }
+
+      if (listing.views) {
+        meta.push(`<span class="listing-meta-item"><i class="bi bi-eye"></i> ${listing.views} views</span>`);
+      }
+
+      return meta.length > 0 ? `<div class="listing-meta">${meta.join('')}</div>` : '';
+    }
+
+    // Get detail URL
+    function getDetailUrl(category, id) {
+      const urls = {
+        apartment: `apartment-detail.html?id=${id}`,
+        car: `car-detail.html?id=${id}`,
+        land: `land-detail.html?id=${id}`,
+        drivingSchool: `driving-school-detail.html?id=${id}`
+      };
+      return urls[category] || '#';
+    }
+
+    // Set view mode
+    function setViewMode(mode) {
+      currentView = mode;
+      localStorage.setItem('exploreViewMode', mode);
+      document.getElementById('gridViewBtn').classList.toggle('active', mode === 'grid');
+      document.getElementById('listViewBtn').classList.toggle('active', mode === 'list');
+      renderListings();
+    }
+
+    // Load view preference
+    function loadViewPreference() {
+      const saved = localStorage.getItem('exploreViewMode');
+      if (saved) {
+        setViewMode(saved);
+      }
+    }
+  </script>
+</body>
+</html>
+

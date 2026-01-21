@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Firebase Storage Status</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .status-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .status-box.success {
+      border-left: 4px solid #4caf50;
+    }
+    .status-box.error {
+      border-left: 4px solid #f44336;
+    }
+    .status-box.warning {
+      border-left: 4px solid #ff9800;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #1976D2;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Firebase Storage Status Checker</h1>
+  
+  <div class="status-box" id="firebaseStatus">
+    <h3>Firebase SDK Status</h3>
+    <p id="firebaseStatusText">Checking...</p>
+  </div>
+  
+  <div class="status-box" id="storageStatus">
+    <h3>Storage Status</h3>
+    <p id="storageStatusText">Checking...</p>
+  </div>
+  
+  <div class="status-box" id="bucketStatus">
+    <h3>Storage Bucket</h3>
+    <p id="bucketStatusText">Checking...</p>
+  </div>
+  
+  <div class="status-box" id="testUpload">
+    <h3>Test Upload</h3>
+    <p id="testUploadText">Ready to test...</p>
+    <input type="file" id="testFile" accept="image/*" style="margin: 10px 0;">
+    <br>
+    <button onclick="testUpload()">Test Upload Small Image</button>
+  </div>
+  
+  <div class="status-box" id="instructions">
+    <h3>📋 Instructions</h3>
+    <ol>
+      <li>Click "Check Status" button below</li>
+      <li>Review the status boxes above</li>
+      <li>If Storage is not enabled, follow the guide in <code>ENABLE_FIREBASE_STORAGE.md</code></li>
+      <li>Try a test upload with a small image</li>
+    </ol>
+    <button onclick="checkStatus()">Check Status</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJ2Ak6jpQxx87pAXzZO84Qpv9mk6QumJ4",
+      authDomain: "home-africa-90018.firebaseapp.com",
+      projectId: "home-africa-90018",
+      storageBucket: "home-africa-90018.appspot.com",
+      messagingSenderId: "38483277216",
+      appId: "1:38483277216:web:945484e33e73d92fbc60c5"
+    };
+
+    function checkStatus() {
+      // Check Firebase SDK
+      const firebaseStatusBox = document.getElementById('firebaseStatus');
+      const firebaseStatusText = document.getElementById('firebaseStatusText');
+      
+      if (typeof firebase !== 'undefined') {
+        firebaseStatusBox.className = 'status-box success';
+        firebaseStatusText.innerHTML = '✅ Firebase SDK loaded successfully';
+      } else {
+        firebaseStatusBox.className = 'status-box error';
+        firebaseStatusText.innerHTML = '❌ Firebase SDK not loaded';
+        return;
+      }
+
+      // Initialize Firebase
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Check Storage
+        const storageStatusBox = document.getElementById('storageStatus');
+        const storageStatusText = document.getElementById('storageStatusText');
+        
+        if (typeof firebase.storage !== 'undefined') {
+          storageStatusBox.className = 'status-box success';
+          storageStatusText.innerHTML = '✅ Firebase Storage SDK loaded';
+        } else {
+          storageStatusBox.className = 'status-box error';
+          storageStatusText.innerHTML = '❌ Firebase Storage SDK not loaded. Make sure firebase-storage-compat.js is included.';
+          return;
+        }
+
+        // Check Storage instance
+        try {
+          const storage = firebase.storage();
+          const bucketStatusBox = document.getElementById('bucketStatus');
+          const bucketStatusText = document.getElementById('bucketStatusText');
+          
+          const bucket = storage.app.options.storageBucket;
+          if (bucket) {
+            bucketStatusBox.className = 'status-box success';
+            bucketStatusText.innerHTML = `✅ Storage bucket configured: <code>${bucket}</code>`;
+          } else {
+            bucketStatusBox.className = 'status-box error';
+            bucketStatusText.innerHTML = '❌ Storage bucket not configured';
+          }
+        } catch (error) {
+          const bucketStatusBox = document.getElementById('bucketStatus');
+          const bucketStatusText = document.getElementById('bucketStatusText');
+          bucketStatusBox.className = 'status-box error';
+          bucketStatusText.innerHTML = `❌ Error accessing storage: ${error.message}`;
+        }
+
+      } catch (error) {
+        const firebaseStatusBox = document.getElementById('firebaseStatus');
+        const firebaseStatusText = document.getElementById('firebaseStatusText');
+        firebaseStatusBox.className = 'status-box error';
+        firebaseStatusText.innerHTML = `❌ Error initializing Firebase: ${error.message}`;
+      }
+    }
+
+    async function testUpload() {
+      const fileInput = document.getElementById('testFile');
+      const testUploadText = document.getElementById('testUploadText');
+      
+      if (!fileInput.files || fileInput.files.length === 0) {
+        testUploadText.innerHTML = '⚠️ Please select an image first';
+        return;
+      }
+
+      const file = fileInput.files[0];
+      
+      if (file.size > 5 * 1024 * 1024) {
+        testUploadText.innerHTML = '⚠️ File too large. Please use an image under 5MB';
+        return;
+      }
+
+      try {
+        testUploadText.innerHTML = '⏳ Uploading test image...';
+        
+        const storage = firebase.storage();
+        const fileName = `test/${Date.now()}_${file.name}`;
+        const storageRef = storage.ref().child(fileName);
+        
+        const uploadTask = storageRef.put(file);
+        
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            testUploadText.innerHTML = `⏳ Uploading... ${Math.round(progress)}%`;
+          },
+          (error) => {
+            testUploadText.innerHTML = `❌ Upload failed: ${error.message}<br><small>Check Firebase Console → Storage → Rules</small>`;
+            console.error('Upload error:', error);
+          },
+          async () => {
+            const url = await uploadTask.snapshot.ref.getDownloadURL();
+            testUploadText.innerHTML = `✅ Upload successful!<br><small>URL: ${url.substring(0, 50)}...</small>`;
+            
+            // Try to delete test file
+            try {
+              await storageRef.delete();
+              testUploadText.innerHTML += '<br>🗑️ Test file deleted';
+            } catch (deleteError) {
+              console.log('Could not delete test file:', deleteError);
+            }
+          }
+        );
+        
+      } catch (error) {
+        testUploadText.innerHTML = `❌ Error: ${error.message}`;
+        console.error('Test upload error:', error);
+      }
+    }
+
+    // Auto-check on load
+    window.addEventListener('load', () => {
+      setTimeout(checkStatus, 500);
+    });
+  </script>
+</body>
+</html>
+

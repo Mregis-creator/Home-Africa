@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Email Notifications - HOME AFRICA</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #00c853;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #00ffff;
+      margin-top: 0;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #00ffff;
+    }
+    button {
+      background: linear-gradient(90deg, #00ffff 0%, #8fff00 100%);
+      color: #222;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 10px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+      display: block;
+    }
+    .config-check {
+      background: #fff3cd;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      border-left: 4px solid #ffc107;
+    }
+    .config-check.success {
+      background: #d4edda;
+      border-left-color: #28a745;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-card">
+    <h1>📧 Email Notifications Test</h1>
+    
+    <div id="configCheck" class="config-check">
+      <strong>⚠️ Configuration Check:</strong>
+      <p id="configStatus">Checking EmailJS configuration...</p>
+    </div>
+
+    <h2>1. Test Basic Email</h2>
+    <div class="form-group">
+      <label>Your Email Address:</label>
+      <input type="email" id="testEmail" placeholder="your-email@example.com" value="">
+    </div>
+    <button onclick="testBasicEmail()">Send Test Email</button>
+    <div id="basicEmailStatus" class="status"></div>
+
+    <h2>2. Test Welcome Email</h2>
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" id="welcomeEmail" placeholder="your-email@example.com" value="">
+    </div>
+    <div class="form-group">
+      <label>Name:</label>
+      <input type="text" id="welcomeName" placeholder="Your Name" value="Test User">
+    </div>
+    <button onclick="testWelcomeEmail()">Send Welcome Email</button>
+    <div id="welcomeEmailStatus" class="status"></div>
+
+    <h2>3. Test Booking Confirmation</h2>
+    <div class="form-group">
+      <label>Customer Email:</label>
+      <input type="email" id="bookingEmail" placeholder="customer@example.com" value="">
+    </div>
+    <div class="form-group">
+      <label>Customer Name:</label>
+      <input type="text" id="bookingName" placeholder="Customer Name" value="Test Customer">
+    </div>
+    <div class="form-group">
+      <label>Listing Title:</label>
+      <input type="text" id="bookingListing" placeholder="Property/Car Name" value="Test Apartment">
+    </div>
+    <div class="form-group">
+      <label>Merchant Email:</label>
+      <input type="email" id="merchantEmail" placeholder="merchant@example.com" value="">
+    </div>
+    <div class="form-group">
+      <label>Merchant Name:</label>
+      <input type="text" id="merchantName" placeholder="Merchant Name" value="Test Merchant">
+    </div>
+    <button onclick="testBookingEmail()">Send Booking Confirmation</button>
+    <div id="bookingEmailStatus" class="status"></div>
+  </div>
+
+  <!-- Load required scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="js/email-notifications.js"></script>
+
+  <script>
+    // Check configuration on load
+    window.addEventListener('DOMContentLoaded', function() {
+      checkConfiguration();
+    });
+
+    function checkConfiguration() {
+      const configCheck = document.getElementById('configCheck');
+      const configStatus = document.getElementById('configStatus');
+      
+      setTimeout(() => {
+        if (!window.emailNotifications) {
+          configStatus.innerHTML = '❌ Email notifications system not loaded. Check if <code>js/email-notifications.js</code> is accessible.';
+          return;
+        }
+
+        const isConfigured = window.emailNotifications.isEmailJSConfigured();
+        
+        if (isConfigured) {
+          configCheck.classList.add('success');
+          configStatus.innerHTML = '✅ EmailJS is configured and ready!';
+        } else {
+          configStatus.innerHTML = `
+            ⚠️ EmailJS not configured yet.<br>
+            <strong>Next steps:</strong><br>
+            1. Open <code>js/email-notifications.js</code><br>
+            2. Update lines 14-18 with your EmailJS credentials:<br>
+            &nbsp;&nbsp;- Public Key<br>
+            &nbsp;&nbsp;- Service ID<br>
+            &nbsp;&nbsp;- Template ID<br>
+            3. Refresh this page<br>
+            <br>
+            See <code>EMAILJS_SETUP_GUIDE.md</code> for detailed instructions.
+          `;
+        }
+      }, 500);
+    }
+
+    async function testBasicEmail() {
+      const email = document.getElementById('testEmail').value;
+      const statusDiv = document.getElementById('basicEmailStatus');
+      
+      if (!email) {
+        showStatus(statusDiv, 'error', 'Please enter your email address');
+        return;
+      }
+
+      statusDiv.className = 'status info';
+      statusDiv.textContent = 'Sending test email...';
+      statusDiv.style.display = 'block';
+
+      try {
+        const result = await window.emailNotifications.sendEmail({
+          to: email,
+          subject: 'Test Email from HOME AFRICA',
+          html: `
+            <h2>Test Email</h2>
+            <p>Hello!</p>
+            <p>This is a test email from HOME AFRICA. If you're reading this, the email system is working perfectly! ✅</p>
+            <p>Best regards,<br>The HOME AFRICA Team</p>
+          `,
+          text: 'This is a test email from HOME AFRICA. If you\'re reading this, the email system is working perfectly!'
+        });
+
+        if (result.success) {
+          showStatus(statusDiv, 'success', `✅ Email sent successfully via ${result.method}! Check your inbox.`);
+        } else {
+          showStatus(statusDiv, 'error', `❌ Failed: ${result.error || 'Unknown error'}`);
+        }
+      } catch (error) {
+        showStatus(statusDiv, 'error', `❌ Error: ${error.message}`);
+      }
+    }
+
+    async function testWelcomeEmail() {
+      const email = document.getElementById('welcomeEmail').value;
+      const name = document.getElementById('welcomeName').value;
+      const statusDiv = document.getElementById('welcomeEmailStatus');
+      
+      if (!email) {
+        showStatus(statusDiv, 'error', 'Please enter an email address');
+        return;
+      }
+
+      statusDiv.className = 'status info';
+      statusDiv.textContent = 'Sending welcome email...';
+      statusDiv.style.display = 'block';
+
+      try {
+        await window.emailNotifications.sendWelcomeEmail(email, name, false);
+        showStatus(statusDiv, 'success', '✅ Welcome email sent! Check your inbox.');
+      } catch (error) {
+        showStatus(statusDiv, 'error', `❌ Error: ${error.message}`);
+      }
+    }
+
+    async function testBookingEmail() {
+      const email = document.getElementById('bookingEmail').value;
+      const name = document.getElementById('bookingName').value;
+      const listing = document.getElementById('bookingListing').value;
+      const merchantEmail = document.getElementById('merchantEmail').value;
+      const merchantName = document.getElementById('merchantName').value;
+      const statusDiv = document.getElementById('bookingEmailStatus');
+      
+      if (!email || !merchantEmail) {
+        showStatus(statusDiv, 'error', 'Please enter both customer and merchant emails');
+        return;
+      }
+
+      statusDiv.className = 'status info';
+      statusDiv.textContent = 'Sending booking confirmation emails...';
+      statusDiv.style.display = 'block';
+
+      try {
+        await window.emailNotifications.sendBookingConfirmation({
+          userEmail: email,
+          userName: name,
+          listingTitle: listing,
+          scheduledDate: new Date().toISOString(),
+          merchantName: merchantName,
+          merchantEmail: merchantEmail
+        });
+        showStatus(statusDiv, 'success', '✅ Booking confirmation emails sent! Check both inboxes.');
+      } catch (error) {
+        showStatus(statusDiv, 'error', `❌ Error: ${error.message}`);
+      }
+    }
+
+    function showStatus(element, type, message) {
+      element.className = `status ${type}`;
+      element.textContent = message;
+      element.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+

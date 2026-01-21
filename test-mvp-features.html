@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MVP Feature Test - HOME AFRICA</title>
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .test-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      max-width: 900px;
+      margin: 0 auto 2rem;
+    }
+    .test-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      border-left: 4px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .test-item.success {
+      background: #d4edda;
+      border-left-color: #28a745;
+    }
+    .test-item.error {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+    }
+    .test-item.pending {
+      background: #e2e3e5;
+      border-left-color: #6c757d;
+    }
+    .test-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .test-btn:hover {
+      transform: translateY(-1px);
+    }
+    .btn-primary-test {
+      background: #667eea;
+      color: white;
+    }
+    .btn-success-test {
+      background: #28a745;
+      color: white;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 1rem;
+    }
+    .progress-bar {
+      height: 8px;
+      background: #e2e3e5;
+      border-radius: 4px;
+      margin-top: 1rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-card">
+    <h1>🧪 MVP Feature Test Suite</h1>
+    <p class="text-muted">Test all critical features before deployment</p>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+    <p class="text-center mt-2"><strong id="progressText">0% Complete</strong></p>
+    
+    <div id="testResults">
+      <!-- Tests will be added here -->
+    </div>
+    
+    <button class="btn btn-primary-test w-100 mt-3" onclick="runAllTests()" id="runTestsBtn">
+      🚀 Run All Tests
+    </button>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-storage.js"></script>
+  <script src="js/supabase-listings.js"></script>
+  <script src="js/supabase-merchants.js"></script>
+
+  <script>
+    const tests = [
+      {
+        id: 'supabase-init',
+        name: 'Supabase Initialization',
+        test: testSupabaseInit
+      },
+      {
+        id: 'storage-bucket',
+        name: 'Storage Bucket (listings)',
+        test: testStorageBucket
+      },
+      {
+        id: 'listings-table',
+        name: 'Listings Table Access',
+        test: testListingsTable
+      },
+      {
+        id: 'create-listing',
+        name: 'Create Listing (Test)',
+        test: testCreateListing
+      },
+      {
+        id: 'get-listings',
+        name: 'Get Listings',
+        test: testGetListings
+      },
+      {
+        id: 'update-listing',
+        name: 'Update Listing',
+        test: testUpdateListing
+      },
+      {
+        id: 'delete-listing',
+        name: 'Delete Listing',
+        test: testDeleteListing
+      },
+      {
+        id: 'auth-session',
+        name: 'Authentication Session',
+        test: testAuthSession
+      }
+    ];
+    
+    let completedTests = 0;
+    
+    async function runAllTests() {
+      const btn = document.getElementById('runTestsBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Running Tests...';
+      
+      completedTests = 0;
+      updateProgress();
+      
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.innerHTML = '';
+      
+      for (const test of tests) {
+        const testDiv = createTestItem(test.name, 'pending', 'Running...');
+        resultsDiv.appendChild(testDiv);
+        
+        try {
+          const result = await test.test();
+          updateTestItem(testDiv, result.status, result.message);
+        } catch (error) {
+          updateTestItem(testDiv, 'error', `Error: ${error.message}`);
+        }
+        
+        completedTests++;
+        updateProgress();
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '✅ Tests Complete - Run Again';
+      
+      // Show summary
+      const summary = generateSummary();
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = `test-item ${summary.status}`;
+      summaryDiv.style.marginTop = '1rem';
+      summaryDiv.innerHTML = `<strong>📊 ${summary.message}</strong>`;
+      resultsDiv.appendChild(summaryDiv);
+    }
+    
+    function createTestItem(name, status, message) {
+      const div = document.createElement('div');
+      div.className = `test-item ${status}`;
+      div.id = `test-${name.replace(/\s+/g, '-').toLowerCase()}`;
+      div.innerHTML = `
+        <div>
+          <strong>${name}:</strong> <span class="test-message">${message}</span>
+        </div>
+        <button class="test-btn btn-primary-test" onclick="runSingleTest('${name}')">Test</button>
+      `;
+      return div;
+    }
+    
+    function updateTestItem(div, status, message) {
+      div.className = `test-item ${status}`;
+      div.querySelector('.test-message').textContent = message;
+    }
+    
+    function updateProgress() {
+      const percentage = (completedTests / tests.length) * 100;
+      document.getElementById('progressBar').style.width = percentage + '%';
+      document.getElementById('progressText').textContent = `${Math.round(percentage)}% Complete (${completedTests}/${tests.length})`;
+    }
+    
+    async function testSupabaseInit() {
+      if (!window.supabaseClient) {
+        return { status: 'error', message: 'Supabase client not initialized' };
+      }
+      
+      const { data, error } = await window.supabaseClient.auth.getSession();
+      if (error && error.message.includes('Invalid API key')) {
+        return { status: 'error', message: 'Invalid API key in config' };
+      }
+      
+      return { status: 'success', message: '✅ Supabase initialized correctly' };
+    }
+    
+    async function testStorageBucket() {
+      if (!window.supabaseStorage) {
+        return { status: 'error', message: 'Storage helper not loaded' };
+      }
+      
+      const exists = await window.supabaseStorage.checkBucket('listings');
+      if (!exists) {
+        return { status: 'error', message: '❌ Bucket "listings" not found. Create it in Supabase Dashboard' };
+      }
+      
+      return { status: 'success', message: '✅ Bucket exists and is accessible' };
+    }
+    
+    async function testListingsTable() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('listings')
+          .select('id')
+          .limit(1);
+        
+        if (error) {
+          if (error.code === 'PGRST116') {
+            return { status: 'error', message: '❌ Table "listings" does not exist. Run database schema SQL' };
+          }
+          return { status: 'error', message: `❌ Error: ${error.message}` };
+        }
+        
+        return { status: 'success', message: '✅ Table accessible' };
+      } catch (error) {
+        return { status: 'error', message: `❌ ${error.message}` };
+      }
+    }
+    
+    async function testCreateListing() {
+      try {
+        if (!window.supabaseListings) {
+          return { status: 'error', message: 'Listings helper not loaded' };
+        }
+        
+        const testListing = {
+          type: 'apartment',
+          title: 'TEST LISTING - DELETE ME',
+          description: 'This is a test listing',
+          price: 1000000,
+          location: { city: 'Kigali' },
+          images: [],
+          metadata: {
+            merchantName: 'Test Merchant',
+            test: true
+          }
+        };
+        
+        const created = await window.supabaseListings.createListing(testListing);
+        
+        if (created && created.id) {
+          // Store ID for cleanup
+          window.testListingId = created.id;
+          return { status: 'success', message: `✅ Created test listing (ID: ${created.id.substring(0, 8)}...)` };
+        }
+        
+        return { status: 'error', message: '❌ Failed to create listing' };
+      } catch (error) {
+        return { status: 'error', message: `❌ ${error.message}` };
+      }
+    }
+    
+    async function testGetListings() {
+      try {
+        if (!window.supabaseListings) {
+          return { status: 'error', message: 'Listings helper not loaded' };
+        }
+        
+        const listings = await window.supabaseListings.getListings('apartment');
+        
+        return { status: 'success', message: `✅ Retrieved ${listings.length} listings` };
+      } catch (error) {
+        return { status: 'error', message: `❌ ${error.message}` };
+      }
+    }
+    
+    async function testUpdateListing() {
+      try {
+        if (!window.testListingId) {
+          return { status: 'warning', message: '⚠️ No test listing to update (run create test first)' };
+        }
+        
+        if (!window.supabaseListings) {
+          return { status: 'error', message: 'Listings helper not loaded' };
+        }
+        
+        await window.supabaseListings.updateListing(window.testListingId, {
+          title: 'TEST LISTING UPDATED'
+        });
+        
+        return { status: 'success', message: '✅ Listing updated successfully' };
+      } catch (error) {
+        return { status: 'error', message: `❌ ${error.message}` };
+      }
+    }
+    
+    async function testDeleteListing() {
+      try {
+        if (!window.testListingId) {
+          return { status: 'warning', message: '⚠️ No test listing to delete (run create test first)' };
+        }
+        
+        if (!window.supabaseListings) {
+          return { status: 'error', message: 'Listings helper not loaded' };
+        }
+        
+        await window.supabaseListings.deleteListing(window.testListingId);
+        
+        return { status: 'success', message: '✅ Test listing deleted (cleanup complete)' };
+      } catch (error) {
+        return { status: 'error', message: `❌ ${error.message}` };
+      }
+    }
+    
+    async function testAuthSession() {
+      try {
+        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        
+        if (error) {
+          return { status: 'warning', message: `⚠️ Auth check: ${error.message}` };
+        }
+        
+        if (session) {
+          return { status: 'success', message: `✅ User authenticated (${session.user.email || 'Logged in'})` };
+        } else {
+          return { status: 'warning', message: '⚠️ No active session (this is OK for public features)' };
+        }
+      } catch (error) {
+        return { status: 'error', message: `❌ ${error.message}` };
+      }
+    }
+    
+    async function runSingleTest(testName) {
+      const test = tests.find(t => t.name === testName);
+      if (!test) return;
+      
+      const testDiv = document.getElementById(`test-${testName.replace(/\s+/g, '-').toLowerCase()}`);
+      if (!testDiv) return;
+      
+      updateTestItem(testDiv, 'pending', 'Running...');
+      
+      try {
+        const result = await test.test();
+        updateTestItem(testDiv, result.status, result.message);
+      } catch (error) {
+        updateTestItem(testDiv, 'error', `Error: ${error.message}`);
+      }
+    }
+    
+    function generateSummary() {
+      const items = document.querySelectorAll('.test-item');
+      let success = 0, error = 0, warning = 0;
+      
+      items.forEach(item => {
+        if (item.classList.contains('success')) success++;
+        else if (item.classList.contains('error')) error++;
+        else if (item.classList.contains('warning')) warning++;
+      });
+      
+      if (error === 0 && warning === 0) {
+        return { status: 'success', message: `🎉 All tests passed! Ready for deployment!` };
+      } else if (error > 0) {
+        return { status: 'error', message: `❌ ${error} test(s) failed. Fix errors before deploying.` };
+      } else {
+        return { status: 'warning', message: `⚠️ ${warning} warning(s). Review before deploying.` };
+      }
+    }
+    
+    // Initialize test list on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const resultsDiv = document.getElementById('testResults');
+      tests.forEach(test => {
+        const testDiv = createTestItem(test.name, 'pending', 'Not tested yet');
+        resultsDiv.appendChild(testDiv);
+      });
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All Listings | HOME AFRICA</title>
+
+  <!-- Offline Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+  <!-- ✨ Custom Styles -->
+  <style>
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      z-index: -1;
+      pointer-events: none;
+      display: block;
+    }
+    .particles-js-canvas-el {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: -1 !important;
+      display: block !important;
+    }
+    /* Splash Screen Styles */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.7s;
+      animation: splashFadeIn 1.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes splashFadeIn {
+      0% { opacity: 0; transform: scale(1.08) translateY(40px); }
+      60% { opacity: 1; transform: scale(1.01) translateY(-10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    #splash-screen img {
+      max-width: 40vw;
+      max-height: 40vh;
+      border-radius: 50%;
+      box-shadow: 0 0 60px #0ff, 0 0 120px #8fff00;
+      opacity: 0;
+      transform: scale(0.7) rotate(-10deg);
+      animation: logoPopIn 2.2s 3.3s cubic-bezier(0.4,0,0.4,1) forwards;
+    }
+    @keyframes logoPopIn {
+      0% { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+      60% { opacity: 1; transform: scale(1.08) rotate(6deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    #splash-screen h1 {
+      margin-top: 2rem;
+      font-size: 3.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.2em;
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+      animation: textSlideIn 1.1s 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    #splash-screen h2 {
+      color: #fff;
+      margin-top: 1.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: textSlideIn 1s 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes textSlideIn {
+      0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* Driving License Prompt Modal */
+    .license-prompt-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 10002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      animation: modalFadeIn 0.5s ease-out;
+    }
+    @keyframes modalFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .license-prompt-content {
+      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,255,136,0.15) 100%);
+      border: 3px solid #0ff;
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(0,255,255,0.3), 0 0 80px rgba(143,255,0,0.2);
+      animation: modalSlideIn 0.6s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .license-prompt-content::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(0,255,255,0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+    @keyframes modalSlideIn {
+      0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .license-prompt-content h2 {
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px rgba(0,255,255,0.5);
+    }
+    .license-prompt-content p {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .license-prompt-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-license-yes {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(0,255,255,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-license-yes:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 30px rgba(0,255,255,0.5);
+    }
+    .btn-license-no {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-license-no:hover {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.5);
+      transform: scale(1.05);
+    }
+    .license-prompt-content .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: transparent;
+      border: none;
+      color: #0ff;
+      font-size: 2rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+    .license-prompt-content .close-btn:hover {
+      background: rgba(0,255,255,0.2);
+      transform: rotate(90deg);
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+    }
+    .navbar .container {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+      animation: glow-pulse 2s infinite;
+      box-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+    }
+    .navbar-brand img:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff; }
+      50% { box-shadow: 0 0 18px #0ff, 0 0 36px #0ff; }
+    }
+    .content-wrapper {
+      flex: 1;
+      padding-top: 3rem;
+      padding-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .hero-mini {
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      height: 200px;
+      color: white;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-mini .container {
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    }
+    .property-card img {
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+    }
+    .card {
+      background: linear-gradient(120deg, rgba(0,0,0,0.92) 60%, rgba(0,255,136,0.18) 100%);
+      border: 2px solid #0ff;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      border-radius: 12px;
+      color: #fff;
+    }
+    .card-title {
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .property-card .price-gradient, .property-card .text-primary.fw-bold {
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: unset !important;
+    }
+    .btn-primary, .btn-success {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      border: none;
+      font-weight: bold;
+      box-shadow: 0 2px 8px 0 rgba(0,255,136,0.15);
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn-primary:hover, .btn-primary:focus, .btn-success:hover, .btn-success:focus {
+      background: linear-gradient(90deg, #8fff00 0%, #0ff 100%);
+      color: #111;
+    }
+    .navbar .nav-link, .navbar .navbar-brand {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+    .navbar .nav-link:hover, .navbar .navbar-brand:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+    /* Unified Footer Styles - Responsive */
+    footer.bg-dark {
+      background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
+      border-top: 2px solid #0ff;
+      box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .footer-link {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+    .footer-link:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+    /* Add padding to body to prevent content from being hidden behind fixed footer */
+    body {
+      padding-bottom: 250px;
+    }
+    @media (max-width: 768px) {
+      footer.bg-dark {
+        position: relative;
+      }
+      body {
+        padding-bottom: 0;
+      }
+      footer.bg-dark .row > div {
+        margin-bottom: 1.5rem;
+      }
+    }
+    @media (min-width: 769px) {
+      footer.bg-dark .container {
+        max-width: 1200px;
+      }
+    }
+    .bi {
+      color: #0ff;
+      font-size: 1.3rem;
+      transition: color 0.2s, text-shadow 0.2s;
+      text-shadow: 0 0 8px #8fff00;
+    }
+    .bi:hover {
+      color: #8fff00;
+      text-shadow: 0 0 12px #0ff;
+    }
+    /* Add status label CSS for cars */
+    .property-status-label {
+      display: inline-block;
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 2;
+      padding: 0.35em 1.1em 0.35em 1.1em;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: 2em;
+      background: rgba(10, 10, 30, 0.92);
+      box-shadow: 0 2px 12px 0 rgba(0,255,136,0.13);
+      border: 3px solid transparent;
+      border-image: linear-gradient(90deg, #0ff 0%, #8fff00 50%, #0050c8 100%);
+      border-image-slice: 1;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      transition: box-shadow 0.2s, border 0.2s;
+      box-shadow: 0 0 0 4px rgba(0,255,136,0.10);
+    }
+    .property-status-sale {
+      color: #fff;
+      background: linear-gradient(90deg, #003366 80%, #0050c8 100%);
+      border-image: linear-gradient(90deg, #0050c8 0%, #0ff 50%, #8fff00 100%);
+      border-image-slice: 1;
+    }
+    .property-status-rent {
+      color: #003a2b;
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      border-image: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      border-image-slice: 1;
+    }
+    /* Search Bar Styles */
+    .search-bar-container {
+      position: relative;
+    }
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #0ff;
+      z-index: 10;
+    }
+    .search-input {
+      padding-left: 45px;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid rgba(0,255,136,0.3);
+      color: #fff;
+      border-radius: 12px;
+    }
+    .search-input:focus {
+      background: rgba(0,0,0,0.8);
+      border-color: #0ff;
+      box-shadow: 0 0 15px rgba(0,255,136,0.3);
+      color: #fff;
+    }
+    .search-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* Sort and View Toggle Styles */
+    .sort-container, .view-toggle-container {
+      display: flex;
+      align-items: center;
+    }
+    .sort-select {
+      background: rgba(0,0,0,0.6);
+      border: 2px solid rgba(0,255,136,0.3);
+      color: #fff;
+      border-radius: 12px;
+      padding: 0.5rem 1rem;
+      min-width: 180px;
+    }
+    .sort-select:focus {
+      background: rgba(0,0,0,0.8);
+      border-color: #0ff;
+      box-shadow: 0 0 15px rgba(0,255,136,0.3);
+      color: #fff;
+    }
+    .sort-select option {
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .view-toggle-btn {
+      background: rgba(0,0,0,0.6);
+      border: 2px solid rgba(0,255,136,0.3);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-left: 0.5rem;
+    }
+    .view-toggle-btn:hover {
+      background: rgba(0,255,136,0.2);
+      border-color: #0ff;
+    }
+    .view-toggle-btn.active {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      border-color: #0ff;
+      color: #222;
+    }
+    .filter-toggle-btn {
+      border: 2px solid rgba(0,255,136,0.3);
+      color: #fff;
+      border-radius: 12px;
+    }
+    .filter-toggle-btn:hover {
+      background: rgba(0,255,136,0.2);
+      border-color: #0ff;
+      color: #fff;
+    }
+
+    /* Filters Sidebar Styles */
+    .filters-sidebar {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .filters-card {
+      background: linear-gradient(120deg, rgba(0,0,0,0.92) 60%, rgba(0,255,136,0.18) 100%);
+      border: 2px solid #0ff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+    }
+    .filter-section {
+      border-bottom: 1px solid rgba(0,255,136,0.2);
+      padding-bottom: 1rem;
+    }
+    .filter-section:last-child {
+      border-bottom: none;
+    }
+    .filter-label {
+      color: #0ff;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: block;
+      font-size: 0.95rem;
+    }
+    .filter-label i {
+      margin-right: 0.5rem;
+    }
+    .filter-checkboxes .form-check {
+      margin-bottom: 0.5rem;
+    }
+    .filter-checkboxes .form-check-input {
+      background-color: rgba(0,255,136,0.1);
+      border-color: rgba(0,255,136,0.3);
+    }
+    .filter-checkboxes .form-check-input:checked {
+      background-color: #00ff88;
+      border-color: #00ff88;
+    }
+    .filter-checkboxes .form-check-label {
+      color: #fff;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+    .price-display {
+      color: #8fff00;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .filter-actions .btn {
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    /* List View Styles */
+    .list-view .col-md-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    .list-view .property-card {
+      display: flex;
+      flex-direction: row;
+      height: auto;
+    }
+    .list-view .property-card img {
+      width: 300px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px 0 0 12px;
+    }
+    .list-view .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .list-view .property-status-label {
+      position: static;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Favorite Button Styles */
+    .favorite-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.8);
+      border: 2px solid rgba(0,255,136,0.3);
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 4;
+      transition: all 0.3s;
+    }
+    .favorite-btn:hover {
+      background: rgba(0,255,136,0.2);
+      border-color: #0ff;
+      transform: scale(1.1);
+    }
+    .favorite-btn.favorited {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      border-color: #0ff;
+      color: #222;
+    }
+    .favorite-btn.favorited i {
+      color: #222;
+    }
+
+    /* Contact Buttons Styles */
+    .contact-buttons {
+      margin-top: 0.75rem;
+    }
+    .contact-btn {
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      flex: 1;
+      min-width: 80px;
+    }
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,136,0.3);
+    }
+    .contact-btn.btn-success {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      border: none;
+    }
+    .contact-btn.btn-primary {
+      background: linear-gradient(135deg, #0ff 0%, #00ccff 100%);
+      border: none;
+    }
+
+    @media (max-width: 576px) {
+      .hero-mini h2 {
+        font-size: 1.3rem;
+      }
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+      .property-card img {
+        height: 140px;
+      }
+      .filters-sidebar {
+        position: relative;
+        top: 0;
+        max-height: none;
+      }
+      .list-view .property-card {
+        flex-direction: column;
+      }
+      .list-view .property-card img {
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+      }
+    }
+  </style>
+    <!-- Particle.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <!-- 🌌 Particle Background -->
+  <div id="particles-js"></div>
+
+  <!-- Driving License Prompt Modal -->
+  <div id="licensePromptModal" class="license-prompt-modal" style="display:none;">
+    <div class="license-prompt-content">
+      <button class="close-btn" onclick="closeLicensePrompt()">&times;</button>
+      <h2>🚗 Ready to Drive?</h2>
+      <p>Before you buy a car, would you like to earn your driving license first?</p>
+      <p style="font-size: 1rem; color: #8fff00;">Get professional training from HOME AFRICA Driving School and hit the road with confidence!</p>
+      <div class="license-prompt-buttons">
+        <button class="btn-license-yes" onclick="goToDrivingSchool()">Yes, I want to learn!</button>
+        <button class="btn-license-no" onclick="closeLicensePrompt()">No, continue browsing</button>
+      </div>
+    </div>
+  </div>
+  <!-- 🚀 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="explore.html">Explore</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land Plots</a></li>
+          <li class="nav-item"><a class="nav-link" href="post.html">Post your property</a></li>
+          <li class="nav-item"><a class="nav-link" href="signin.html">Log In</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
+              <i class="bi bi-robot"></i> Ask Rejo
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🏙️ Page Banner Hero -->
+  <section class="hero-mini">
+    <div class="container">
+      <h2 class="mb-2">Cars for Sale</h2>
+      <nav style="font-size: 0.9rem;">
+        <a href="index.html" class="text-white text-decoration-underline">🏠 Home</a> › 
+        <a href="apartment.html" class="text-white text-decoration-underline">Apartments</a> › 
+        Cars
+      </nav>
+    </div>
+  </section>
+
+  <!-- 🚗 Car Listings -->
+  <div class="container py-5">
+    <!-- Search and Controls Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <div class="search-bar-container">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" id="carSearchInput" class="form-control search-input" placeholder="Search by make, model, or keyword...">
+        </div>
+      </div>
+      <div class="col-md-6 d-flex gap-2 justify-content-md-end">
+        <button class="btn btn-outline-light" onclick="saveSearchAlert()" title="Save this search to get alerts">
+          <i class="bi bi-bell"></i> Save Search Alert
+        </button>
+        <div class="sort-container">
+          <select id="sortSelect" class="form-select sort-select" title="Sort listings">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="year-new">Year: Newest</option>
+            <option value="year-old">Year: Oldest</option>
+            <option value="mileage-low">Mileage: Lowest</option>
+            <option value="mileage-high">Mileage: Highest</option>
+          </select>
+        </div>
+        <div class="view-toggle-container">
+          <button id="gridViewBtn" class="view-toggle-btn active" title="Grid View">
+            <i class="bi bi-grid-3x3-gap"></i>
+          </button>
+          <button id="listViewBtn" class="view-toggle-btn" title="List View">
+            <i class="bi bi-list-ul"></i>
+          </button>
+        </div>
+        <button id="filterToggleBtn" class="btn btn-outline-light filter-toggle-btn">
+          <i class="bi bi-funnel"></i> Filters
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Filters Sidebar -->
+      <div id="filtersSidebar" class="col-12 col-lg-3 mb-4 filters-sidebar" style="display:none;">
+        <div class="filters-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="bi bi-funnel-fill"></i> Filters</h5>
+            <button id="closeFiltersBtn" class="btn-close btn-close-white"></button>
+          </div>
+          
+          <!-- Price Range -->
+          <div class="filter-section mb-4">
+            <label class="filter-label"><i class="bi bi-currency-exchange"></i> Price Range (RWF)</label>
+            <div class="d-flex gap-2 mb-2">
+              <input type="number" id="minPrice" class="form-control" placeholder="Min" min="0">
+              <input type="number" id="maxPrice" class="form-control" placeholder="Max" min="0">
+            </div>
+            <div class="price-display">
+              <span id="priceRangeDisplay">All Prices</span>
+        </div>
+      </div>
+
+          <!-- Year Range -->
+          <div class="filter-section mb-4">
+            <label class="filter-label"><i class="bi bi-calendar"></i> Year</label>
+            <div class="d-flex gap-2">
+              <select id="minYear" class="form-select">
+                <option value="">Min Year</option>
+              </select>
+              <select id="maxYear" class="form-select">
+                <option value="">Max Year</option>
+              </select>
+          </div>
+          </div>
+
+          <!-- Mileage Range -->
+          <div class="filter-section mb-4">
+            <label class="filter-label"><i class="bi bi-speedometer"></i> Mileage (km)</label>
+            <div class="d-flex gap-2 mb-2">
+              <input type="number" id="minMileage" class="form-control" placeholder="Min" min="0">
+              <input type="number" id="maxMileage" class="form-control" placeholder="Max" min="0">
+        </div>
+      </div>
+
+          <!-- Transmission -->
+          <div class="filter-section mb-4">
+            <label class="filter-label"><i class="bi bi-gear"></i> Transmission</label>
+            <div class="filter-checkboxes">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterAutomatic" value="Automatic">
+                <label class="form-check-label" for="filterAutomatic">Automatic</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterManual" value="Manual">
+                <label class="form-check-label" for="filterManual">Manual</label>
+          </div>
+        </div>
+      </div>
+
+          <!-- Fuel Type -->
+          <div class="filter-section mb-4">
+            <label class="filter-label"><i class="bi bi-fuel-pump"></i> Fuel Type</label>
+            <div class="filter-checkboxes">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterPetrol" value="Petrol">
+                <label class="form-check-label" for="filterPetrol">Petrol</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterDiesel" value="Diesel">
+                <label class="form-check-label" for="filterDiesel">Diesel</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterElectric" value="Electric">
+                <label class="form-check-label" for="filterElectric">Electric</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Make/Model (will be populated dynamically) -->
+          <div class="filter-section mb-4">
+            <label class="filter-label"><i class="bi bi-car-front"></i> Make</label>
+            <select id="filterMake" class="form-select mb-2">
+              <option value="">All Makes</option>
+            </select>
+            <select id="filterModel" class="form-select" disabled>
+              <option value="">All Models</option>
+            </select>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="filter-actions">
+            <button id="applyFiltersBtn" class="btn btn-primary w-100 mb-2">
+              <i class="bi bi-check-circle"></i> Apply Filters
+            </button>
+            <button id="clearFiltersBtn" class="btn btn-outline-light w-100">
+              <i class="bi bi-x-circle"></i> Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car Listings Grid -->
+      <div id="listingsContainer" class="col-12 col-lg-9">
+        <div id="listingsGrid" class="row g-4">
+
+        </div>
+        
+        <!-- Results Count -->
+        <div id="resultsCount" class="mt-4 text-center text-white">
+          <p class="mb-0"><i class="bi bi-car-front"></i> <span id="resultsNumber">0</span> cars found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/search-alerts.js"></script>
+    <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 60, density: { enable: true, value_area: 800 } },
+          color: { value: "#0ff" },
+          shape: { type: "circle" },
+          opacity: { value: 0.3 },
+          size: { value: 3 },
+          move: { enable: true, speed: 1 }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "repulse" },
+            onclick: { enable: true, mode: "push" }
+          },
+          modes: {
+            repulse: { distance: 100 },
+            push: { particles_nb: 4 }
+          }
+        },
+        retina_detect: true
+      });
+
+      // Show license prompt exactly 3 seconds after landing on cars page
+      function initLicensePrompt() {
+        setTimeout(function() {
+          showLicensePrompt();
+        }, 3000);
+      }
+      
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLicensePrompt);
+      } else {
+        // DOM is already loaded
+        initLicensePrompt();
+      }
+
+      // License prompt functions
+      function showLicensePrompt() {
+        // Check if user has already dismissed it (using localStorage)
+        if (!localStorage.getItem('licensePromptDismissed')) {
+          const modal = document.getElementById('licensePromptModal');
+          if (modal) {
+            modal.style.display = 'flex';
+          } else {
+            console.error('License prompt modal not found');
+          }
+        }
+      }
+
+      function closeLicensePrompt() {
+        const modal = document.getElementById('licensePromptModal');
+        if (modal) {
+          modal.style.display = 'none';
+        }
+        localStorage.setItem('licensePromptDismissed', 'true');
+      }
+
+      function goToDrivingSchool() {
+        window.location.href = 'driving-school.html';
+      }
+      
+      // Make functions globally accessible
+      window.showLicensePrompt = showLicensePrompt;
+      window.closeLicensePrompt = closeLicensePrompt;
+      window.goToDrivingSchool = goToDrivingSchool;
+
+      // Time ago utility function
+      function timeAgo(timestamp) {
+        if (!timestamp) return 'Just now';
+        
+        let seconds;
+        if (timestamp.seconds) {
+          seconds = Math.floor((new Date().getTime() / 1000) - timestamp.seconds);
+        } else if (timestamp.createdAtSeconds) {
+          seconds = Math.floor((new Date().getTime() / 1000) - timestamp.createdAtSeconds);
+        } else {
+          return 'Just now';
+        }
+        
+        if (seconds < 60) return seconds + 's ago';
+        if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+        if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+        if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+        if (seconds < 2592000) return Math.floor(seconds / 604800) + 'w ago';
+        if (seconds < 31536000) return Math.floor(seconds / 2592000) + 'mo ago';
+        return Math.floor(seconds / 31536000) + 'y ago';
+      }
+
+      // Update time ago every minute
+      function updateTimeAgo() {
+        document.querySelectorAll('.time-ago').forEach(function(el) {
+          const timestamp = JSON.parse(el.dataset.timestamp);
+          el.textContent = timeAgo(timestamp);
+        });
+      }
+      setInterval(updateTimeAgo, 60000);
+
+      // Global variables for car listings
+      let allCars = [];
+      let filteredCars = [];
+      let currentView = localStorage.getItem('carViewMode') || 'grid';
+
+      // Initialize favorites from localStorage
+      function getFavorites() {
+        return JSON.parse(localStorage.getItem('carFavorites') || '[]');
+      }
+
+      function saveFavorites(favorites) {
+        localStorage.setItem('carFavorites', JSON.stringify(favorites));
+      }
+
+      function toggleFavorite(carId) {
+        let favorites = getFavorites();
+        const index = favorites.indexOf(carId);
+        if (index > -1) {
+          favorites.splice(index, 1);
+        } else {
+          favorites.push(carId);
+        }
+        saveFavorites(favorites);
+        return favorites.includes(carId);
+      }
+
+      function isFavorite(carId) {
+        return getFavorites().includes(carId);
+      }
+
+      // Extract make and model from title
+      function extractMakeModel(title) {
+        const parts = title.split(' - ');
+        if (parts.length >= 2) {
+          return { make: parts[0].trim(), model: parts[1].split(' ')[0] };
+        }
+        return { make: title.split(' ')[0], model: '' };
+      }
+
+      // Extract year from title
+      function extractYear(title) {
+        const yearMatch = title.match(/\b(19|20)\d{2}\b/);
+        return yearMatch ? parseInt(yearMatch[0]) : null;
+      }
+
+      // Render car card
+      function renderCarCard(car, docId) {
+        const timestamp = car.createdAt || { createdAtSeconds: car.createdAtSeconds };
+        const carId = docId || car.id || Math.random().toString(36);
+        const isFav = isFavorite(carId);
+        const { make, model } = extractMakeModel(car.title || 'Car');
+        const year = extractYear(car.title || '');
+        const price = parseInt(car.price || 0);
+        const mileage = parseInt(car.mileage || 0);
+
+            const card = document.createElement('div');
+        card.className = currentView === 'list' ? 'col-md-12' : 'col-md-4';
+        card.dataset.carId = carId;
+        card.dataset.make = make;
+        card.dataset.model = model;
+        card.dataset.year = year || '';
+        card.dataset.price = price;
+        card.dataset.mileage = mileage;
+        card.dataset.transmission = car.transmission || '';
+        card.dataset.fuel = car.fuel || '';
+        card.dataset.title = (car.title || '').toLowerCase();
+        
+        const contactPhone = car.merchantContact || '';
+        const whatsappLink = contactPhone ? `https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}?text=Hello, I'm interested in ${encodeURIComponent(car.title || 'this car')}` : '#';
+        const telLink = contactPhone ? `tel:${contactPhone}` : '#';
+        const emailLink = car.merchantEmail ? `mailto:${car.merchantEmail}?subject=Inquiry about ${encodeURIComponent(car.title || 'your listing')}` : '#';
+        
+            card.innerHTML = `
+              <div class="card shadow property-card position-relative">
+            <button class="favorite-btn ${isFav ? 'favorited' : ''}" onclick="handleFavoriteClick('${carId}')" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+              <i class="bi ${isFav ? 'bi-heart-fill' : 'bi-heart'}"></i>
+            </button>
+                <span class="property-status-label property-status-sale">For Sale</span>
+            <span class="time-ago-badge" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.8);color:#8fff00;padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;font-weight:bold;z-index:3;border:1px solid #0ff;">
+              <i class="bi bi-clock"></i> <span class="time-ago" data-timestamp='${JSON.stringify(timestamp)}'>${timeAgo(timestamp)}</span>
+            </span>
+            <a href="car-detail.html?id=${carId}" style="text-decoration:none;color:inherit;">
+              <img src="${car.images && car.images[0] ? car.images[0] : 'images/car1.jpg'}" class="card-img-top" alt="Car Listing" style="cursor:pointer;">
+            </a>
+                <div class="card-body">
+              <a href="car-detail.html?id=${carId}" style="text-decoration:none;color:inherit;">
+                  <h5 class="card-title">${car.title || 'Car'}</h5>
+                <p class="card-text">${car.transmission || ''} • ${car.fuel || ''} • ${car.mileage ? car.mileage + 'km' : ''}</p>
+                <p class="text-primary fw-bold price-gradient">RWF ${price.toLocaleString()}</p>
+              </a>
+              ${car.merchantName ? '<p class="text-muted small mt-2"><i class="bi bi-person"></i> ' + car.merchantName + '</p>' : ''}
+              ${contactPhone ? `
+                <div class="contact-buttons mt-3 d-flex gap-2 flex-wrap">
+                  <a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-success contact-btn" title="Contact via WhatsApp">
+                    <i class="bi bi-whatsapp"></i> WhatsApp
+                  </a>
+                  <a href="${telLink}" class="btn btn-sm btn-primary contact-btn" title="Call">
+                    <i class="bi bi-telephone"></i> Call
+                  </a>
+                  <a href="car-detail.html?id=${carId}" class="btn btn-sm btn-outline-light contact-btn" title="View Details">
+                    <i class="bi bi-eye"></i> Details
+                  </a>
+                </div>
+              ` : `
+                <div class="mt-3">
+                  <a href="car-detail.html?id=${carId}" class="btn btn-sm btn-outline-light w-100 contact-btn" title="View Details">
+                    <i class="bi bi-eye"></i> View Details
+                  </a>
+                </div>
+              `}
+                </div>
+              </div>
+            `;
+        return card;
+      }
+
+      // Filter cars based on current filters
+      function filterCars() {
+        const searchTerm = document.getElementById('carSearchInput')?.value.toLowerCase() || '';
+        const minPrice = parseInt(document.getElementById('minPrice')?.value) || 0;
+        const maxPrice = parseInt(document.getElementById('maxPrice')?.value) || Infinity;
+        const minYear = document.getElementById('minYear')?.value ? parseInt(document.getElementById('minYear').value) : null;
+        const maxYear = document.getElementById('maxYear')?.value ? parseInt(document.getElementById('maxYear').value) : null;
+        const minMileage = parseInt(document.getElementById('minMileage')?.value) || 0;
+        const maxMileage = parseInt(document.getElementById('maxMileage')?.value) || Infinity;
+        
+        const transmissionFilters = [];
+        if (document.getElementById('filterAutomatic')?.checked) transmissionFilters.push('Automatic');
+        if (document.getElementById('filterManual')?.checked) transmissionFilters.push('Manual');
+        
+        const fuelFilters = [];
+        if (document.getElementById('filterPetrol')?.checked) fuelFilters.push('Petrol');
+        if (document.getElementById('filterDiesel')?.checked) fuelFilters.push('Diesel');
+        if (document.getElementById('filterElectric')?.checked) fuelFilters.push('Electric');
+        
+        const makeFilter = document.getElementById('filterMake')?.value || '';
+        const modelFilter = document.getElementById('filterModel')?.value || '';
+
+        filteredCars = allCars.filter(car => {
+          const price = parseInt(car.price || 0);
+          const mileage = parseInt(car.mileage || 0);
+          const { make, model } = extractMakeModel(car.title || '');
+          const year = extractYear(car.title || '');
+          const title = (car.title || '').toLowerCase();
+
+          // Search filter
+          if (searchTerm && !title.includes(searchTerm) && !make.toLowerCase().includes(searchTerm) && !model.toLowerCase().includes(searchTerm)) {
+            return false;
+          }
+
+          // Price filter
+          if (price < minPrice || price > maxPrice) return false;
+
+          // Year filter
+          if (year) {
+            if (minYear && year < minYear) return false;
+            if (maxYear && year > maxYear) return false;
+          }
+
+          // Mileage filter
+          if (mileage < minMileage || mileage > maxMileage) return false;
+
+          // Transmission filter
+          if (transmissionFilters.length > 0 && !transmissionFilters.includes(car.transmission)) return false;
+
+          // Fuel filter
+          if (fuelFilters.length > 0 && !fuelFilters.includes(car.fuel)) return false;
+
+          // Make filter
+          if (makeFilter && make !== makeFilter) return false;
+
+          // Model filter
+          if (modelFilter && model !== modelFilter) return false;
+
+          return true;
+        });
+
+        sortCars();
+        renderCars();
+      }
+
+      // Sort cars
+      function sortCars() {
+        const sortValue = document.getElementById('sortSelect')?.value || 'newest';
+        
+        filteredCars.sort((a, b) => {
+          const priceA = parseInt(a.price || 0);
+          const priceB = parseInt(b.price || 0);
+          const mileageA = parseInt(a.mileage || 0);
+          const mileageB = parseInt(b.mileage || 0);
+          const yearA = extractYear(a.title || '');
+          const yearB = extractYear(b.title || '');
+          const dateA = a.createdAtSeconds || 0;
+          const dateB = b.createdAtSeconds || 0;
+
+          switch(sortValue) {
+            case 'price-low': return priceA - priceB;
+            case 'price-high': return priceB - priceA;
+            case 'year-new': return (yearB || 0) - (yearA || 0);
+            case 'year-old': return (yearA || 0) - (yearB || 0);
+            case 'mileage-low': return mileageA - mileageB;
+            case 'mileage-high': return mileageB - mileageA;
+            case 'oldest': return dateA - dateB;
+            case 'newest':
+            default: return dateB - dateA;
+          }
+        });
+      }
+
+      // Render cars
+      function renderCars() {
+        const container = document.getElementById('listingsGrid');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        container.className = currentView === 'list' ? 'row g-4 list-view' : 'row g-4';
+
+        if (filteredCars.length === 0) {
+          container.innerHTML = `
+            <div class="col-12 text-center py-5">
+              <i class="bi bi-search" style="font-size: 4rem; color: #0ff; opacity: 0.5;"></i>
+              <h4 class="mt-3" style="color: #fff;">No cars found</h4>
+              <p style="color: rgba(255,255,255,0.7);">Try adjusting your filters or search terms</p>
+            </div>
+          `;
+          const resultsCount = document.getElementById('resultsNumber');
+          if (resultsCount) resultsCount.textContent = '0';
+          return;
+        }
+
+        filteredCars.forEach((car) => {
+          const card = renderCarCard(car, car.id);
+          container.appendChild(card);
+        });
+
+        const resultsCount = document.getElementById('resultsNumber');
+        if (resultsCount) resultsCount.textContent = filteredCars.length;
+        updateTimeAgo();
+      }
+
+      // Handle favorite click
+      window.handleFavoriteClick = function(carId) {
+        const isFav = toggleFavorite(carId);
+        const btn = document.querySelector(`[data-car-id="${carId}"] .favorite-btn`);
+        if (btn) {
+          btn.classList.toggle('favorited', isFav);
+          btn.querySelector('i').className = `bi ${isFav ? 'bi-heart-fill' : 'bi-heart'}`;
+          btn.title = isFav ? 'Remove from favorites' : 'Add to favorites';
+        }
+      };
+
+      // Populate year dropdowns
+      function populateYearDropdowns() {
+        const years = [];
+        allCars.forEach(car => {
+          const year = extractYear(car.title || '');
+          if (year && !years.includes(year)) years.push(year);
+        });
+        years.sort((a, b) => b - a);
+
+        const minYearSelect = document.getElementById('minYear');
+        const maxYearSelect = document.getElementById('maxYear');
+        
+        if (minYearSelect && maxYearSelect) {
+          years.forEach(year => {
+            minYearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+            maxYearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+          });
+        }
+      }
+
+      // Populate make/model dropdowns
+      function populateMakeModelDropdowns() {
+        const makes = new Set();
+        const makeModels = {};
+
+        allCars.forEach(car => {
+          const { make, model } = extractMakeModel(car.title || '');
+          if (make) {
+            makes.add(make);
+            if (!makeModels[make]) makeModels[make] = new Set();
+            if (model) makeModels[make].add(model);
+          }
+        });
+
+        const makeSelect = document.getElementById('filterMake');
+        if (makeSelect) {
+          makes.forEach(make => {
+            makeSelect.innerHTML += `<option value="${make}">${make}</option>`;
+          });
+
+          makeSelect.addEventListener('change', function() {
+            const selectedMake = this.value;
+            const modelSelect = document.getElementById('filterModel');
+            if (modelSelect) {
+              modelSelect.innerHTML = '<option value="">All Models</option>';
+              modelSelect.disabled = !selectedMake;
+
+              if (selectedMake && makeModels[selectedMake]) {
+                Array.from(makeModels[selectedMake]).sort().forEach(model => {
+                  modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
+                });
+              }
+            }
+          });
+        }
+      }
+
+      // Update price range display
+      function updatePriceDisplay() {
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const display = document.getElementById('priceRangeDisplay');
+        
+        if (!minPrice || !maxPrice || !display) return;
+        
+        const minVal = minPrice.value;
+        const maxVal = maxPrice.value;
+        
+        if (minVal && maxVal) {
+          display.textContent = `RWF ${parseInt(minVal).toLocaleString()} - RWF ${parseInt(maxVal).toLocaleString()}`;
+        } else if (minVal) {
+          display.textContent = `From RWF ${parseInt(minVal).toLocaleString()}`;
+        } else if (maxVal) {
+          display.textContent = `Up to RWF ${parseInt(maxVal).toLocaleString()}`;
+        } else {
+          display.textContent = 'All Prices';
+        }
+      }
+
+      // View toggle functions
+      function setViewMode(mode) {
+        currentView = mode;
+        localStorage.setItem('carViewMode', mode);
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+        if (gridBtn) gridBtn.classList.toggle('active', mode === 'grid');
+        if (listBtn) listBtn.classList.toggle('active', mode === 'list');
+        renderCars();
+      }
+
+      // Fetch and render car listings from Supabase
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add static cars
+        const staticCars = [
+          { id: 'static1', title: 'Toyota RAV4 - 2017', transmission: 'Automatic', fuel: 'Petrol', mileage: '60000', price: '18000000', createdAtSeconds: Math.floor(Date.now() / 1000) - 3600 },
+          { id: 'static2', title: 'Suzuki Swift - 2019', transmission: 'Manual', fuel: 'Petrol', mileage: '45000', price: '13500000', createdAtSeconds: Math.floor(Date.now() / 1000) - 7200 },
+          { id: 'static3', title: 'Toyota Prado - 2016', transmission: 'Automatic', fuel: 'Diesel', mileage: '85000', price: '45000000', createdAtSeconds: Math.floor(Date.now() / 1000) - 10800 }
+        ];
+        allCars = [...staticCars];
+
+        const container = document.getElementById('listingsGrid');
+        if (!container) {
+          console.error('Listings container not found');
+          return;
+        }
+
+        // Load from Supabase
+        async function loadCarsFromSupabase() {
+          try {
+            if (window.supabaseListings) {
+              const listings = await window.supabaseListings.getListings('car');
+              listings.forEach(listing => {
+                // Transform Supabase listing to car format
+                const car = {
+                  id: listing.id,
+                  title: listing.title,
+                  price: listing.price?.toString() || '0',
+                  transmission: listing.metadata?.transmission || '',
+                  fuel: listing.metadata?.fuel || '',
+                  mileage: listing.metadata?.mileage || '',
+                  images: listing.images || [],
+                  merchantName: listing.metadata?.merchantName || '',
+                  merchantContact: listing.metadata?.merchantContact || '',
+                  createdAtSeconds: listing.created_at ? Math.floor(new Date(listing.created_at).getTime() / 1000) : Math.floor(Date.now() / 1000)
+                };
+                allCars.push(car);
+              });
+              console.log(`✅ Loaded ${listings.length} cars from Supabase`);
+              applyFilters();
+              return;
+            }
+          } catch (supabaseError) {
+            console.error('❌ Failed to load cars from Supabase:', supabaseError);
+            // Show error message
+            const carsContainer = document.getElementById('carsContainer');
+            if (carsContainer) {
+              carsContainer.innerHTML = '<div class="alert alert-danger">Failed to load cars. Please refresh the page.</div>';
+            }
+            return;
+          }
+          
+          // If we reach here, no cars were loaded
+          const carsContainer = document.getElementById('carsContainer');
+          if (carsContainer) {
+            carsContainer.innerHTML = '<div class="alert alert-info">No cars found.</div>';
+          }
+        }
+
+        // Event listeners
+        const searchInput = document.getElementById('carSearchInput');
+        if (searchInput) {
+          searchInput.addEventListener('input', filterCars);
+        }
+
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+          sortSelect.addEventListener('change', function() {
+            sortCars();
+            renderCars();
+          });
+        }
+
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+        if (gridViewBtn) gridViewBtn.addEventListener('click', () => setViewMode('grid'));
+        if (listViewBtn) listViewBtn.addEventListener('click', () => setViewMode('list'));
+
+        const filterToggleBtn = document.getElementById('filterToggleBtn');
+        if (filterToggleBtn) {
+          filterToggleBtn.addEventListener('click', function() {
+            const sidebar = document.getElementById('filtersSidebar');
+            if (sidebar) {
+              sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+            }
+          });
+        }
+
+        const closeFiltersBtn = document.getElementById('closeFiltersBtn');
+        if (closeFiltersBtn) {
+          closeFiltersBtn.addEventListener('click', function() {
+            const sidebar = document.getElementById('filtersSidebar');
+            if (sidebar) sidebar.style.display = 'none';
+          });
+        }
+
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        if (applyFiltersBtn) {
+          applyFiltersBtn.addEventListener('click', filterCars);
+        }
+
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        if (clearFiltersBtn) {
+          clearFiltersBtn.addEventListener('click', function() {
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('minYear').value = '';
+            document.getElementById('maxYear').value = '';
+            document.getElementById('minMileage').value = '';
+            document.getElementById('maxMileage').value = '';
+            document.getElementById('filterAutomatic').checked = false;
+            document.getElementById('filterManual').checked = false;
+            document.getElementById('filterPetrol').checked = false;
+            document.getElementById('filterDiesel').checked = false;
+            document.getElementById('filterElectric').checked = false;
+            document.getElementById('filterMake').value = '';
+            document.getElementById('filterModel').value = '';
+            document.getElementById('filterModel').disabled = true;
+            if (searchInput) searchInput.value = '';
+            updatePriceDisplay();
+            filterCars();
+          });
+        }
+
+        // Price range display updates
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        if (minPrice) minPrice.addEventListener('input', updatePriceDisplay);
+        if (maxPrice) maxPrice.addEventListener('input', updatePriceDisplay);
+
+        // Initialize view mode
+        setViewMode(currentView);
+
+        // Start search alerts checking
+        if (typeof searchAlerts !== 'undefined' && db) {
+          searchAlerts.startChecking(60); // Check every 60 minutes
+        }
+      });
+
+      // Save search alert function
+      function saveSearchAlert() {
+        const criteria = {
+          type: 'car',
+          keywords: document.getElementById('carSearchInput')?.value || '',
+          minPrice: document.getElementById('minPrice')?.value || '',
+          maxPrice: document.getElementById('maxPrice')?.value || '',
+          minYear: document.getElementById('minYear')?.value || '',
+          maxYear: document.getElementById('maxYear')?.value || '',
+          transmission: document.getElementById('transmissionFilter')?.value || '',
+          fuel: document.getElementById('fuelFilter')?.value || '',
+          make: document.getElementById('makeFilter')?.value || ''
+        };
+
+        if (typeof searchAlerts !== 'undefined') {
+          searchAlerts.saveAlert(criteria);
+          alert('Search alert saved! You will be notified when new listings match your criteria.');
+        } else {
+          alert('Search alerts feature not available');
+        }
+      }
+    </script>
+
+<!-- 🌍 Footer -->
+<footer class="bg-dark text-light pt-4 pb-3 mt-5">
+  <div class="container">
+    <div class="row">
+      <!-- Brand Info -->
+      <div class="col-md-3 mb-3">
+        <h5>🏠 HOME AFRICA</h5>
+        <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+      </div>
+      <!-- Quick Links -->
+      <div class="col-md-3 mb-3">
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
+          <li><a href="apartment.html" class="footer-link">Apartments</a></li>
+          <li><a href="land.html" class="footer-link">Land</a></li>
+          <li><a href="cars.html" class="footer-link">Cars</a></li>
+        </ul>
+      </div>
+      <!-- Contact Info -->
+      <div class="col-md-3 mb-3">
+        <h6>Contact Us</h6>
+        <ul class="list-unstyled">
+          <li>Phone: +250 788 123 456</li>
+          <li>Email: info@home.africa</li>
+          <li>Address: Kigali, Rwanda</li>
+        </ul>
+      </div>
+      <!-- Social Links -->
+      <div class="col-md-3 mb-3">
+        <h6>Follow Us</h6>
+        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
+        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
+        <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
+        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <hr style="border-color: rgba(255,255,255,0.1)" />
+    <div class="text-center small">
+      &copy; 2025 HOME AFRICA. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+  
+  <!-- Footer Fix - Dynamic padding to prevent content overlap -->
+  <script src="js/footer-fix.js"></script>
+</body>
+</html>

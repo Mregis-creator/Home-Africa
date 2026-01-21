@@ -1,0 +1,103 @@
+<!-- Comments Section Component -->
+<!-- Include this before footer on listing detail pages -->
+
+<div class="comments-section-container" style="position: relative; z-index: 1; max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+  <div class="comments-card" style="background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%); border: 2px solid #ff0088; border-radius: 16px; padding: 2rem; box-shadow: 0 0 24px 0 rgba(255,0,136,0.2);">
+    <h3 class="text-white mb-4">
+      <i class="bi bi-chat-dots"></i> Discussion & Questions
+      <small class="text-white-50" id="commentsCount">(0 comments)</small>
+    </h3>
+
+    <!-- Comment Form -->
+    <div class="comment-form mb-4" id="commentFormSection">
+      <div class="d-flex gap-2 align-items-start">
+        <img src="images/hero-bg.jpeg" alt="Your Avatar" 
+             id="commentUserAvatar"
+             style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #0ff; flex-shrink: 0;">
+        <div class="flex-grow-1">
+          <textarea class="form-control" 
+                    id="commentInput" 
+                    rows="3" 
+                    placeholder="Ask a question or share your thoughts about this listing..."
+                    style="background: rgba(255,255,255,0.1); border: 1px solid rgba(0,255,255,0.3); color: #fff; resize: vertical;"></textarea>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <div>
+              <input type="file" 
+                     id="commentImages" 
+                     accept="image/*" 
+                     multiple 
+                     style="display: none;">
+              <button type="button" 
+                      class="btn btn-sm btn-outline-primary" 
+                      onclick="document.getElementById('commentImages').click()">
+                <i class="bi bi-image"></i> Add Images
+              </button>
+            </div>
+            <button type="button" 
+                    class="btn btn-primary" 
+                    id="submitCommentBtn"
+                    onclick="submitComment()">
+              <i class="bi bi-send"></i> Post Comment
+            </button>
+          </div>
+          <div id="commentImagePreview" class="mt-2" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments List -->
+    <div id="commentsContainer">
+      <!-- Comments will be loaded here -->
+      <div class="text-center text-white-50 py-4">
+        <i class="bi bi-chat" style="font-size: 2rem;"></i>
+        <p class="mt-2">No comments yet. Be the first to comment!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .comment-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+  }
+
+  .comment-item:hover {
+    border-color: #0ff;
+    box-shadow: 0 4px 20px rgba(0,255,255,0.2);
+  }
+
+  .reply-item {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid #0ff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .comment-actions .btn-link {
+    color: #0ff;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .comment-actions .btn-link:hover {
+    color: #8fff00;
+  }
+
+  .form-control:focus {
+    background: rgba(255,255,255,0.15);
+    border-color: #0ff;
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(0,255,255,0.25);
+  }
+
+  .form-control::placeholder {
+    color: rgba(255,255,255,0.5);
+  }
+</style>
+

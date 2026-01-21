@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Success - HOME AFRICA</title>
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      padding-top: 80px;
+      padding-bottom: 100px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+    .success-container {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 3rem;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #0ff;
+      border-radius: 16px;
+      text-align: center;
+      color: #fff;
+    }
+    .success-icon {
+      font-size: 5rem;
+      color: #0ff;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <i class="bi bi-check-circle-fill success-icon"></i>
+    <h1 style="color: #0ff;">Payment Successful!</h1>
+    <p class="lead">Your merchant account subscription has been activated.</p>
+    <p>You can now start posting listings and managing your properties.</p>
+    <div class="mt-4">
+      <a href="post.html" class="btn btn-primary me-2">Post Your First Listing</a>
+      <a href="dashboard.html" class="btn btn-outline-primary">Go to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/payments.js"></script>
+  <script>
+    // Verify payment on page load
+    (async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+      
+      if (sessionId && window.paymentSystem) {
+        try {
+          await window.paymentSystem.verifyPayment(sessionId);
+        } catch (error) {
+          console.error('Payment verification error:', error);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Details | HOME AFRICA</title>
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <style>
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    html, body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+    }
+    .nav-link {
+      color: rgba(255,255,255,0.9) !important;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .nav-link:hover {
+      color: #0ff !important;
+      transform: translateY(-2px);
+    }
+    .detail-container {
+      position: relative;
+      z-index: 1;
+      padding-top: 2rem;
+      padding-bottom: 4rem;
+    }
+    .detail-card {
+      background: linear-gradient(120deg, rgba(0,0,0,0.92) 60%, rgba(0,255,136,0.18) 100%);
+      border: 2px solid #0ff;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      margin-bottom: 2rem;
+    }
+    .image-gallery {
+      position: relative;
+    }
+    .main-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid #0ff;
+      cursor: pointer;
+    }
+    .thumbnail-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      overflow-x: auto;
+    }
+    .thumbnail {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgba(0,255,136,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .thumbnail:hover, .thumbnail.active {
+      border-color: #0ff;
+      transform: scale(1.1);
+    }
+    .detail-title {
+      color: #0ff;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .detail-price {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .detail-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .info-item {
+      background: rgba(0,255,136,0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(0,255,136,0.3);
+    }
+    .info-label {
+      color: #8fff00;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .info-value {
+      color: #fff;
+      font-size: 1.1rem;
+    }
+    .contact-section {
+      background: rgba(0,255,136,0.15);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 2px solid #0ff;
+      margin-top: 2rem;
+    }
+    .contact-btn {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      transition: all 0.3s;
+    }
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,136,0.3);
+    }
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      border: none;
+      color: white;
+    }
+    .btn-call {
+      background: linear-gradient(135deg, #0ff 0%, #00ccff 100%);
+      border: none;
+      color: white;
+    }
+    .btn-email {
+      background: linear-gradient(135deg, #8fff00 0%, #66cc00 100%);
+      border: none;
+      color: #222;
+    }
+    .verified-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+    }
+    .social-share {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .share-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(0,255,136,0.3);
+      color: #fff;
+      transition: all 0.3s;
+    }
+    .share-btn:hover {
+      border-color: #0ff;
+      transform: scale(1.1);
+    }
+    .reviews-section {
+      margin-top: 2rem;
+    }
+    .review-card {
+      background: rgba(0,255,136,0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(0,255,136,0.3);
+    }
+    .star-rating {
+      color: #8fff00;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.95);
+      border-top: 2px solid #0ff;
+      z-index: 1000;
+      padding: 1rem 0;
+    }
+    @media (max-width: 768px) {
+      .main-image {
+        height: 250px;
+      }
+      .detail-title {
+        font-size: 1.5rem;
+      }
+      .detail-price {
+        font-size: 2rem;
+      }
+      .footer {
+        position: relative;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="explore.html">Explore</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land Plots</a></li>
+          <li class="nav-item"><a class="nav-link" href="post.html">Post your property</a></li>
+          <li class="nav-item"><a class="nav-link" href="signin.html">Log In</a></li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
+              <i class="bi bi-robot"></i> Ask Rejo
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Detail Container -->
+  <div class="container detail-container">
+    <div id="loadingSpinner" class="text-center py-5">
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    
+    <div id="detailContent" style="display:none;">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="detail-card">
+            <!-- Image Gallery -->
+            <div class="image-gallery">
+              <img id="mainImage" src="images/car1.jpg" class="main-image" alt="Car Image">
+              <div class="thumbnail-container" id="thumbnailContainer"></div>
+            </div>
+
+            <!-- Description -->
+            <div class="mt-4">
+              <h3 class="text-white mb-3"><i class="bi bi-info-circle"></i> Description</h3>
+              <p id="carDescription" class="text-white-50" style="line-height: 1.8;"></p>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+              <h3 class="text-white mb-3"><i class="bi bi-star-fill"></i> Reviews</h3>
+              <div id="reviewsContainer"></div>
+              <button class="btn btn-outline-light mt-3" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <i class="bi bi-plus-circle"></i> Add Review
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="detail-card">
+            <h2 id="carTitle" class="detail-title"></h2>
+            <div class="detail-price" id="carPrice"></div>
+            
+            <div class="detail-info-grid">
+              <div class="info-item">
+                <div class="info-label"><i class="bi bi-gear"></i> Transmission</div>
+                <div class="info-value" id="carTransmission"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label"><i class="bi bi-fuel-pump"></i> Fuel Type</div>
+                <div class="info-value" id="carFuel"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label"><i class="bi bi-speedometer"></i> Mileage</div>
+                <div class="info-value" id="carMileage"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label"><i class="bi bi-calendar"></i> Year</div>
+                <div class="info-value" id="carYear"></div>
+              </div>
+            </div>
+
+            <!-- Merchant Info -->
+            <div class="contact-section">
+              <h4 class="text-white mb-3">
+                <i class="bi bi-person-badge"></i> Seller Information
+                <span id="verifiedBadge" class="verified-badge" style="display:none;">
+                  <i class="bi bi-check-circle-fill"></i> Verified
+                </span>
+              </h4>
+              <p class="text-white" id="merchantName"></p>
+              <p class="text-white-50" id="merchantContact"></p>
+              
+              <div class="mt-3">
+                <a id="whatsappBtn" href="#" class="btn btn-whatsapp contact-btn" target="_blank">
+                  <i class="bi bi-whatsapp"></i> WhatsApp
+                </a>
+                <a id="callBtn" href="#" class="btn btn-call contact-btn">
+                  <i class="bi bi-telephone"></i> Call Now
+                </a>
+                <a id="emailBtn" href="#" class="btn btn-email contact-btn">
+                  <i class="bi bi-envelope"></i> Email
+                </a>
+              </div>
+            </div>
+
+            <!-- Booking Section -->
+            <div class="mt-3">
+              <button class="btn btn-primary w-100 contact-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                <i class="bi bi-calendar-check"></i> Schedule Test Drive
+              </button>
+            </div>
+
+            <!-- Social Share -->
+            <div class="social-share">
+              <a id="shareWhatsApp" href="#" target="_blank" class="share-btn btn-success" title="Share on WhatsApp">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+              <a id="shareFacebook" href="#" target="_blank" class="share-btn" style="background:#1877f2;" title="Share on Facebook">
+                <i class="bi bi-facebook"></i>
+              </a>
+              <a id="shareTwitter" href="#" target="_blank" class="share-btn" style="background:#1da1f2;" title="Share on Twitter">
+                <i class="bi bi-twitter"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Modal -->
+  <div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background:rgba(0,0,0,0.95);border:2px solid #0ff;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(0,255,136,0.3);">
+          <h5 class="modal-title text-white"><i class="bi bi-calendar-check"></i> Schedule Test Drive</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="bookingForm">
+            <input type="hidden" id="bookingCarId">
+            <div class="mb-3">
+              <label class="text-white">Your Name *</label>
+              <input type="text" class="form-control" id="bookingName" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
+            </div>
+            <div class="mb-3">
+              <label class="text-white">Phone Number *</label>
+              <input type="tel" class="form-control" id="bookingPhone" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
+            </div>
+            <div class="mb-3">
+              <label class="text-white">Preferred Date *</label>
+              <input type="date" class="form-control" id="bookingDate" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
+            </div>
+            <div class="mb-3">
+              <label class="text-white">Preferred Time *</label>
+              <input type="time" class="form-control" id="bookingTime" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
+            </div>
+            <div class="mb-3">
+              <label class="text-white">Message (Optional)</label>
+              <textarea class="form-control" id="bookingMessage" rows="3" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Submit Booking</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background:rgba(0,0,0,0.95);border:2px solid #0ff;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(0,255,136,0.3);">
+          <h5 class="modal-title text-white"><i class="bi bi-star-fill"></i> Add Review</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reviewForm">
+            <input type="hidden" id="reviewCarId">
+            <div class="mb-3">
+              <label class="text-white">Your Name *</label>
+              <input type="text" class="form-control" id="reviewName" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
+            </div>
+            <div class="mb-3">
+              <label class="text-white">Rating *</label>
+              <select class="form-select" id="reviewRating" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Very Good</option>
+                <option value="3">3 - Good</option>
+                <option value="2">2 - Fair</option>
+                <option value="1">1 - Poor</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="text-white">Review *</label>
+              <textarea class="form-control" id="reviewText" rows="4" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comments-section-container" style="position: relative; z-index: 1; max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+    <div class="comments-card" style="background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%); border: 2px solid #ff0088; border-radius: 16px; padding: 2rem; box-shadow: 0 0 24px 0 rgba(255,0,136,0.2);">
+      <h3 class="text-white mb-4">
+        <i class="bi bi-chat-dots"></i> Discussion & Questions
+        <small class="text-white-50" id="commentsCount">(0 comments)</small>
+      </h3>
+
+      <!-- Comment Form -->
+      <div class="comment-form mb-4" id="commentFormSection">
+        <div class="d-flex gap-2 align-items-start">
+          <img src="images/hero-bg.jpeg" alt="Your Avatar" 
+               id="commentUserAvatar"
+               style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #0ff; flex-shrink: 0;">
+          <div class="flex-grow-1">
+            <textarea class="form-control" 
+                      id="commentInput" 
+                      rows="3" 
+                      placeholder="Ask a question or share your thoughts about this car..."
+                      style="background: rgba(255,255,255,0.1); border: 1px solid rgba(0,255,255,0.3); color: #fff; resize: vertical;"></textarea>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div>
+                <input type="file" 
+                       id="commentImages" 
+                       accept="image/*" 
+                       multiple 
+                       style="display: none;">
+                <button type="button" 
+                        class="btn btn-sm btn-outline-primary" 
+                        onclick="document.getElementById('commentImages').click()">
+                  <i class="bi bi-image"></i> Add Images
+                </button>
+              </div>
+              <button type="button" 
+                      class="btn btn-primary" 
+                      id="submitCommentBtn"
+                      onclick="submitComment()">
+                <i class="bi bi-send"></i> Post Comment
+              </button>
+            </div>
+            <div id="commentImagePreview" class="mt-2" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments List -->
+      <div id="commentsContainer">
+        <!-- Comments will be loaded here -->
+        <div class="text-center text-white-50 py-4">
+          <i class="bi bi-chat" style="font-size: 2rem;"></i>
+          <p class="mt-2">No comments yet. Be the first to comment!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .comment-item {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+
+    .comment-item:hover {
+      border-color: #0ff;
+      box-shadow: 0 4px 20px rgba(0,255,255,0.2);
+    }
+
+    .reply-item {
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid #0ff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .comment-actions .btn-link {
+      color: #0ff;
+      text-decoration: none;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .comment-actions .btn-link:hover {
+      color: #8fff00;
+    }
+
+    .form-control:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #0ff;
+      color: #fff;
+      box-shadow: 0 0 0 0.2rem rgba(0,255,255,0.25);
+    }
+
+    .form-control::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+  </style>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container text-center">
+      <p class="mb-0 text-white">&copy; 2025 HOME AFRICA. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="js/notifications.js"></script>
+  
+  <script>
+
+    // Initialize particles
+    particlesJS('particles-js', {
+      particles: { number: { value: 50 }, color: { value: '#0ff' } },
+      interactivity: { events: { onhover: { enable: true, mode: 'repulse' } } }
+    });
+
+    // Get car ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const carId = urlParams.get('id');
+
+    // Load car details
+    function loadCarDetails() {
+      if (!carId) {
+        document.getElementById('loadingSpinner').innerHTML = '<p class="text-white">Car ID not found</p>';
+        return;
+      }
+
+      // Check if it's a static car
+      const staticCars = {
+        'static1': { title: 'Toyota RAV4 - 2017', transmission: 'Automatic', fuel: 'Petrol', mileage: '60000', price: '18000000', merchantName: 'Auto Dealer', merchantContact: '+250788123456', images: ['images/car1.jpg'] },
+        'static2': { title: 'Suzuki Swift - 2019', transmission: 'Manual', fuel: 'Petrol', mileage: '45000', price: '13500000', merchantName: 'Car Sales', merchantContact: '+250788123456', images: ['images/car2.jpg'] },
+        'static3': { title: 'Toyota Prado - 2016', transmission: 'Automatic', fuel: 'Diesel', mileage: '85000', price: '45000000', merchantName: 'Premium Motors', merchantContact: '+250788123456', images: ['images/car3.jpg'] }
+      };
+
+      if (staticCars[carId]) {
+        displayCar(staticCars[carId], carId);
+        return;
+      }
+
+      // Load from Supabase
+      async function loadCarDetails() {
+        try {
+          // Try Supabase first
+          if (window.supabaseListings) {
+            const listing = await window.supabaseListings.getListingById(carId);
+            if (listing) {
+              // Transform Supabase listing to car format
+              const car = {
+                id: listing.id,
+                title: listing.title,
+                description: listing.description,
+                price: listing.price?.toString() || '0',
+                transmission: listing.metadata?.transmission || '',
+                fuel: listing.metadata?.fuel || '',
+                mileage: listing.metadata?.mileage || '',
+                images: listing.images || [],
+                merchantName: listing.metadata?.merchantName || '',
+                merchantContact: listing.metadata?.merchantContact || '',
+                merchantEmail: listing.metadata?.merchantEmail || '',
+                views: listing.views || 0
+              };
+              
+              displayCar(car, carId);
+              // Track view in Supabase
+              await window.supabaseListings.incrementViews(carId);
+              console.log('✅ Loaded car from Supabase');
+              return;
+            }
+          }
+        } catch (supabaseError) {
+          console.error('❌ Failed to load car from Supabase:', supabaseError);
+          const loadingSpinner = document.getElementById('loadingSpinner');
+          if (loadingSpinner) {
+            loadingSpinner.innerHTML = '<p class="text-white">Error loading car details. Please refresh the page.</p>';
+          }
+        }
+      }
+      
+      loadCarDetails();
+    }
+
+    // Track view (handled by Supabase in loadCarDetails)
+    function trackView(carId) {
+      // View tracking is handled by Supabase incrementViews
+      // This function kept for compatibility but does nothing
+
+      // Track in localStorage for recently viewed
+      const carTitle = document.getElementById('carTitle')?.textContent || 'Car Listing';
+      const carImage = document.getElementById('mainImage')?.src || '';
+      const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      const newItem = {
+        type: 'car',
+        id: carId,
+        title: carTitle,
+        image: carImage,
+        url: window.location.href,
+        time: 'just now'
+      };
+      const filtered = viewed.filter(item => item.id !== carId);
+      filtered.unshift(newItem);
+      localStorage.setItem('recentlyViewed', JSON.stringify(filtered.slice(0, 20)));
+    }
+
+    function displayCar(car, id) {
+      // Extract year from title
+      const yearMatch = (car.title || '').match(/\b(19|20)\d{2}\b/);
+      const year = yearMatch ? yearMatch[0] : 'N/A';
+
+      // Set title and price
+      document.getElementById('carTitle').textContent = car.title || 'Car';
+      document.getElementById('carPrice').textContent = `RWF ${parseInt(car.price || 0).toLocaleString()}`;
+      document.getElementById('carTransmission').textContent = car.transmission || 'N/A';
+      document.getElementById('carFuel').textContent = car.fuel || 'N/A';
+      document.getElementById('carMileage').textContent = car.mileage ? car.mileage + ' km' : 'N/A';
+      document.getElementById('carYear').textContent = year;
+      document.getElementById('carDescription').textContent = car.description || 'No description available.';
+      document.getElementById('merchantName').textContent = car.merchantName || 'Seller';
+      document.getElementById('merchantContact').textContent = car.merchantContact || 'Contact not available';
+
+      // Set images
+      const images = car.images && car.images.length > 0 ? car.images : ['images/car1.jpg'];
+      document.getElementById('mainImage').src = images[0];
+      
+      const thumbnailContainer = document.getElementById('thumbnailContainer');
+      thumbnailContainer.innerHTML = '';
+      images.forEach((img, index) => {
+        const thumb = document.createElement('img');
+        thumb.src = img;
+        thumb.className = 'thumbnail' + (index === 0 ? ' active' : '');
+        thumb.onclick = () => {
+          document.getElementById('mainImage').src = img;
+          document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+          thumb.classList.add('active');
+        };
+        thumbnailContainer.appendChild(thumb);
+      });
+
+      // Set contact links
+      const phone = car.merchantContact || '';
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const whatsappLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=Hello, I'm interested in ${encodeURIComponent(car.title || 'this car')}` : '#';
+      const telLink = phone ? `tel:${phone}` : '#';
+      const emailLink = car.merchantEmail ? `mailto:${car.merchantEmail}?subject=Inquiry about ${encodeURIComponent(car.title || 'your listing')}` : '#';
+
+      document.getElementById('whatsappBtn').href = whatsappLink;
+      document.getElementById('callBtn').href = telLink;
+      document.getElementById('emailBtn').href = emailLink;
+
+      // Set social share links
+      const shareUrl = encodeURIComponent(window.location.href);
+      const shareText = encodeURIComponent(`Check out this ${car.title || 'car'} on HOME AFRICA!`);
+      document.getElementById('shareWhatsApp').href = `https://wa.me/?text=${shareText}%20${shareUrl}`;
+      document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+      document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+
+      // Set verified badge
+      if (car.verified) {
+        document.getElementById('verifiedBadge').style.display = 'inline-block';
+      }
+
+      // Set booking and review IDs
+      document.getElementById('bookingCarId').value = id;
+      document.getElementById('reviewCarId').value = id;
+
+      // Load reviews
+      loadReviews(id);
+
+      // Show content
+      document.getElementById('loadingSpinner').style.display = 'none';
+      document.getElementById('detailContent').style.display = 'block';
+    }
+
+    // Load reviews (TODO: Migrate to Supabase)
+    function loadReviews(carId) {
+      const container = document.getElementById('reviewsContainer');
+      if (container) {
+        container.innerHTML = '<p class="text-white-50">Reviews feature coming soon.</p>';
+      }
+      // TODO: Implement reviews in Supabase
+    }
+
+    // Booking form submission
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Submitting...';
+      
+      try {
+        const bookingData = {
+          listingId: document.getElementById('bookingCarId').value,
+          name: document.getElementById('bookingName').value,
+          phone: document.getElementById('bookingPhone').value,
+          email: document.getElementById('bookingEmail')?.value || '',
+          scheduledDate: document.getElementById('bookingDate').value,
+          scheduledTime: document.getElementById('bookingTime').value,
+          notes: document.getElementById('bookingMessage').value,
+          bookingType: 'test_drive'
+        };
+        
+        if (window.bookingSystem) {
+          await window.bookingSystem.createBooking(bookingData);
+          alert('✅ Booking submitted successfully! You will receive a confirmation email shortly.');
+          bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+          document.getElementById('bookingForm').reset();
+        } else {
+          throw new Error('Booking system not initialized');
+        }
+      } catch (error) {
+        console.error('Booking error:', error);
+        alert('Error submitting booking: ' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+
+    // Review form submission
+    document.getElementById('reviewForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // TODO: Implement review submission in Supabase
+      alert('Reviews feature coming soon. This will be implemented in Supabase.');
+      bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+      document.getElementById('reviewForm').reset();
+    });
+
+    // Load on page load
+    loadCarDetails();
+  </script>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/email-notifications.js"></script>
+  <script src="js/supabase-listings.js"></script>
+  
+  <!-- Comments System -->
+  <script src="js/comments-system.js"></script>
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+  
+  <!-- Footer Fix -->
+  <script src="js/footer-fix.js"></script>
+
+  <script>
+    // Initialize comments system for this listing
+    let listingCommentsSystem = null;
+    
+    // Wait for page to load and get listing ID
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get listing ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const listingId = urlParams.get('id');
+      
+      if (listingId) {
+        // Initialize comments system
+        // First, we need to get or create a post for this listing
+        initializeListingComments(listingId);
+      }
+    });
+
+    // Initialize comments for a listing
+    async function initializeListingComments(listingId) {
+      try {
+        const supabase = window.supabaseClient;
+        if (!supabase) {
+          console.log('Supabase not available');
+          return;
+        }
+
+        // Check if a post exists for this listing
+        const { data: existingPost } = await supabase
+          .from('post_listings')
+          .select('post_id')
+          .eq('listing_id', listingId)
+          .single();
+
+        let postId = null;
+
+        if (existingPost) {
+          postId = existingPost.post_id;
+        } else {
+          // Create a post for this listing (if merchant)
+          // For now, we'll use the listing ID as post ID reference
+          // In production, create a post entry
+          postId = listingId; // Temporary: use listing ID
+        }
+
+        // Initialize comments system
+        if (postId) {
+          listingCommentsSystem = new CommentsSystem(postId, 'commentsContainer');
+          window.currentCommentsSystem = listingCommentsSystem;
+        }
+
+      } catch (error) {
+        console.error('Error initializing comments:', error);
+      }
+    }
+
+    // Submit comment
+    async function submitComment() {
+      const commentInput = document.getElementById('commentInput');
+      const commentText = commentInput.value.trim();
+
+      if (!commentText) {
+        alert('Please enter a comment');
+        return;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const listingId = urlParams.get('id');
+
+      if (!listingId) {
+        alert('Listing ID not found');
+        return;
+      }
+
+      // Get or create post for this listing
+      try {
+        const supabase = window.supabaseClient;
+        if (!supabase) {
+          alert('Database connection not available');
+          return;
+        }
+
+        // Check if post exists
+        let { data: postLink } = await supabase
+          .from('post_listings')
+          .select('post_id')
+          .eq('listing_id', listingId)
+          .single();
+
+        let postId = null;
+
+        if (postLink) {
+          postId = postLink.post_id;
+        } else {
+          // Create a post for this listing
+          const userId = getCurrentUserId();
+          const authorType = getAuthorType();
+
+          // Get listing details to create post
+          const { data: listing } = await supabase
+            .from('listings')
+            .select('*')
+            .eq('id', listingId)
+            .single();
+
+          if (listing) {
+            const { data: newPost } = await supabase
+              .from('posts')
+              .insert([{
+                author_id: listing.merchant_id || userId,
+                author_type: listing.merchant_id ? 'merchant' : authorType,
+                post_type: 'product',
+                title: listing.title || 'Product Discussion',
+                content: `Discussion for ${listing.title}`,
+                visibility: 'public',
+                status: 'published'
+              }])
+              .select()
+              .single();
+
+            if (newPost) {
+              postId = newPost.id;
+
+              // Link post to listing
+              await supabase
+                .from('post_listings')
+                .insert([{
+                  post_id: newPost.id,
+                  listing_id: listingId
+                }]);
+            }
+          }
+        }
+
+        if (postId && listingCommentsSystem) {
+          // Get images if any
+          const imageFiles = document.getElementById('commentImages').files;
+          let imageUrls = [];
+          
+          if (imageFiles.length > 0) {
+            // Upload images (simplified - in production, upload to storage)
+            for (let file of imageFiles) {
+              const reader = new FileReader();
+              const dataUrl = await new Promise((resolve) => {
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+              });
+              imageUrls.push(dataUrl);
+            }
+          }
+
+          await listingCommentsSystem.addComment(commentText, null, imageUrls);
+          
+          // Clear form
+          commentInput.value = '';
+          document.getElementById('commentImages').value = '';
+          document.getElementById('commentImagePreview').style.display = 'none';
+          document.getElementById('commentImagePreview').innerHTML = '';
+        }
+
+      } catch (error) {
+        console.error('Error submitting comment:', error);
+        alert('Error submitting comment: ' + error.message);
+      }
+    }
+
+    // Helper functions
+    function getCurrentUserId() {
+      return localStorage.getItem('userId');
+    }
+
+    function getAuthorType() {
+      return localStorage.getItem('isMerchant') === 'true' ? 'merchant' : 'user';
+    }
+
+    // Image preview for comments
+    document.getElementById('commentImages')?.addEventListener('change', function(e) {
+      const preview = document.getElementById('commentImagePreview');
+      if (!preview) return;
+      
+      preview.innerHTML = '';
+      preview.style.display = 'block';
+      
+      Array.from(e.target.files).forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.width = '100px';
+          img.style.height = '100px';
+          img.style.objectFit = 'cover';
+          img.style.borderRadius = '8px';
+          img.style.marginRight = '10px';
+          img.style.border = '2px solid #0ff';
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  </script>
+</body>
+</html>
+

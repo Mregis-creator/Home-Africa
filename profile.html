@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Profile | HOME AFRICA</title>
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <style>
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    html, body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+    }
+    .nav-link {
+      color: rgba(255,255,255,0.9) !important;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .nav-link:hover {
+      color: #0ff !important;
+      transform: translateY(-2px);
+    }
+    .profile-container {
+      position: relative;
+      z-index: 1;
+      padding-top: 2rem;
+      padding-bottom: 4rem;
+    }
+    .profile-card {
+      background: linear-gradient(120deg, rgba(0,0,0,0.92) 60%, rgba(0,255,136,0.18) 100%);
+      border: 2px solid #0ff;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      margin-bottom: 2rem;
+    }
+    .profile-header {
+      text-align: center;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid rgba(0,255,136,0.3);
+      margin-bottom: 2rem;
+    }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #0ff;
+      margin: 0 auto 1rem;
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: #222;
+    }
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid rgba(0,255,136,0.3);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      padding: 1rem 2rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      color: #0ff;
+      border-bottom-color: #0ff;
+    }
+    .tab-btn:hover {
+      color: #8fff00;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .favorite-card, .viewed-card {
+      background: rgba(0,255,136,0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(0,255,136,0.3);
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    .favorite-card:hover, .viewed-card:hover {
+      background: rgba(0,255,136,0.15);
+      border-color: #0ff;
+      transform: translateX(5px);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255,255,255,0.5);
+    }
+    .listing-card {
+      background: rgba(0,255,136,0.1);
+      border: 1px solid rgba(0,255,255,0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+      height: 100%;
+    }
+    .listing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,255,255,0.3);
+      border-color: #0ff;
+    }
+    .listing-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .listing-info {
+      padding: 1rem;
+    }
+    .listing-type-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: linear-gradient(90deg, #ff0088 0%, #00ffff 100%);
+      color: #000;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .listing-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+    }
+    .post-card {
+      background: rgba(0,255,136,0.1);
+      border: 1px solid rgba(0,255,255,0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    .post-card:hover {
+      background: rgba(0,255,136,0.15);
+      border-color: #0ff;
+      transform: translateX(5px);
+    }
+    .post-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land Plots</a></li>
+          <li class="nav-item"><a class="nav-link active" href="profile.html">Profile</a></li>
+          <li class="nav-item user-nav-item" style="display: none;">
+            <a class="nav-link" href="#" onclick="window.homeAfricaAuth.signOut(); return false;">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
+              <i class="bi bi-robot"></i> Ask Rejo
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Container -->
+  <div class="container profile-container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <h2 class="text-white mb-2 user-name">My Profile</h2>
+        <p class="text-white-50 user-email" id="userEmail">Loading...</p>
+        <div class="user-role-badge mt-2" style="display: none;"></div>
+        <button class="btn btn-outline-primary mt-3" onclick="showEditProfileModal()" id="editProfileBtn" style="display: none;">
+          <i class="bi bi-pencil"></i> Edit Profile
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('listings')">
+          <i class="bi bi-house"></i> My Listings
+        </button>
+        <button class="tab-btn" onclick="switchTab('posts')">
+          <i class="bi bi-file-post"></i> My Posts
+        </button>
+        <button class="tab-btn" onclick="switchTab('favorites')">
+          <i class="bi bi-heart-fill"></i> Favorites
+        </button>
+        <button class="tab-btn" onclick="switchTab('viewed')">
+          <i class="bi bi-clock-history"></i> Recently Viewed
+        </button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div id="listingsTab" class="tab-content active">
+        <h3 class="text-white mb-3"><i class="bi bi-house"></i> My Listings</h3>
+        <div id="userListings"></div>
+      </div>
+
+      <div id="postsTab" class="tab-content">
+        <h3 class="text-white mb-3"><i class="bi bi-file-post"></i> My Posts</h3>
+        <div id="userPosts"></div>
+      </div>
+
+      <div id="favoritesTab" class="tab-content">
+        <h3 class="text-white mb-3"><i class="bi bi-heart-fill"></i> My Favorites</h3>
+        <div id="favoritesList"></div>
+      </div>
+
+      <div id="viewedTab" class="tab-content">
+        <h3 class="text-white mb-3"><i class="bi bi-clock-history"></i> Recently Viewed</h3>
+        <div id="viewedList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light pt-4 pb-3 mt-5" style="position:relative;z-index:1;">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2025 HOME AFRICA. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%); border: 2px solid #ff0088;">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(255,0,136,0.3);">
+          <h5 class="modal-title text-white"><i class="bi bi-pencil"></i> Edit Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label text-white">Full Name</label>
+            <input type="text" class="form-control" id="editFullName" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(0,255,255,0.3); color: #fff;">
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-white">Bio</label>
+            <textarea class="form-control" id="editBio" rows="3" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(0,255,255,0.3); color: #fff;"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-white">Phone</label>
+            <input type="tel" class="form-control" id="editPhone" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(0,255,255,0.3); color: #fff;">
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-white">Location</label>
+            <input type="text" class="form-control" id="editLocation" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(0,255,255,0.3); color: #fff;">
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid rgba(255,0,136,0.3);">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveProfileEdits()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
+  <!-- Auth System -->
+  <script src="js/auth.js"></script>
+  
+  <script>
+
+    // Initialize particles
+    particlesJS('particles-js', {
+      particles: { number: { value: 50 }, color: { value: '#0ff' } },
+      interactivity: { events: { onhover: { enable: true, mode: 'repulse' } } }
+    });
+
+    // Switch tabs
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tab + 'Tab').classList.add('active');
+      
+      if (tab === 'favorites') {
+        loadFavorites();
+      } else if (tab === 'viewed') {
+        loadRecentlyViewed();
+      }
+      // Listings and posts are loaded automatically by profile.js
+    }
+
+    // Show edit profile modal
+    function showEditProfileModal() {
+      const user = window.homeAfricaProfile?.currentUserData;
+      if (!user) {
+        alert('Please wait for profile to load...');
+        return;
+      }
+
+      const modal = document.getElementById('editProfileModal');
+      if (modal) {
+        document.getElementById('editFullName').value = user.full_name || '';
+        document.getElementById('editBio').value = user.bio || '';
+        document.getElementById('editPhone').value = user.phone || '';
+        document.getElementById('editLocation').value = user.location || '';
+        new bootstrap.Modal(modal).show();
+      }
+    }
+
+    // Save profile edits
+    async function saveProfileEdits() {
+      if (!window.homeAfricaProfile) {
+        alert('Profile system not initialized');
+        return;
+      }
+
+      const profileData = {
+        full_name: document.getElementById('editFullName').value.trim(),
+        bio: document.getElementById('editBio').value.trim(),
+        phone: document.getElementById('editPhone').value.trim(),
+        location: document.getElementById('editLocation').value.trim()
+      };
+
+      try {
+        await window.homeAfricaProfile.updateProfile(profileData);
+        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+        alert('Profile updated successfully!');
+      } catch (error) {
+        alert('Error updating profile: ' + error.message);
+      }
+    }
+
+    // Check if user owns this profile
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (window.homeAfricaAuth && window.homeAfricaAuth.isAuthenticated()) {
+          const currentUserId = window.homeAfricaAuth.getCurrentUserId();
+          const urlParams = new URLSearchParams(window.location.search);
+          const profileUserId = urlParams.get('userId');
+          
+          // Show edit button only if viewing own profile
+          if (!profileUserId || profileUserId === currentUserId) {
+            const editBtn = document.getElementById('editProfileBtn');
+            if (editBtn) editBtn.style.display = 'block';
+          }
+        }
+      }, 1000);
+    });
+
+    // Load favorites
+    function loadFavorites() {
+      const favorites = JSON.parse(localStorage.getItem('carFavorites') || '[]');
+      const container = document.getElementById('favoritesList');
+      
+      if (favorites.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-heart" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+            <h4 class="mt-3 text-white-50">No favorites yet</h4>
+            <p class="text-white-50">Start browsing and add listings to your favorites!</p>
+            <a href="cars.html" class="btn btn-primary mt-3">Browse Cars</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      
+      // Load favorites from Supabase
+      async function loadFavoriteFromSupabase(carId) {
+        try {
+          if (window.supabaseListings && !carId.startsWith('static')) {
+            const listing = await window.supabaseListings.getListingById(carId);
+            if (listing) {
+              const car = {
+                title: listing.title,
+                price: listing.price?.toString() || '0',
+                images: listing.images || []
+              };
+              const card = createFavoriteCard(car, carId, 'car');
+              container.appendChild(card);
+              return;
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to load favorite from Supabase:', error);
+        }
+        
+        // Handle static cars
+        if (carId.startsWith('static')) {
+          const staticCars = {
+            'static1': { title: 'Toyota RAV4 - 2017', price: '18000000', images: ['images/car1.jpg'] },
+            'static2': { title: 'Suzuki Swift - 2019', price: '13500000', images: ['images/car2.jpg'] },
+            'static3': { title: 'Toyota Prado - 2016', price: '45000000', images: ['images/car3.jpg'] }
+          };
+          if (staticCars[carId]) {
+            const card = createFavoriteCard(staticCars[carId], carId, 'car');
+            container.appendChild(card);
+          }
+        }
+      }
+      
+      favorites.forEach(carId => {
+        loadFavoriteFromSupabase(carId);
+      });
+    }
+
+    // Create favorite card
+    function createFavoriteCard(item, id, type) {
+      const div = document.createElement('div');
+      div.className = 'favorite-card';
+      const image = item.images && item.images[0] ? item.images[0] : (type === 'car' ? 'images/car1.jpg' : type === 'apartment' ? 'images/house1.jpg' : 'images/land1.jpg');
+      const detailPage = type === 'car' ? 'car-detail.html' : type === 'apartment' ? 'apartment-detail.html' : 'land-detail.html';
+      
+      div.innerHTML = `
+        <div class="row align-items-center">
+          <div class="col-md-2">
+            <img src="${image}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;" alt="${item.title}">
+          </div>
+          <div class="col-md-8">
+            <h5 class="text-white mb-1">${item.title || 'Untitled'}</h5>
+            <p class="text-white-50 mb-0">RWF ${parseInt(item.price || 0).toLocaleString()}</p>
+          </div>
+          <div class="col-md-2 text-end">
+            <a href="${detailPage}?id=${id}" class="btn btn-sm btn-primary">
+              <i class="bi bi-eye"></i> View
+            </a>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    // Load recently viewed
+    function loadRecentlyViewed() {
+      const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      const container = document.getElementById('viewedList');
+      
+      if (viewed.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-clock-history" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+            <h4 class="mt-3 text-white-50">No recently viewed items</h4>
+            <p class="text-white-50">Start browsing to see your recently viewed listings here!</p>
+            <a href="cars.html" class="btn btn-primary mt-3">Browse Listings</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      viewed.slice(0, 10).forEach(item => {
+        const card = createViewedCard(item);
+        container.appendChild(card);
+      });
+    }
+
+    // Create viewed card
+    function createViewedCard(item) {
+      const div = document.createElement('div');
+      div.className = 'viewed-card';
+      div.innerHTML = `
+        <div class="row align-items-center">
+          <div class="col-md-2">
+            <img src="${item.image || 'images/car1.jpg'}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;" alt="${item.title}">
+          </div>
+          <div class="col-md-8">
+            <h5 class="text-white mb-1">${item.title}</h5>
+            <p class="text-white-50 mb-0">Viewed ${item.time}</p>
+          </div>
+          <div class="col-md-2 text-end">
+            <a href="${item.url}" class="btn btn-sm btn-outline-light">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    // Track page views (add to detail pages)
+    function trackView(type, id, title, image) {
+      const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      const newItem = {
+        type,
+        id,
+        title,
+        image,
+        url: `${type}-detail.html?id=${id}`,
+        time: 'just now'
+      };
+      // Remove if already exists
+      const filtered = viewed.filter(item => item.id !== id);
+      // Add to beginning
+      filtered.unshift(newItem);
+      // Keep only last 20
+      localStorage.setItem('recentlyViewed', JSON.stringify(filtered.slice(0, 20)));
+    }
+
+    // Load on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFavorites();
+    });
+  </script>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <!-- Auth System -->
+  <script src="js/auth.js"></script>
+  
+  <!-- Protected Pages Auth Check -->
+  <script src="js/protected-pages.js"></script>
+  
+  <!-- Profile System -->
+  <script src="js/profile.js"></script>
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+  
+  <!-- Footer Fix -->
+  <script src="js/footer-fix.js"></script>
+</body>
+</html>
+

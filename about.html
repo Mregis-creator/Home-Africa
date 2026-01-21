@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Us</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #eee;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+    }
+
+    .navbar .container {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+      animation: glow-pulse 2s infinite;
+      box-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+    }
+
+    .navbar-brand img:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% {
+        box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+      }
+      50% {
+        box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+      }
+    }
+
+    .navbar .nav-link,
+    .navbar .navbar-brand {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .navbar-brand:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 576px) {
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Hero Section */
+    .hero {
+      background: url('images/panafrica-map.png') center/cover no-repeat;
+      padding: 140px 20px 80px;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 0;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      z-index: 1;
+      position: relative;
+      color: #ffc107;
+      text-shadow: 0 0 10px black;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      z-index: 1;
+      position: relative;
+      max-width: 700px;
+      margin: 20px auto;
+    }
+
+    /* Sections */
+    .section {
+      padding: 60px 20px;
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      color: #0ff;
+    }
+
+    .card {
+      background: #222;
+      border: none;
+      color: #eee;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.1);
+      padding: 2rem;
+      margin-bottom: 30px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 24px rgba(0, 255, 255, 0.4);
+    }
+
+    .card h3 {
+      color: #ffc107;
+    }
+
+    /* Unified Footer Styles - Responsive */
+    footer.bg-dark {
+      background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
+      border-top: 2px solid #0ff;
+      box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    footer a {
+      color: #ccc;
+      text-decoration: none;
+    }
+    footer a:hover {
+      color: yellow;
+    }
+    /* Add padding to body to prevent content from being hidden behind fixed footer */
+    body {
+      padding-bottom: 250px;
+    }
+    @media (max-width: 768px) {
+      footer.bg-dark {
+        position: relative;
+      }
+      body {
+        padding-bottom: 0;
+      }
+      footer.bg-dark .row > div {
+        margin-bottom: 1.5rem;
+      }
+    }
+    @media (min-width: 769px) {
+      footer.bg-dark .container {
+        max-width: 1200px;
+      }
+    }
+
+    .highlight-africa {
+      background: linear-gradient(to right, #00a651, #ffcd00, #e94e1b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+    }
+
+    .footer-link {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+
+    .bi {
+      color: #0ff;
+      font-size: 1.3rem;
+      transition: color 0.2s, text-shadow 0.2s;
+      text-shadow: 0 0 8px #8fff00;
+    }
+
+    .bi:hover {
+      color: #8fff00;
+      text-shadow: 0 0 12px #0ff;
+    }
+
+    .footer .row, footer .row {
+      margin-bottom: 0.2rem !important;
+    }
+
+    footer hr {
+      margin-top: 0.2rem !important;
+      margin-bottom: 0.2rem !important;
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .text-center.small {
+      margin-top: 0.1rem !important;
+      margin-bottom: 0 !important;
+      font-size: 0.95em;
+    }
+
+    /* Navbar toggler adjustments */
+    .navbar-toggler {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🌍 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Home Africa Logo" />
+        HOME AFRICA
+      </a>
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#navbarNav" 
+        aria-controls="navbarNav" 
+        aria-expanded="false" 
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="explore.html">Explore</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="apartment.html">Apartments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="cars.html">Cars</a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link active" href="land.html">Land Plots</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="land.html">Post your property</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="signin.html">Log In</a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link active" href="about.html">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
+              <i class="bi bi-robot"></i> Ask Rejo
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="driving-school.html">Driving School</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🌄 Hero Section -->
+  <section class="hero" role="region" aria-label="Hero section">
+    <div class="container position-relative">
+      <h1>Driven by Africa. Powered by Rejo Group Inc.</h1>
+      <p>We are more than a pan african real estate network. We are a movement of dignity and Pan-African pride. Join the network as a partner or client today !</p>
+    </div>
+  </section>
+
+  <!-- 🎯 Vision & Mission -->
+  <section class="section" role="region" aria-labelledby="vision-mission">
+    <div class="container">
+      <h2 id="vision-mission" class="visually-hidden">Vision and Mission</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <h3>Our Vision</h3>
+            <p>
+              To be the leading force behind Africa’s safe, confident, and empowered road users — building a future where mobility is not a privilege, but a <strong>right</strong> and a <strong>skill</strong> mastered by all.
+            </p>
+            <p class="highlight-africa">We see an Africa where every journey begins with knowledge, purpose, and pride.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">            
+            <h3>Our Mission</h3>
+            <p>
+              To provide accessible, world-class real estate solutions that integrates safety, responsibility, and digital innovation. We train not just drivers — but <strong>ambassadors of change</strong> behind the wheel.
+            </p>
+            <p class="highlight-africa">From Kigali to Cairo, Lagos to Lusaka — we’re driving Africa forward, one Partner at a time.</p>
+          </div>
+        </div>
+  </section>
+
+ <!-- 🌍 Footer -->
+<footer class="bg-dark text-light pt-4 pb-3 mt-5" style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 1000;
+">
+  <div class="container">
+    <div class="row">
+      <!-- Brand Info -->
+      <div class="col-md-3 mb-3">
+        <h5>🏠 HOME AFRICA</h5>
+        <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="col-md-3 mb-3">
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
+          <li><a href="apartment.html" class="footer-link">Apartments</a></li>
+          <li><a href="land.html" class="footer-link">Land</a></li>
+          <li><a href="cars.html" class="footer-link">Cars</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="col-md-3 mb-3">
+        <h6>Contact Us</h6>
+        <ul class="list-unstyled">
+          <li>Phone: +250 788 123 456</li>
+          <li>Email: info@home.africa</li>
+          <li>Address: Kigali, Rwanda</li>
+        </ul>
+      </div>
+
+      <!-- Social Links -->
+      <div class="col-md-3 mb-3">
+        <h6>Follow Us</h6>
+        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
+        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
+        <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
+        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <hr style="border-color: rgba(255,255,255,0.1)" />
+    <div class="text-center small">
+        &copy; 2025 HOME AFRICA. All rights reserved.
+    </div>
+  </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Dynamic year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+  
+  <!-- Footer Fix - Dynamic padding to prevent content overlap -->
+  <script src="js/footer-fix.js"></script>
+</body>
+</html>

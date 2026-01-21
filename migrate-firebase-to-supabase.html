@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase to Supabase Migration Tool</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .container {
+      background: rgba(0,0,0,0.8);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 2px solid #0ff;
+    }
+    h1 {
+      color: #0ff;
+      text-align: center;
+    }
+    .section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(0,255,255,0.1);
+      border-radius: 8px;
+      border: 1px solid #0ff;
+    }
+    button {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 0.5rem;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #8fff00 0%, #0ff 100%);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #000;
+      padding: 1rem;
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      border: 1px solid #0ff;
+    }
+    .log-entry {
+      margin: 0.25rem 0;
+      padding: 0.25rem;
+    }
+    .log-success { color: #0ff; }
+    .log-error { color: #ff0088; }
+    .log-warning { color: #ffaa00; }
+    .log-info { color: #8fff00; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .stat-card {
+      background: rgba(0,255,255,0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #0ff;
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Firebase to Supabase Migration Tool</h1>
+    
+    <div class="section">
+      <h2>Migration Status</h2>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="merchantsMigrated">0</div>
+          <div>Merchants Migrated</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="listingsMigrated">0</div>
+          <div>Listings Migrated</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="errorsCount">0</div>
+          <div>Errors</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Migration Actions</h2>
+      <button onclick="migrateMerchants()">Migrate Merchants</button>
+      <button onclick="migrateCarListings()">Migrate Car Listings</button>
+      <button onclick="migrateApartmentListings()">Migrate Apartment Listings</button>
+      <button onclick="migrateLandListings()">Migrate Land Listings</button>
+      <button onclick="migrateAll()">Migrate Everything</button>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="section">
+      <h2>Migration Log</h2>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-merchants.js"></script>
+  <script src="js/supabase-listings.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJ2Ak6jpQxx87pAXzZO84Qpv9mk6QumJ4",
+      authDomain: "home-africa-90018.firebaseapp.com",
+      projectId: "home-africa-90018",
+      storageBucket: "home-africa-90018.appspot.com",
+      messagingSenderId: "38483277216",
+      appId: "1:38483277216:web:945484e33e73d92fbc60c5"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let merchantsMigrated = 0;
+    let listingsMigrated = 0;
+    let errorsCount = 0;
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    function updateStats() {
+      document.getElementById('merchantsMigrated').textContent = merchantsMigrated;
+      document.getElementById('listingsMigrated').textContent = listingsMigrated;
+      document.getElementById('errorsCount').textContent = errorsCount;
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+      merchantsMigrated = 0;
+      listingsMigrated = 0;
+      errorsCount = 0;
+      updateStats();
+    }
+
+    async function migrateMerchants() {
+      log('🔄 Starting merchant migration...', 'info');
+      
+      try {
+        const snapshot = await db.collection('merchants').get();
+        log(`📊 Found ${snapshot.size} merchants in Firebase`, 'info');
+        
+        for (const doc of snapshot.docs) {
+          try {
+            const merchantData = doc.data();
+            
+            // Transform Firebase merchant to Supabase format
+            const supabaseMerchant = {
+              merchantName: merchantData.merchantName || merchantData.business_name || '',
+              merchantEmail: merchantData.merchantEmail || merchantData.email || '',
+              merchantContact: merchantData.merchantContact || merchantData.phone || '',
+              email: merchantData.merchantEmail || merchantData.email || '',
+              verified: merchantData.verified || false,
+              rating: merchantData.rating || 0,
+              totalReviews: merchantData.totalReviews || merchantData.total_reviews || 0,
+              totalListings: merchantData.totalListings || merchantData.total_listings || 0,
+              userId: doc.id
+            };
+
+            // Create user first if needed
+            if (supabaseMerchant.email && window.supabaseClient) {
+              const { data: existingUser } = await window.supabaseClient
+                .from('users')
+                .select('id')
+                .eq('email', supabaseMerchant.email)
+                .maybeSingle();
+
+              if (!existingUser) {
+                const { data: newUser } = await window.supabaseClient
+                  .from('users')
+                  .insert([{
+                    email: supabaseMerchant.email,
+                    full_name: supabaseMerchant.merchantName,
+                    role: 'merchant',
+                    verified: supabaseMerchant.verified
+                  }])
+                  .select()
+                  .single();
+
+                if (newUser) {
+                  supabaseMerchant.userId = newUser.id;
+                }
+              } else {
+                supabaseMerchant.userId = existingUser.id;
+              }
+            }
+
+            // Create merchant in Supabase
+            if (window.supabaseMerchants && supabaseMerchant.userId) {
+              await window.supabaseMerchants.createMerchant(supabaseMerchant.userId, supabaseMerchant);
+              merchantsMigrated++;
+              log(`✅ Migrated merchant: ${supabaseMerchant.merchantName}`, 'success');
+            } else {
+              throw new Error('Supabase client not initialized or missing userId');
+            }
+          } catch (error) {
+            errorsCount++;
+            log(`❌ Error migrating merchant ${doc.id}: ${error.message}`, 'error');
+          }
+        }
+        
+        log(`✅ Merchant migration complete! Migrated: ${merchantsMigrated}, Errors: ${errorsCount}`, 'success');
+        updateStats();
+      } catch (error) {
+        errorsCount++;
+        log(`❌ Fatal error during merchant migration: ${error.message}`, 'error');
+        updateStats();
+      }
+    }
+
+    async function migrateCarListings() {
+      log('🔄 Starting car listings migration...', 'info');
+      await migrateListings('carListings', 'car');
+    }
+
+    async function migrateApartmentListings() {
+      log('🔄 Starting apartment listings migration...', 'info');
+      await migrateListings('apartmentListings', 'apartment');
+    }
+
+    async function migrateLandListings() {
+      log('🔄 Starting land listings migration...', 'info');
+      await migrateListings('landListings', 'land');
+    }
+
+    async function migrateListings(collectionName, type) {
+      try {
+        const snapshot = await db.collection(collectionName).get();
+        log(`📊 Found ${snapshot.size} ${type} listings in Firebase`, 'info');
+        
+        for (const doc of snapshot.docs) {
+          try {
+            const listingData = doc.data();
+            
+            // Transform Firebase listing to Supabase format
+            const supabaseListing = {
+              type: type,
+              title: listingData.title || '',
+              description: listingData.description || '',
+              price: listingData.price || 0,
+              images: listingData.images || [],
+              location: listingData.location || '',
+              city: listingData.city || listingData.location || '',
+              merchantName: listingData.merchantName || '',
+              merchantContact: listingData.merchantContact || '',
+              metadata: {
+                transmission: listingData.transmission || '',
+                fuel: listingData.fuel || '',
+                mileage: listingData.mileage || '',
+                rooms: listingData.rooms || '',
+                status: listingData.status || '',
+                size: listingData.size || ''
+              }
+            };
+
+            // Create listing in Supabase
+            if (window.supabaseListings) {
+              await window.supabaseListings.createListing(supabaseListing);
+              listingsMigrated++;
+              log(`✅ Migrated ${type} listing: ${supabaseListing.title}`, 'success');
+            } else {
+              throw new Error('Supabase listings client not initialized');
+            }
+          } catch (error) {
+            errorsCount++;
+            log(`❌ Error migrating ${type} listing ${doc.id}: ${error.message}`, 'error');
+          }
+        }
+        
+        log(`✅ ${type} listings migration complete! Migrated: ${listingsMigrated}, Errors: ${errorsCount}`, 'success');
+        updateStats();
+      } catch (error) {
+        errorsCount++;
+        log(`❌ Fatal error during ${type} listings migration: ${error.message}`, 'error');
+        updateStats();
+      }
+    }
+
+    async function migrateAll() {
+      log('🚀 Starting full migration...', 'info');
+      clearLog();
+      
+      await migrateMerchants();
+      await migrateCarListings();
+      await migrateApartmentListings();
+      await migrateLandListings();
+      
+      log('🎉 Full migration complete!', 'success');
+      updateStats();
+    }
+
+    // Initialize
+    log('✅ Migration tool ready. Click a button to start migration.', 'info');
+  </script>
+</body>
+</html>
+

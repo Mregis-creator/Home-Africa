@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Post Your Property | HOME AFRICA</title>
+
+  <!-- Offline Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+  <style>
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      z-index: -1;
+      pointer-events: none;
+      display: block;
+    }
+    .particles-js-canvas-el {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: -1 !important;
+      display: block !important;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 50%, rgba(255,0,136,0.18) 100%);
+      pointer-events: none;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid #0ff;
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+    }
+    .navbar .container {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar-brand img {
+      height: 50px;
+      border-radius: 12px;
+      animation: glow-pulse 2s infinite;
+      box-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+    }
+    .navbar-brand img:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 0 18px #0ff, 0 0 36px #0ff;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff; }
+      50% { box-shadow: 0 0 18px #0ff, 0 0 36px #0ff; }
+    }
+    .content-wrapper {
+      flex: 1;
+      padding-top: 3rem;
+      padding-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .card {
+      background: linear-gradient(120deg, rgba(0,0,0,0.92) 60%, rgba(0,255,136,0.18) 100%);
+      border: 2px solid #0ff;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      border-radius: 12px;
+      color: #fff;
+    }
+    .card-title {
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn-primary, .btn-success {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      border: none;
+      font-weight: bold;
+      box-shadow: 0 2px 8px 0 rgba(0,255,136,0.15);
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn-primary:hover, .btn-primary:focus, .btn-success:hover, .btn-success:focus {
+      background: linear-gradient(90deg, #8fff00 0%, #0ff 100%);
+      color: #111;
+    }
+    .navbar .nav-link, .navbar .navbar-brand {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+    .navbar .nav-link:hover, .navbar .navbar-brand:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+    footer.bg-dark {
+      background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
+      border-top: 2px solid #0ff;
+      box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
+      position: static !important;
+      bottom: unset !important;
+      width: 100%;
+    }
+    .footer-link {
+      color: #fff !important;
+      transition: color 0.2s;
+    }
+    .footer-link:hover {
+      color: #FFD600 !important;
+      text-decoration: underline;
+    }
+    .bi {
+      color: #0ff;
+      font-size: 1.3rem;
+      transition: color 0.2s, text-shadow 0.2s;
+      text-shadow: 0 0 8px #8fff00;
+    }
+    .bi:hover {
+      color: #8fff00;
+      text-shadow: 0 0 12px #0ff;
+    }
+    /* Splash Screen Styles */
+    #splash-screen-post {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.7s;
+      animation: splashFadeIn 1.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes splashFadeIn {
+      0% { opacity: 0; transform: scale(1.08) translateY(40px); }
+      60% { opacity: 1; transform: scale(1.01) translateY(-10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    #splash-screen-post img {
+      max-width: 40vw;
+      max-height: 40vh;
+      border-radius: 50%;
+      box-shadow: 0 0 60px #0ff, 0 0 120px #8fff00;
+        opacity: 0;
+      transform: scale(0.7) rotate(-10deg);
+      animation: logoPopIn 2.2s 3.3s cubic-bezier(0.4,0,0.4,1) forwards;
+    }
+    @keyframes logoPopIn {
+      0% { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+      60% { opacity: 1; transform: scale(1.08) rotate(6deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    #splash-screen-post h1 {
+      margin-top: 2rem;
+      font-size: 3.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 10%, #8fff00 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.2em;
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+      animation: textSlideIn 1.1s 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    #splash-screen-post h2 {
+      color: #fff;
+      margin-top: 1.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: textSlideIn 1s 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes textSlideIn {
+      0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @media (max-width: 576px) {
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Unified Footer Styles - Responsive */
+    footer.bg-dark {
+      background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
+      border-top: 2px solid #0ff;
+      box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    /* Add padding to body to prevent content from being hidden behind fixed footer */
+    body {
+      padding-bottom: 250px;
+    }
+    @media (max-width: 768px) {
+      footer.bg-dark {
+        position: relative;
+      }
+      body {
+        padding-bottom: 0;
+      }
+      footer.bg-dark .row > div {
+        margin-bottom: 1.5rem;
+      }
+    }
+    @media (min-width: 769px) {
+      footer.bg-dark .container {
+        max-width: 1200px;
+      }
+    }
+
+    /* Add a visible error message for form submission */
+    #formError {
+      color: #ff3860;
+      font-weight: bold;
+      margin-top: 1rem;
+      display: none;
+      text-align: center;
+    }
+
+    /* Add a loading spinner for submit button */
+    .spinner-border {
+      width: 1.5rem;
+      height: 1.5rem;
+      vertical-align: middle;
+      margin-left: 0.5rem;
+      display: none;
+    }
+
+    /* Debug log area */
+    #debugLog {
+      background: #222;
+      color: #0ff;
+      padding: 8px 12px;
+      font-size: 0.95em;
+      display: none;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    .btn-primary.loading {
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    .btn-primary.pulsing {
+      animation: pulse-submit 2s ease-in-out infinite;
+    }
+    @keyframes pulse-submit {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 2px 8px 0 rgba(0,255,136,0.2);
+      }
+      50% { 
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px 0 rgba(0,255,136,0.25);
+      }
+    }
+    .btn-primary.loading .spinner-border-sm {
+      width: 1rem;
+      height: 1rem;
+      border-width: 0.15em;
+    }
+    
+    /* Loading overlay with spinning circle */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.5s ease;
+    }
+    
+    .spinning-circle-container {
+      text-align: center;
+      color: #fff;
+    }
+    
+    .spinning-circle {
+      width: 80px;
+      height: 80px;
+      border: 6px solid rgba(0, 255, 136, 0.2);
+      border-top-color: #00ff88;
+      border-right-color: #00ff88;
+      border-radius: 50%;
+      animation: spin-circle 1s linear infinite;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 255, 136, 0.3);
+    }
+    
+    @keyframes spin-circle {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .loading-text {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #00ff88;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+      margin: 0;
+      animation: pulse-text 1.5s ease-in-out infinite;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    @keyframes pulse-text {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+    
+    /* Success state styling */
+    .loading-overlay.success .spinning-circle {
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .loading-overlay.success .loading-text {
+      animation: none;
+      opacity: 1;
+      color: #28a745;
+      text-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .success-checkmark {
+      display: none;
+      font-size: 4rem;
+      color: #28a745;
+      text-shadow: 0 0 20px rgba(40, 167, 69, 0.8);
+      animation: checkmark-pop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      margin-bottom: 1rem;
+    }
+    
+    .loading-overlay.success .success-checkmark {
+      display: block;
+    }
+    
+    @keyframes checkmark-pop {
+      0% {
+        opacity: 0;
+        transform: scale(0) rotate(-45deg);
+      }
+      50% {
+        transform: scale(1.2) rotate(5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+    
+    /* Consent checkbox styling */
+    .consent-checkbox {
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+    .consent-checkbox .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      margin-top: 0.25em;
+      cursor: pointer;
+    }
+    .consent-checkbox .form-check-input:checked {
+      background-color: #00ff88;
+      border-color: #00ff88;
+    }
+    .consent-checkbox .form-check-label {
+      cursor: pointer;
+      font-weight: 500;
+      margin-left: 8px;
+      color: #fff;
+    }
+    .consent-checkbox .form-check-label a {
+      text-decoration: underline;
+      transition: color 0.3s;
+    }
+    .consent-checkbox .form-check-label a:hover {
+      color: #8fff00;
+    }
+    .consent-checkbox .form-check-label i {
+      margin-right: 6px;
+      color: #00ff88;
+    }
+    
+    /* Service checkboxes styling */
+    .service-checkbox {
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+    .service-checkbox:hover {
+      background: rgba(0,255,136,0.15);
+      border-color: rgba(0,255,136,0.4);
+      transform: translateY(-2px);
+    }
+    .service-checkbox .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      margin-top: 0.25em;
+      cursor: pointer;
+    }
+    .service-checkbox .form-check-input:checked {
+      background-color: #00ff88;
+      border-color: #00ff88;
+    }
+    .service-checkbox .form-check-label {
+      cursor: pointer;
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    .service-checkbox .form-check-label i {
+      margin-right: 6px;
+      color: #00ff88;
+    }
+    /* Hero Mini Section */
+    .hero-mini {
+      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      height: 200px;
+      color: white;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      margin-top: 60px;
+    }
+    .hero-mini .container {
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    }
+    .hero-mini h2 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    /* Enhanced Form Styling */
+    .posting-form-container {
+      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,255,136,0.2) 100%);
+      border: 2px solid #0ff;
+      border-radius: 20px;
+      padding: 3rem;
+      margin: 2rem 0;
+      box-shadow: 0 0 30px rgba(0,255,255,0.2);
+      position: relative;
+      z-index: 1;
+    }
+    .posting-form-container h4 {
+      color: #0ff;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+    .form-label {
+      color: #8fff00;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .form-control, .form-select {
+      background: rgba(0,0,0,0.6);
+      border: 2px solid rgba(0,255,255,0.3);
+      color: #fff;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s;
+    }
+    .form-control:focus, .form-select:focus {
+      background: rgba(0,0,0,0.8);
+      border-color: #0ff;
+      box-shadow: 0 0 15px rgba(0,255,255,0.4);
+      color: #fff;
+    }
+    .form-control::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .product-select-card {
+      background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,255,136,0.15) 100%);
+      border: 2px solid #0ff;
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .product-select-card label {
+      font-size: 1.3rem;
+      color: #0ff;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .product-select-card select {
+      font-size: 1.1rem;
+      padding: 1rem;
+    }
+    .merchant-info-card {
+      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,136,255,0.1) 100%);
+      border: 2px solid rgba(0,255,255,0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .merchant-info-card h5 {
+      color: #8fff00;
+      margin-bottom: 1rem;
+    }
+    .success-message {
+      background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 1.1rem;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(40,167,69,0.3);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+</head>
+<body>
+  <!-- 🌌 Particle Background -->
+  <div id="particles-js"></div>
+  
+  <!-- Splash Screen Overlay -->
+  <div id="splash-screen-post" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
+    <div style="text-align:center;">
+      <img id="splash-logo-post" src="images/hero-bg.jpeg" alt="HOME AFRICA" style="max-width:40vw;max-height:40vh;border-radius:50%;box-shadow:0 0 60px #0ff,0 0 120px #8fff00;">
+      <h1 style="margin-top:2rem;font-size:3.5rem;font-weight:bold;background:linear-gradient(90deg,#0ff 10%,#8fff00 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.2em;">HOME AFRICA</h1>
+      <h2 style="color:#fff;margin-top:1.5rem;">Beyond Horizons</h2>
+    </div>
+  </div>
+  <div id="main-content-post" style="display:none;">
+  <!-- 🚀 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="images/hero-bg.jpeg" alt="Logo" />
+        HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="explore.html">Explore</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land Plots</a></li>
+          <li class="nav-item"><a class="nav-link" href="post.html">Post your property</a></li>
+          <li class="nav-item"><a class="nav-link" href="signin.html">Log In</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
+              <i class="bi bi-robot"></i> Ask Rejo
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <!-- 🏙️ Page Banner Hero -->
+    <section class="hero-mini">
+      <div class="container">
+        <h2 class="mb-2">Post Your Property</h2>
+        <nav style="font-size: 0.9rem; color: white;">
+          <a href="index.html" class="text-white text-decoration-underline">🏠 Home</a> › 
+          Post Your Property
+        </nav>
+      </div>
+    </section>
+
+    <!-- 📝 Posting Form Section -->
+    <div class="container py-5">
+      <div class="product-select-card">
+        <label for="productSelect" class="form-label fw-bold"><i class="bi bi-box-seam"></i> What are you bringing to the market?</label>
+        <select class="form-select form-select-lg" id="productSelect" aria-label="Select product to post">
+          <option value="" selected disabled>Choose a product type</option>
+          <option value="apartment">🏠 Apartment</option>
+          <option value="car">🚗 Car</option>
+          <option value="land">🌍 Land Plot</option>
+          <option value="drivingSchool">🚦 Driving School</option>
+        </select>
+      </div>
+
+      <!-- Contact Information Card (Optional) -->
+      <div class="merchant-info-card" id="merchantInfoCard" style="display:none;">
+        <h5><i class="bi bi-person-badge"></i> Contact Information (Optional)</h5>
+        <p class="text-muted small mb-3">Provide your contact details so interested buyers can reach you directly.</p>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="merchantName" class="form-label">Your Name / Business Name</label>
+            <input type="text" class="form-control" id="merchantName" placeholder="Your name or business name" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="merchantContact" class="form-label">Contact Number</label>
+            <input type="tel" class="form-control" id="merchantContact" placeholder="+250 788 123 456" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Spinner Overlay -->
+      <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinning-circle-container">
+          <div class="spinning-circle"></div>
+          <div class="success-checkmark">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <p class="loading-text">Posting your listing...</p>
+        </div>
+      </div>
+
+      <!-- Registration Modal Removed - Public Posting Enabled -->
+
+      <div id="formContainer"></div>
+      <div id="formError"></div>
+      <div id="successMessage" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- 🌍 Footer -->
+  <footer class="bg-dark text-light pt-4 pb-3 mt-5">
+    <div class="container">
+      <div class="row">
+        <!-- Brand Info -->
+        <div class="col-md-3 mb-3">
+          <h5>🏠 HOME AFRICA</h5>
+          <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+        </div>
+        <!-- Quick Links -->
+        <div class="col-md-3 mb-3">
+          <h6>Quick Links</h6>
+          <ul class="list-unstyled">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
+            <li><a href="apartment.html" class="footer-link">Apartments</a></li>
+            <li><a href="land.html" class="footer-link">Land</a></li>
+            <li><a href="cars.html" class="footer-link">Cars</a></li>
+          </ul>
+        </div>
+        <!-- Contact Info -->
+        <div class="col-md-3 mb-3">
+          <h6>Contact Us</h6>
+          <ul class="list-unstyled">
+            <li>Phone: +250 788 123 456</li>
+            <li>Email: info@home.africa</li>
+            <li>Address: Kigali, Rwanda</li>
+          </ul>
+        </div>
+        <!-- Social Links -->
+        <div class="col-md-3 mb-3">
+          <h6>Follow Us</h6>
+          <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
+          <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
+          <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
+          <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+      <hr style="border-color: rgba(255,255,255,0.1)" />
+      <div class="text-center small">
+        &copy; 2025 HOME AFRICA. All rights reserved.
+      </div>
+    </div>
+  </footer>
+  </div>
+
+  <!-- 💫 Scripts: Supabase -->
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-storage.js"></script>
+  <script src="js/supabase-merchants.js"></script>
+  <script src="js/supabase-listings.js"></script>
+  
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Supabase
+    // Global error handler
+    window.onerror = function(msg, url, line, col, error) {
+      const debugLog = document.getElementById('debugLog');
+      debugLog.style.display = 'block';
+      debugLog.textContent = 'JS Error: ' + msg + ' at ' + url + ':' + line + ':' + col;
+    };
+
+    function logDebug(msg) {
+      const debugLog = document.getElementById('debugLog');
+      debugLog.style.display = 'block';
+      debugLog.textContent = msg;
+    }
+
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: "#0ff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.3 },
+        size: { value: 3 },
+        move: { enable: true, speed: 1 }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          repulse: { distance: 100 },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+
+    // Hide splash screen immediately (splash only on index page)
+    window.addEventListener('DOMContentLoaded', function() {
+      const splashScreen = document.getElementById('splash-screen-post');
+      if (splashScreen) {
+        splashScreen.style.display = 'none';
+      }
+      const mainContent = document.getElementById('main-content-post');
+      if (mainContent) {
+          mainContent.style.display = '';
+      }
+    });
+
+
+    const forms = {
+      apartment: `
+        <div class="posting-form-container">
+          <h4><i class="bi bi-house-door"></i> Post an Apartment</h4>
+        <form class="needs-validation" novalidate>
+          <div class="mb-3">
+              <label for="aptTitle" class="form-label"><i class="bi bi-tag"></i> Title *</label>
+              <input type="text" class="form-control" id="aptTitle" placeholder="e.g. Modern 3BR Apartment in Nyarutarama" required />
+            <div class="invalid-feedback">Please enter the apartment title.</div>
+          </div>
+          <div class="mb-3">
+              <label for="aptLocation" class="form-label"><i class="bi bi-geo-alt"></i> Location *</label>
+              <input type="text" class="form-control" id="aptLocation" placeholder="e.g. Nyarutarama, Kigali" required />
+            <div class="invalid-feedback">Please enter the location.</div>
+          </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="aptRooms" class="form-label"><i class="bi bi-door-open"></i> Number of Rooms *</label>
+                <input type="number" class="form-control" id="aptRooms" min="1" placeholder="e.g. 3" required />
+            <div class="invalid-feedback">Please enter a valid number of rooms.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="aptStatus" class="form-label"><i class="bi bi-info-circle"></i> Status *</label>
+                <select class="form-select" id="aptStatus" required>
+                  <option value="" disabled selected>Select status</option>
+                  <option value="For Sale">For Sale</option>
+                  <option value="For Rent">For Rent</option>
+                </select>
+                <div class="invalid-feedback">Please select a status.</div>
+              </div>
+          </div>
+          <div class="mb-3">
+              <label for="aptPrice" class="form-label"><i class="bi bi-currency-exchange"></i> Price (RWF) *</label>
+              <input type="number" class="form-control" id="aptPrice" min="0" placeholder="e.g. 50000000" required />
+            <div class="invalid-feedback">Please enter a valid price.</div>
+          </div>
+          <div class="mb-3">
+              <label for="aptDesc" class="form-label"><i class="bi bi-card-text"></i> Description *</label>
+              <textarea class="form-control" id="aptDesc" rows="4" placeholder="Describe your apartment (features, amenities, etc.)" required></textarea>
+            <div class="invalid-feedback">Please provide a description.</div>
+          </div>
+            <div class="mb-3">
+              <label for="aptImages" class="form-label"><i class="bi bi-image"></i> Images (3-5 images) *</label>
+              <input type="file" class="form-control" id="aptImages" multiple accept="image/*" required />
+              <div class="invalid-feedback">Please upload at least 3 images.</div>
+              <div class="form-text text-muted">Upload 3-5 images. First image will be the main display image.</div>
+              <div id="aptImagePreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+            </div>
+            <div class="mb-3">
+              <div class="form-check consent-checkbox">
+                <input class="form-check-input" type="checkbox" id="consentApartment" required />
+                <label class="form-check-label" for="consentApartment">
+                  <i class="bi bi-shield-check"></i> I agree to the <a href="#" target="_blank" style="color: #00ff88;">User Agreement</a> and consent to the terms and conditions *
+                </label>
+                <div class="invalid-feedback">You must agree to the User Agreement to proceed.</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-upload"></i> Post Apartment</button>
+            </div>
+        </form>
+        </div>
+      `,
+      car: `
+        <div class="posting-form-container">
+          <h4><i class="bi bi-car-front"></i> Post a Car</h4>
+        <form class="needs-validation" novalidate>
+          <div class="mb-3">
+              <label for="carTitle" class="form-label"><i class="bi bi-tag"></i> Title *</label>
+              <input type="text" class="form-control" id="carTitle" placeholder="e.g. Toyota RAV4 - 2017" required />
+            <div class="invalid-feedback">Please enter the car title.</div>
+          </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="carTransmission" class="form-label"><i class="bi bi-gear"></i> Transmission *</label>
+            <select class="form-select" id="carTransmission" required>
+              <option value="" disabled selected>Select transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+            <div class="invalid-feedback">Please select a transmission type.</div>
+          </div>
+              <div class="col-md-4 mb-3">
+                <label for="carFuel" class="form-label"><i class="bi bi-fuel-pump"></i> Fuel Type *</label>
+            <select class="form-select" id="carFuel" required>
+              <option value="" disabled selected>Select fuel type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric</option>
+            </select>
+            <div class="invalid-feedback">Please select a fuel type.</div>
+          </div>
+              <div class="col-md-4 mb-3">
+                <label for="carMileage" class="form-label"><i class="bi bi-speedometer"></i> Mileage (km) *</label>
+                <input type="number" class="form-control" id="carMileage" min="0" placeholder="e.g. 60000" required />
+            <div class="invalid-feedback">Please enter valid mileage.</div>
+              </div>
+          </div>
+          <div class="mb-3">
+              <label for="carPrice" class="form-label"><i class="bi bi-currency-exchange"></i> Price (RWF) *</label>
+              <input type="number" class="form-control" id="carPrice" min="0" placeholder="e.g. 18000000" required />
+            <div class="invalid-feedback">Please enter a valid price.</div>
+          </div>
+            <div class="mb-3">
+              <label for="carImages" class="form-label"><i class="bi bi-image"></i> Images (3-5 images) *</label>
+              <input type="file" class="form-control" id="carImages" multiple accept="image/*" required />
+              <div class="invalid-feedback">Please upload at least 3 images.</div>
+              <div class="form-text text-muted">Upload 3-5 images. First image will be the main display image.</div>
+              <div id="carImagePreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+            </div>
+            <div class="mb-3">
+              <div class="form-check consent-checkbox">
+                <input class="form-check-input" type="checkbox" id="consentCar" required />
+                <label class="form-check-label" for="consentCar">
+                  <i class="bi bi-shield-check"></i> I agree to the <a href="#" target="_blank" style="color: #00ff88;">User Agreement</a> and consent to the terms and conditions *
+                </label>
+                <div class="invalid-feedback">You must agree to the User Agreement to proceed.</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-upload"></i> Post Car</button>
+            </div>
+        </form>
+        </div>
+      `,
+      land: `
+        <div class="posting-form-container">
+          <h4><i class="bi bi-map"></i> Post a Land Plot</h4>
+        <form class="needs-validation" novalidate>
+          <div class="mb-3">
+              <label for="landTitle" class="form-label"><i class="bi bi-tag"></i> Title *</label>
+              <input type="text" class="form-control" id="landTitle" placeholder="e.g. Prime Land Plot in Kimironko" required />
+            <div class="invalid-feedback">Please enter the land title.</div>
+          </div>
+          <div class="mb-3">
+              <label for="landLocation" class="form-label"><i class="bi bi-geo-alt"></i> Location *</label>
+              <input type="text" class="form-control" id="landLocation" placeholder="e.g. Kimironko, Kigali" required />
+            <div class="invalid-feedback">Please enter the location.</div>
+          </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="landSize" class="form-label"><i class="bi bi-rulers"></i> Size (sqm) *</label>
+                <input type="number" class="form-control" id="landSize" min="0" placeholder="e.g. 500" required />
+            <div class="invalid-feedback">Please enter valid size.</div>
+          </div>
+              <div class="col-md-6 mb-3">
+                <label for="landPrice" class="form-label"><i class="bi bi-currency-exchange"></i> Price (RWF) *</label>
+                <input type="number" class="form-control" id="landPrice" min="0" placeholder="e.g. 15000000" required />
+            <div class="invalid-feedback">Please enter a valid price.</div>
+          </div>
+            </div>
+            <div class="mb-3">
+              <label for="landImages" class="form-label"><i class="bi bi-image"></i> Images (3-5 images) *</label>
+              <input type="file" class="form-control" id="landImages" multiple accept="image/*" required />
+              <div class="invalid-feedback">Please upload at least 3 images.</div>
+              <div class="form-text text-muted">Upload 3-5 images. First image will be the main display image.</div>
+              <div id="landImagePreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+            </div>
+            <div class="mb-3">
+              <div class="form-check consent-checkbox">
+                <input class="form-check-input" type="checkbox" id="consentLand" required />
+                <label class="form-check-label" for="consentLand">
+                  <i class="bi bi-shield-check"></i> I agree to the <a href="#" target="_blank" style="color: #00ff88;">User Agreement</a> and consent to the terms and conditions *
+                </label>
+                <div class="invalid-feedback">You must agree to the User Agreement to proceed.</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-upload"></i> Post Land Plot</button>
+            </div>
+        </form>
+        </div>
+      `,
+      drivingSchool: `
+        <div class="posting-form-container">
+          <h4><i class="bi bi-mortarboard"></i> Register Your Driving School</h4>
+        <form class="needs-validation" novalidate>
+          <div class="mb-3">
+              <label for="dsName" class="form-label"><i class="bi bi-building"></i> School Name *</label>
+              <input type="text" class="form-control" id="dsName" placeholder="e.g. Elite Driving Academy" required />
+            <div class="invalid-feedback">Please enter the school name.</div>
+          </div>
+          <div class="mb-3">
+              <label for="dsLocation" class="form-label"><i class="bi bi-geo-alt"></i> Location *</label>
+              <input type="text" class="form-control" id="dsLocation" placeholder="e.g. Kigali, Nyarugenge" required />
+            <div class="invalid-feedback">Please enter the location.</div>
+          </div>
+          <div class="mb-3">
+              <label for="dsContact" class="form-label"><i class="bi bi-telephone"></i> Contact Number *</label>
+              <input type="tel" class="form-control" id="dsContact" placeholder="+250 788 123 456" required pattern="\\+?\\d{7,15}" />
+            <div class="invalid-feedback">Please enter a valid contact number.</div>
+          </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="bi bi-check2-square"></i> Services We Offer *</label>
+              <div class="form-text mb-2">Select all services your driving school can provide to platform customers:</div>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <div class="form-check form-check-inline service-checkbox">
+                    <input class="form-check-input" type="checkbox" id="dsServiceStandard" value="Standard" />
+                    <label class="form-check-label" for="dsServiceStandard">
+                      <i class="bi bi-award"></i> Standard Package
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check form-check-inline service-checkbox">
+                    <input class="form-check-input" type="checkbox" id="dsServicePremium" value="Premium" />
+                    <label class="form-check-label" for="dsServicePremium">
+                      <i class="bi bi-star-fill"></i> Premium Package
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check form-check-inline service-checkbox">
+                    <input class="form-check-input" type="checkbox" id="dsServiceProvisional" value="Provisional" />
+                    <label class="form-check-label" for="dsServiceProvisional">
+                      <i class="bi bi-clipboard-check"></i> Provisional License
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check form-check-inline service-checkbox">
+                    <input class="form-check-input" type="checkbox" id="dsServicePermanent" value="Permanent" />
+                    <label class="form-check-label" for="dsServicePermanent">
+                      <i class="bi bi-badge-check"></i> Permanent License
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="invalid-feedback" id="dsServicesError" style="display:none;">Please select at least one service.</div>
+            </div>
+            <div class="mb-3">
+              <label for="dsDescription" class="form-label"><i class="bi bi-card-text"></i> Additional Information</label>
+              <textarea class="form-control" id="dsDescription" rows="3" placeholder="Tell us about your driving school, experience, instructors, vehicles, etc."></textarea>
+            </div>
+            <div class="mb-3">
+              <div class="form-check consent-checkbox">
+                <input class="form-check-input" type="checkbox" id="consentDrivingSchool" required />
+                <label class="form-check-label" for="consentDrivingSchool">
+                  <i class="bi bi-shield-check"></i> I agree to the <a href="#" target="_blank" style="color: #00ff88;">User Agreement</a> and consent to the terms and conditions *
+                </label>
+                <div class="invalid-feedback">You must agree to the User Agreement to proceed.</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-upload"></i> Register Driving School</button>
+            </div>
+        </form>
+        </div>
+      `
+    };
+
+    const formContainer = document.getElementById('formContainer');
+    const productSelect = document.getElementById('productSelect');
+    const merchantInfoCard = document.getElementById('merchantInfoCard');
+
+    // PUBLIC POSTING MODE: Merchant registration checks removed
+    // Anyone can now post listings without registration
+
+    // Image preview functionality
+    function setupImagePreview(inputId, previewId) {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      if (!input || !preview) return;
+      
+      input.addEventListener('change', function(e) {
+        preview.innerHTML = '';
+        const files = Array.from(e.target.files);
+        files.forEach((file, index) => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.style.width = '100px';
+              img.style.height = '100px';
+              img.style.objectFit = 'cover';
+              img.style.borderRadius = '8px';
+              img.style.border = '2px solid rgba(0,255,136,0.3)';
+              img.style.marginRight = '10px';
+              img.style.marginBottom = '10px';
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+    }
+
+    // Show success state in loading overlay with fade animation
+    function showSuccessState(listingType) {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const loadingText = loadingOverlay?.querySelector('.loading-text');
+      
+      if (!loadingOverlay) return;
+      
+      // Add success class to trigger fade animation
+      loadingOverlay.classList.add('success');
+      
+      // Update text to show success
+      if (loadingText) {
+        loadingText.textContent = 'Posted ✓';
+        loadingText.style.color = '#28a745';
+        loadingText.style.textShadow = '0 0 15px rgba(40, 167, 69, 0.6)';
+      }
+      
+      // Hide overlay after showing success for 1.5 seconds
+      setTimeout(() => {
+        if (loadingOverlay) {
+          loadingOverlay.style.opacity = '0';
+          setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+            loadingOverlay.classList.remove('success');
+            loadingOverlay.style.opacity = '1';
+            // Reset text
+            if (loadingText) {
+              loadingText.textContent = 'Posting your listing...';
+              loadingText.style.color = '#00ff88';
+              loadingText.style.textShadow = '0 0 10px rgba(0, 255, 136, 0.5)';
+            }
+          }, 500);
+        }
+      }, 1500);
+    }
+    
+    // Upload images to Supabase Storage with progress tracking
+    async function uploadImages(files, listingType, listingId) {
+      if (!files || files.length === 0) return [];
+      if (files.length < 3) throw new Error('At least 3 images required');
+      if (files.length > 5) throw new Error('Maximum 5 images allowed');
+      
+      // Check if Supabase Storage is available
+      if (!window.supabaseStorage || !window.supabaseStorage.supabase) {
+        const errorMsg = 'Supabase Storage is not initialized. Please:\n1. Check js/supabase-config.js is loaded\n2. Enable Storage in Supabase Dashboard\n3. Refresh this page';
+        console.error(errorMsg);
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
+      
+      // Show upload progress
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const loadingText = loadingOverlay?.querySelector('.loading-text');
+      
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+      }
+      
+      try {
+        console.log(`🚀 Starting upload of ${files.length} files to Supabase Storage...`);
+        console.log(`📁 Listing type: ${listingType}, Listing ID: ${listingId}`);
+        
+        // Update progress callback
+        const onProgress = (progress, uploaded, total) => {
+          const roundedProgress = Math.round(progress);
+          
+          if (loadingText) {
+            loadingText.textContent = `Uploading images... ${roundedProgress}% (${uploaded}/${total})`;
+          }
+          
+          // Update progress bar if it exists
+          const progressBar = loadingOverlay?.querySelector('.progress-bar');
+          if (progressBar) {
+            progressBar.style.width = `${roundedProgress}%`;
+          }
+          
+          console.log(`📤 Upload progress: ${roundedProgress}% (${uploaded}/${total})`);
+        };
+        
+        // Show initial progress
+        if (loadingText) {
+          loadingText.textContent = `Preparing upload... 0% (0/${files.length})`;
+        }
+        console.log(`🚀 Starting upload of ${files.length} files...`);
+        
+        // Upload to Supabase Storage
+        const folder = `${listingType}/${listingId}`;
+        const urls = await window.supabaseStorage.uploadImages(
+          files,
+          'listings', // bucket name
+          folder,
+          onProgress
+        );
+        
+        if (loadingText) {
+          loadingText.textContent = 'Upload complete!';
+        }
+        
+        console.log(`✅ All ${urls.length} images uploaded successfully!`);
+        return urls;
+        
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        console.error('Error stack:', error.stack);
+        
+        // Provide helpful error messages
+        let errorMsg = `Upload failed: ${error.message}`;
+        
+        if (error.message.includes('Bucket not found') || error.message.includes('bucket')) {
+          errorMsg = `❌ Storage bucket "listings" not found!\n\nPlease:\n1. Go to Supabase Dashboard → Storage\n2. Click "New bucket"\n3. Name it: "listings"\n4. Set it as Public ✅\n5. Click "Create bucket"\n6. Go to Policies tab and create upload policy\n7. Refresh this page and try again\n\nSee QUICK_FIX_BUCKET_ERROR.md for detailed steps.`;
+        } else if (error.message.includes('permission') || error.message.includes('policy')) {
+          errorMsg += '\n\nPlease check Supabase Storage policies allow uploads. Go to Storage → Policies and create an upload policy.';
+        }
+        
+        if (loadingText) {
+          loadingText.textContent = `❌ ${errorMsg.split('\n')[0]}`;
+        }
+        
+        alert(errorMsg);
+        throw error;
+      } finally {
+        // Hide loading overlay after a short delay
+        setTimeout(() => {
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+          }
+        }, 2000);
+      }
+    }
+
+    // Check registration on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      // Check if redirected from signup
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('registered') === 'true') {
+        localStorage.setItem('merchantRegistered', 'true');
+        // Remove query parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      
+      // Setup image previews when forms are shown
+      productSelect.addEventListener('change', function() {
+        setTimeout(() => {
+          setupImagePreview('aptImages', 'aptImagePreview');
+          setupImagePreview('carImages', 'carImagePreview');
+          setupImagePreview('landImages', 'landImagePreview');
+        }, 100);
+      });
+    });
+
+    productSelect.addEventListener('change', () => {
+      const selected = productSelect.value;
+      
+      // PUBLIC POSTING: No merchant registration required
+      // Anyone can post listings
+      
+      formContainer.innerHTML = forms[selected] || '';
+      
+      // Show merchant info card when a product is selected
+      if (selected) {
+        merchantInfoCard.style.display = 'block';
+      } else {
+        merchantInfoCard.style.display = 'none';
+      }
+
+      const form = formContainer.querySelector('form');
+      if (form) {
+        // Reset validation state on new form load
+        form.classList.remove('was-validated');
+        // Store original button text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn && !submitBtn.getAttribute('data-original-text')) {
+          submitBtn.setAttribute('data-original-text', submitBtn.innerHTML);
+        }
+        
+        // For driving school form, add checkbox validation listeners
+        if (selected === 'drivingSchool') {
+          const serviceCheckboxes = form.querySelectorAll('input[type="checkbox"][id^="dsService"]');
+          const servicesError = document.getElementById('dsServicesError');
+          
+          serviceCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+              if (servicesError) {
+                servicesError.style.display = 'none';
+              }
+            });
+          });
+        }
+        
+        // Attach the event listener directly to the form
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          
+          // PUBLIC POSTING: No merchant registration required
+          // Anyone can post listings
+          
+          const errorDiv = document.getElementById('formError');
+          const successDiv = document.getElementById('successMessage');
+          errorDiv.style.display = 'none';
+          errorDiv.textContent = '';
+          successDiv.style.display = 'none';
+          
+          const submitBtn = form.querySelector('button[type="submit"]');
+          
+          // Merchant info is optional (for contact purposes)
+          const merchantName = document.getElementById('merchantName')?.value.trim() || '';
+          const merchantContact = document.getElementById('merchantContact')?.value.trim() || '';
+          
+          if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            errorDiv.textContent = 'Please fill all required fields correctly.';
+            errorDiv.style.display = 'block';
+            return false;
+          }
+          
+          // Show loading state
+          submitBtn.disabled = true;
+          submitBtn.classList.add('loading', 'pulsing');
+          submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Posting...';
+          
+          // Show spinning circle overlay
+          const loadingOverlay = document.getElementById('loadingOverlay');
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'flex';
+          }
+          
+          // Get form data based on product type
+          const selectedType = productSelect.value;
+          const createdAt = new Date();
+          
+          let listingData = {
+            // Contact info (optional - for public posting)
+            merchantName: merchantName || 'Anonymous',
+            merchantContact: merchantContact || '',
+            createdAt: createdAt.toISOString(),
+            createdAtSeconds: Math.floor(createdAt.getTime() / 1000) // For time ago calculation
+          };
+          
+          // Add product-specific fields
+          if (selectedType === 'apartment') {
+            listingData.title = document.getElementById('aptTitle').value.trim();
+            listingData.location = document.getElementById('aptLocation').value.trim();
+            listingData.rooms = parseInt(document.getElementById('aptRooms').value);
+            listingData.price = document.getElementById('aptPrice').value.trim();
+            listingData.description = document.getElementById('aptDesc').value.trim();
+            listingData.status = document.getElementById('aptStatus').value;
+            
+            // Upload images to Supabase Storage
+            const aptImageFiles = document.getElementById('aptImages').files;
+            if (aptImageFiles.length < 3) {
+              showError('Please upload at least 3 images');
+              return;
+            }
+            
+            // Upload images first
+            uploadImages(aptImageFiles, 'apartments', 'temp-id')
+              .then(async (imageUrls) => {
+                listingData.images = imageUrls;
+                
+                // Save to Supabase (primary)
+                try {
+                  if (window.supabaseListings) {
+                    const supabaseListing = {
+                      ...listingData,
+                      type: 'apartment',
+                      description: listingData.description || ''
+                    };
+                    const created = await window.supabaseListings.createListing(supabaseListing);
+                    console.log('✅ Listing saved to Supabase:', created);
+                    
+                    // Show success state with fade animation
+                    showSuccessState('apartment');
+                    
+                    // Update button to show success
+                    if (submitBtn) {
+                      submitBtn.disabled = false;
+                      submitBtn.classList.remove('loading', 'pulsing');
+                      submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Apartment Submitted Successfully!';
+                      submitBtn.classList.add('btn-success');
+                      submitBtn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+                    }
+                    
+                    sendNotification('Apartment Listing', 'Your apartment has been posted successfully!', 'success');
+                    
+                    // Redirect after showing success animation
+                    setTimeout(() => {
+                      showSuccess('Apartment posted successfully!', 'apartment.html');
+                    }, 2000);
+                    return;
+                  }
+                } catch (supabaseError) {
+                  console.error('❌ Failed to save listing to Supabase:', supabaseError);
+                  showError('Failed to save listing. Please try again.');
+                  if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                  }
+                  if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-house-door"></i> Post Apartment';
+                  }
+                  return;
+                }
+                
+                // Update button to show success
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.classList.remove('loading', 'pulsing');
+                  submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Apartment Submitted Successfully!';
+                  submitBtn.classList.add('btn-success');
+                  submitBtn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+                }
+                
+                sendNotification('Apartment Listing', 'Your apartment has been posted successfully!', 'success');
+                
+                // Redirect after a short delay to show success message
+                setTimeout(() => {
+                  showSuccess('Apartment posted successfully!', 'apartment.html');
+                }, 1500);
+              })
+              .catch((error) => {
+                // Reset button on error
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.classList.remove('loading', 'pulsing');
+                  const originalText = submitBtn.getAttribute('data-original-text') || '<i class="bi bi-upload"></i> Post Apartment';
+                  submitBtn.innerHTML = originalText;
+                }
+                showError('Error posting apartment: ' + error.message);
+              });
+          } else if (selectedType === 'car') {
+            listingData.title = document.getElementById('carTitle').value.trim();
+            listingData.transmission = document.getElementById('carTransmission').value;
+            listingData.fuel = document.getElementById('carFuel').value;
+            listingData.mileage = document.getElementById('carMileage').value.trim();
+            listingData.price = document.getElementById('carPrice').value.trim();
+            
+            // Upload images to Supabase Storage
+            const carImageFiles = document.getElementById('carImages').files;
+            if (carImageFiles.length < 3) {
+              showError('Please upload at least 3 images');
+              return;
+            }
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = loadingOverlay?.querySelector('.loading-text');
+            if (loadingOverlay) {
+              loadingOverlay.style.display = 'flex';
+            }
+            if (loadingText) {
+              loadingText.textContent = 'Preparing upload...';
+            }
+            
+            // Upload images first
+            uploadImages(carImageFiles, 'cars', 'temp-id')
+              .then(async (imageUrls) => {
+                if (loadingText) {
+                  loadingText.textContent = 'Saving listing...';
+                }
+                listingData.images = imageUrls;
+                
+                // Save to Supabase (primary)
+                try {
+                  if (window.supabaseListings) {
+                    const supabaseListing = {
+                      ...listingData,
+                      type: 'car',
+                      description: listingData.description || '',
+                      location: listingData.location || '',
+                      metadata: {
+                        transmission: listingData.transmission,
+                        fuel: listingData.fuel,
+                        mileage: listingData.mileage,
+                        merchantName: listingData.merchantName,
+                        merchantContact: listingData.merchantContact,
+                        merchantEmail: listingData.merchantEmail
+                      }
+                    };
+                    console.log('🚀 Attempting to save car listing to Supabase:', supabaseListing);
+                    const created = await window.supabaseListings.createListing(supabaseListing);
+                    console.log('✅ Listing saved to Supabase:', created);
+                    
+                    if (!created || !created.id) {
+                      throw new Error('Listing was not created in Supabase (no ID returned)');
+                    }
+                    
+                    // Show success state with fade animation
+                    showSuccessState('car');
+                    
+                    // Update button to show success
+                    if (submitBtn) {
+                      submitBtn.disabled = false;
+                      submitBtn.classList.remove('loading', 'pulsing');
+                      submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Car Submitted Successfully!';
+                      submitBtn.classList.add('btn-success');
+                      submitBtn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+                    }
+                    
+                    sendNotification('Car Listing', 'Your car has been posted successfully!', 'success');
+                    
+                    // Redirect after showing success animation
+                    setTimeout(() => {
+                      showSuccess('Car posted successfully!', 'cars.html');
+                    }, 2000);
+                    return;
+                  }
+                } catch (supabaseError) {
+                  console.error('❌ Failed to save listing to Supabase:', supabaseError);
+                  showError('Failed to save listing. Please try again.');
+                  if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                  }
+                  if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-car-front"></i> Post Car';
+                  }
+                  return;
+                }
+              })
+              .catch((error) => {
+                console.error('Upload error:', error);
+                
+                // Reset button on error
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.classList.remove('loading', 'pulsing');
+                  const originalText = submitBtn.getAttribute('data-original-text') || '<i class="bi bi-upload"></i> Post Car';
+                  submitBtn.innerHTML = originalText;
+                }
+                
+                if (loadingOverlay) {
+                  loadingOverlay.style.display = 'none';
+                }
+                showError('Error posting car: ' + error.message);
+              });
+          } else if (selectedType === 'land') {
+            listingData.title = document.getElementById('landTitle').value.trim();
+            listingData.location = document.getElementById('landLocation').value.trim();
+            listingData.size = document.getElementById('landSize').value.trim();
+            listingData.price = document.getElementById('landPrice').value.trim();
+            
+            // Upload images to Supabase Storage
+            const landImageFiles = document.getElementById('landImages').files;
+            if (landImageFiles.length < 3) {
+              showError('Please upload at least 3 images');
+              return;
+            }
+            
+            // Upload images first
+            uploadImages(landImageFiles, 'land', 'temp-id')
+              .then(async (imageUrls) => {
+                listingData.images = imageUrls;
+                
+                // Save to Supabase (primary)
+                try {
+                  if (window.supabaseListings) {
+                    const supabaseListing = {
+                      ...listingData,
+                      type: 'land',
+                      description: listingData.description || '',
+                      metadata: {
+                        size: listingData.size
+                      }
+                    };
+                    const created = await window.supabaseListings.createListing(supabaseListing);
+                    console.log('✅ Listing saved to Supabase:', created);
+                    
+                    // Show success state with fade animation
+                    showSuccessState('land');
+                    
+                    // Update button to show success
+                    if (submitBtn) {
+                      submitBtn.disabled = false;
+                      submitBtn.classList.remove('loading', 'pulsing');
+                      submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Land Plot Submitted Successfully!';
+                      submitBtn.classList.add('btn-success');
+                      submitBtn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+                    }
+                    
+                    sendNotification('Land Plot Listing', 'Your land plot has been posted successfully!', 'success');
+                    
+                    // Redirect after showing success animation
+                    setTimeout(() => {
+                      showSuccess('Land plot posted successfully!', 'land.html');
+                    }, 2000);
+                    return;
+                  }
+                } catch (supabaseError) {
+                  console.error('❌ Failed to save listing to Supabase:', supabaseError);
+                  showError('Failed to save listing. Please try again.');
+                  if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                  }
+                  if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-geo-alt"></i> Post Land Plot';
+                  }
+                  return;
+                }
+              })
+              .catch((error) => {
+                // Reset button on error
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.classList.remove('loading', 'pulsing');
+                  const originalText = submitBtn.getAttribute('data-original-text') || '<i class="bi bi-upload"></i> Post Land Plot';
+                  submitBtn.innerHTML = originalText;
+                }
+                showError('Error posting land: ' + error.message);
+              });
+          } else if (selectedType === 'drivingSchool') {
+            // Validate services
+            const services = [];
+            if (document.getElementById('dsServiceStandard').checked) services.push('Standard');
+            if (document.getElementById('dsServicePremium').checked) services.push('Premium');
+            if (document.getElementById('dsServiceProvisional').checked) services.push('Provisional');
+            if (document.getElementById('dsServicePermanent').checked) services.push('Permanent');
+            
+            if (services.length === 0) {
+              document.getElementById('dsServicesError').style.display = 'block';
+              submitBtn.classList.remove('loading', 'pulsing');
+              submitBtn.disabled = false;
+              const originalText = submitBtn.getAttribute('data-original-text') || submitBtn.textContent;
+              submitBtn.innerHTML = originalText;
+              errorDiv.textContent = 'Please select at least one service your driving school offers.';
+              errorDiv.style.display = 'block';
+              return false;
+            }
+            
+            listingData.name = document.getElementById('dsName').value.trim();
+            listingData.location = document.getElementById('dsLocation').value.trim();
+            listingData.contact = document.getElementById('dsContact').value.trim();
+            listingData.services = services;
+            listingData.description = document.getElementById('dsDescription').value.trim() || '';
+            
+            // Save to Supabase
+            try {
+              if (window.supabaseListings) {
+                const supabaseListing = {
+                  type: 'driving_school',
+                  title: listingData.name,
+                  description: listingData.description || '',
+                  price: 0, // Driving schools don't have a price
+                  location: listingData.location,
+                  metadata: {
+                    name: listingData.name,
+                    contact: listingData.contact,
+                    services: listingData.services,
+                    merchantName: merchantName || 'Anonymous',
+                    merchantContact: merchantContact || ''
+                  }
+                };
+                
+                const created = await window.supabaseListings.createListing(supabaseListing);
+                console.log('✅ Driving school saved to Supabase:', created);
+                
+                // Show success state with fade animation
+                showSuccessState('drivingSchool');
+                
+                // Update button to show success
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.classList.remove('loading', 'pulsing');
+                  submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Driving School Registered Successfully!';
+                  submitBtn.classList.add('btn-success');
+                  submitBtn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+                }
+                
+                sendNotification('Driving School', 'Your driving school has been registered successfully!', 'success');
+                
+                // Redirect after showing success animation
+                setTimeout(() => {
+                  showSuccess('Driving school registered successfully!', 'driving-school.html');
+                }, 2000);
+                return;
+              } else {
+                throw new Error('Supabase listings not initialized');
+              }
+            } catch (error) {
+              console.error('❌ Failed to save driving school to Supabase:', error);
+              showError('Error registering driving school: ' + error.message);
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading', 'pulsing');
+                const originalText = submitBtn.getAttribute('data-original-text') || '<i class="bi bi-upload"></i> Register Driving School';
+                submitBtn.innerHTML = originalText;
+              }
+            }
+          }
+          
+          function showSuccess(message, redirectPage) {
+            // Hide loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+              loadingOverlay.style.display = 'none';
+            }
+            
+            submitBtn.classList.remove('loading', 'pulsing');
+            submitBtn.disabled = false;
+            const originalText = submitBtn.getAttribute('data-original-text') || submitBtn.textContent;
+            submitBtn.innerHTML = originalText;
+            
+            successDiv.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${message}`;
+            successDiv.className = 'success-message';
+            successDiv.style.display = 'block';
+            
+            // Reset form
+            form.reset();
+            form.classList.remove('was-validated');
+            document.getElementById('merchantName').value = '';
+            document.getElementById('merchantContact').value = '';
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+              window.location.href = redirectPage + '#success';
+            }, 2000);
+          }
+          
+          // Notification system
+    function sendNotification(title, message, type) {
+      // Store notification in localStorage for display
+      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      notifications.unshift({
+        title,
+        message,
+        type,
+        timestamp: new Date().toISOString(),
+        read: false
+      });
+      // Keep only last 50 notifications
+      localStorage.setItem('notifications', JSON.stringify(notifications.slice(0, 50)));
+      
+      // Show browser notification if permission granted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+          body: message,
+          icon: 'images/hero-bg.jpeg'
+        });
+      }
+    }
+
+    // Request notification permission on page load
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    function showError(message) {
+            // Hide loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+              loadingOverlay.style.display = 'none';
+            }
+            
+            submitBtn.classList.remove('loading', 'pulsing');
+            submitBtn.disabled = false;
+            const originalText = submitBtn.getAttribute('data-original-text') || submitBtn.textContent;
+            submitBtn.innerHTML = originalText;
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+          }
+        });
+      }
+    });
+  </script>
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  
+  <!-- Auth System -->
+  <script src="js/auth.js"></script>
+  
+  <!-- Protected Pages Auth Check - REMOVED: post.html is now public (anyone can post) -->
+  
+  <!-- AI Chatbot -->
+  <script src="js/ai-chatbot.js"></script>
+  
+  <!-- Footer Fix - Dynamic padding to prevent content overlap -->
+  <script src="js/footer-fix.js"></script>
+</body>
+</html>

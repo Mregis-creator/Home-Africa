@@ -249,6 +249,48 @@ class EmailNotificationSystem {
       `
     });
   }
+
+  /**
+   * Notify seller when someone favorites their listing
+   */
+  async sendFavoriteNotification(sellerEmail, sellerName, listingTitle, buyerName) {
+    await this.sendEmail({
+      to: sellerEmail,
+      subject: `Someone saved your listing: ${listingTitle}`,
+      type: 'favorite_notification',
+      html: `
+        <h2 style="color:#0077b6;">Your Listing Got Saved!</h2>
+        <p>Hello ${sellerName},</p>
+        <p><strong>${buyerName || 'A user'}</strong> just saved your listing to their favorites:</p>
+        <p style="font-size:1.1rem;font-weight:bold;">${listingTitle}</p>
+        <p>They may contact you soon. Make sure your contact details are up to date.</p>
+        <p><a href="${window.location.origin}/dashboard.html" style="background:#0077b6;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;">View Dashboard</a></p>
+        <p>Best regards,<br>HOME AFRICA Team</p>
+      `
+    });
+  }
+
+  /**
+   * Notify seller when their subscription is approved or rejected
+   */
+  async sendSubscriptionStatusNotification(sellerEmail, sellerName, plan, status) {
+    const isApproved = status === 'active';
+    await this.sendEmail({
+      to: sellerEmail,
+      subject: isApproved ? `Your ${plan} Plan is Now Active!` : `Subscription Update: ${plan} Plan`,
+      type: 'subscription_status',
+      html: `
+        <h2 style="color:${isApproved ? '#28a745' : '#dc3545'};">${isApproved ? '🎉 Plan Activated!' : 'Subscription Update'}</h2>
+        <p>Hello ${sellerName},</p>
+        ${isApproved
+          ? `<p>Your <strong>${plan.toUpperCase()}</strong> plan has been activated! Your listings now show the <strong>⚡ Featured</strong> badge.</p>`
+          : `<p>Unfortunately your <strong>${plan.toUpperCase()}</strong> subscription request was not approved. Please contact us at <a href="mailto:info@home.africa">info@home.africa</a> if you believe this is an error.</p>`
+        }
+        <p><a href="${window.location.origin}/premium.html" style="background:#0077b6;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;">View Plans</a></p>
+        <p>Best regards,<br>HOME AFRICA Team</p>
+      `
+    });
+  }
 }
 
 // Create global instance

@@ -10,6 +10,7 @@ class MessagesSystem {
     this.currentParticipant = null;
     this.userId = null;
     this.userType = null;
+    this.isAdmin = false;
     this.init();
   }
 
@@ -17,12 +18,18 @@ class MessagesSystem {
    * Initialize messaging system
    */
   async init() {
-    this.userId = this.getCurrentUserId();
+    this.userId = await this.getCurrentUserId();
     this.userType = this.getAuthorType();
+    this.isAdmin = await this.checkIsAdmin();
 
     if (!this.userId) {
       this.showLoginPrompt();
       return;
+    }
+
+    // Show admin panel if admin
+    if (this.isAdmin) {
+      this.showAdminPanel();
     }
 
     // Check if starting new conversation from URL
@@ -47,6 +54,139 @@ class MessagesSystem {
   }
 
   /**
+   * Check if current user is admin
+   */
+  async checkIsAdmin() {
+    try {
+      if (!this.supabase || !this.userId) return false;
+      
+      const { data, error } = await this.supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', this.userId)
+        .single();
+      
+      if (error) return false;
+      return data?.role === 'admin';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Show admin panel for admin users
+   */
+  showAdminPanel() {
+    // Add admin controls to the page
+    const threadsList = document.getElementById('threadsList');
+    if (threadsList) {
+      const adminPanel = document.createElement('div');
+      adminPanel.className = 'admin-panel mb-3';
+      adminPanel.innerHTML = `
+        <div class="alert alert-warning">
+          <i class="bi bi-shield-lock"></i> <strong>Admin Mode</strong>
+          <div class="mt-2">
+            <button class="btn btn-sm btn-warning" onclick="messagesSystem.loadAllUsers()">
+              <i class="bi bi-people"></i> View All Users
+            </button>
+            <button class="btn btn-sm btn-warning ms-2" onclick="messagesSystem.loadAllMerchants()">
+              <i class="bi bi-shop"></i> View All Merchants
+            </button>
+          </div>
+        </div>
+      `;
+      threadsList.parentNode.insertBefore(adminPanel, threadsList);
+    }
+  }
+
+  /**
+   * Load all users (admin only)
+   */
+  async loadAllUsers() {
+    if (!this.isAdmin) return;
+    
+    try {
+      const { data: users, error } = await this.supabase
+        .from('user_profiles')
+        .select('user_id, display_name, role, created_at')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      
+      if (error) throw error;
+      
+      this.displayUserList(users || [], 'Users');
+    } catch (error) {
+      console.error('Error loading users:', error);
+      alert('Error loading users: ' + error.message);
+    }
+  }
+
+  /**
+   * Load all merchants (admin only)
+   */
+  async loadAllMerchants() {
+    if (!this.isAdmin) return;
+    
+    try {
+      const { data: merchants, error } = await this.supabase
+        .from('business_profiles')
+        .select('merchant_id, business_name, created_at')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      
+      if (error) throw error;
+      
+      this.displayUserList(merchants || [], 'Merchants');
+    } catch (error) {
+      console.error('Error loading merchants:', error);
+      alert('Error loading merchants: ' + error.message);
+    }
+  }
+
+  /**
+   * Display user/merchant list for admin
+   */
+  displayUserList(users, type) {
+    const threadsList = document.getElementById('threadsList');
+    if (!threadsList) return;
+    
+    threadsList.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">All ${type}</h6>
+        <button class="btn btn-sm btn-outline-light" onclick="messagesSystem.loadThreads()">
+          <i class="bi bi-arrow-left"></i> Back
+        </button>
+      </div>
+    `;
+    
+    if (users.length === 0) {
+      threadsList.innerHTML += `<div class="text-muted">No ${type.toLowerCase()} found</div>`;
+      return;
+    }
+    
+    users.forEach(user => {
+      const userId = user.user_id || user.merchant_id;
+      const userName = user.display_name || user.business_name || 'Unknown';
+      const userType = type === 'Merchants' ? 'merchant' : 'user';
+      
+      const userItem = document.createElement('div');
+      userItem.className = 'thread-item';
+      userItem.innerHTML = `
+        <div class="d-flex align-items-center">
+          <div class="thread-info" style="flex: 1;">
+            <div class="thread-name">${escapeHtml(userName)}</div>
+            <div class="thread-preview text-muted small">${userType} • Click to message</div>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="messagesSystem.startConversation('${userId}', '${userType}')">
+            <i class="bi bi-chat"></i>
+          </button>
+        </div>
+      `;
+      threadsList.appendChild(userItem);
+    });
+  }
+
+  /**
    * Show login prompt
    */
   showLoginPrompt() {
@@ -68,11 +208,16 @@ class MessagesSystem {
     try {
       if (!this.supabase || !this.userId) return;
 
-      // Get threads where user is participant 1 or 2
-      const { data: threads, error } = await this.supabase
+      let query = this.supabase
         .from('message_threads')
-        .select('*')
-        .or(`participant_1_id.eq.${this.userId},participant_2_id.eq.${this.userId}`)
+        .select('*');
+
+      // If not admin, only show threads where user is participant
+      if (!this.isAdmin) {
+        query = query.or(`participant_1_id.eq.${this.userId},participant_2_id.eq.${this.userId}`);
+      }
+
+      const { data: threads, error } = await query
         .order('last_message_at', { ascending: false });
 
       if (error) {
@@ -355,19 +500,58 @@ class MessagesSystem {
       }
 
       // Update thread
+      // Fetch thread to determine which participant is the receiver
+      const { data: threadData } = await this.supabase
+        .from('message_threads')
+        .select('participant_1_id')
+        .eq('id', threadId)
+        .single();
+
+      const unreadUpdate = threadData?.participant_1_id === this.userId
+        ? { unread_count_p2: 1 }
+        : { unread_count_p1: 1 };
+
       await this.supabase
         .from('message_threads')
         .update({
           last_message_at: new Date().toISOString(),
           last_message_preview: messageText.substring(0, 50),
-          unread_count_p1: this.userId === this.currentParticipant?.id ? 0 : 0,
-          unread_count_p2: this.userId === this.currentParticipant?.id ? 1 : 0
+          ...unreadUpdate
         })
         .eq('id', threadId);
 
       // Clear input
       messageInput.value = '';
       messageInput.style.height = 'auto';
+
+      // Send email notification to recipient (best-effort, no await)
+      try {
+        if (window.emailNotifications && this.currentParticipant?.id) {
+          const { data: recipientData } = await this.supabase.auth.admin?.getUserById
+            ? { data: null }
+            : await this.supabase.from('user_profiles').select('email, display_name').eq('user_id', this.currentParticipant.id).single().catch(() => ({ data: null }));
+          const senderEmail = (await this.supabase.auth.getSession())?.data?.session?.user?.email || 'Someone';
+          const recipientEmail = recipientData?.email;
+          if (recipientEmail) {
+            window.emailNotifications.sendMessageNotification(recipientEmail, senderEmail, messageText.substring(0, 80));
+          }
+        }
+      } catch (e) { /* non-critical */ }
+
+      // Create in-app notification for recipient (best-effort, no await)
+      try {
+        if (this.currentParticipant?.id) {
+          const senderName = (await this.supabase.auth.getSession())?.data?.session?.user?.email?.split('@')[0] || 'Someone';
+          await this.supabase.from('notifications').insert({
+            user_id: this.currentParticipant.id,
+            type: 'message',
+            title: 'New message from ' + senderName,
+            body: messageText.substring(0, 100),
+            action_url: 'messages.html?thread=' + threadId,
+            read_at: null
+          });
+        }
+      } catch (e) { /* non-critical */ }
 
       // Reload messages
       await this.loadMessages(threadId);
@@ -423,13 +607,13 @@ class MessagesSystem {
   /**
    * Get current user ID
    */
-  getCurrentUserId() {
-    // Try Supabase auth first
+  async getCurrentUserId() {
+    // Try Supabase auth first (async)
     if (this.supabase && this.supabase.auth) {
       try {
-        const session = this.supabase.auth.getSession();
-        if (session?.data?.session?.user) {
-          return session.data.session.user.id;
+        const { data: { session } } = await this.supabase.auth.getSession();
+        if (session?.user) {
+          return session.user.id;
         }
       } catch (e) {
         // Session check failed, fallback to localStorage

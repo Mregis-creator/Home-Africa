@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Analytics Dashboard - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <!-- Chart.js for analytics graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary-cyan: #0ff;
+      --primary-green: #8fff00;
+      --dark-bg: #0a0a0a;
+      --card-bg: rgba(20, 20, 20, 0.95);
+    }
+    
+    body {
+      background: var(--dark-bg);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    .navbar {
+      background: rgba(0, 0, 0, 0.95) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    .navbar-brand { font-weight: 800; color: var(--primary-cyan) !important; }
+    
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-header h2 {
+      color: var(--primary-cyan);
+      margin: 0;
+    }
+    
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--primary-cyan);
+      transform: translateY(-2px);
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .stat-icon.views { background: rgba(0, 255, 255, 0.1); color: var(--primary-cyan); }
+    .stat-icon.favorites { background: rgba(255, 0, 136, 0.1); color: #ff0088; }
+    .stat-icon.messages { background: rgba(143, 255, 0, 0.1); color: var(--primary-green); }
+    .stat-icon.listings { background: rgba(255, 136, 0, 0.1); color: #ff8800; }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .stat-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+    
+    .stat-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+    
+    .stat-change.positive {
+      color: var(--primary-green);
+      background: rgba(143, 255, 0, 0.1);
+    }
+    
+    .stat-change.negative {
+      color: #ff4444;
+      background: rgba(255, 68, 68, 0.1);
+    }
+    
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .chart-container h5 {
+      color: var(--primary-cyan);
+      margin-bottom: 1rem;
+    }
+    
+    .top-listings {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    
+    .top-listings h5 {
+      color: var(--primary-cyan);
+      margin-bottom: 1rem;
+    }
+    
+    .listing-row {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+    
+    .listing-row:hover {
+      background: rgba(0, 255, 255, 0.05);
+    }
+    
+    .listing-row:last-child {
+      border-bottom: none;
+    }
+    
+    .listing-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 1rem;
+    }
+    
+    .listing-info {
+      flex: 1;
+    }
+    
+    .listing-title {
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .listing-views {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+    }
+    
+    .listing-stat {
+      text-align: right;
+    }
+    
+    .listing-stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-cyan);
+    }
+    
+    .time-filter {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .time-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .time-btn.active,
+    .time-btn:hover {
+      background: linear-gradient(90deg, var(--primary-cyan), var(--primary-green));
+      color: #000;
+      border-color: transparent;
+    }
+    
+    .loading-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 3rem;
+      color: #ff4444;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-bar-chart-fill"></i> Analytics
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link active" href="analytics.html">Analytics</a></li>
+          <li class="nav-item"><a class="nav-link" href="business-settings.html">Business</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <div class="dashboard-container">
+    <div class="page-header">
+      <div>
+        <h2><i class="bi bi-graph-up-arrow"></i> Performance Analytics</h2>
+        <p class="text-white-50 mb-0">Track your listings' performance and engagement</p>
+      </div>
+      <div class="time-filter">
+        <button class="time-btn active" data-period="7d">7 Days</button>
+        <button class="time-btn" data-period="30d">30 Days</button>
+        <button class="time-btn" data-period="90d">90 Days</button>
+        <button class="time-btn" data-period="1y">1 Year</button>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon views">
+            <i class="bi bi-eye-fill"></i>
+          </div>
+          <div class="stat-value" id="totalViews">-</div>
+          <div class="stat-label">Total Views</div>
+          <div class="stat-change positive" id="viewsChange">
+            <i class="bi bi-arrow-up"></i> <span>-</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon favorites">
+            <i class="bi bi-heart-fill"></i>
+          </div>
+          <div class="stat-value" id="totalFavorites">-</div>
+          <div class="stat-label">Favorites</div>
+          <div class="stat-change positive" id="favoritesChange">
+            <i class="bi bi-arrow-up"></i> <span>-</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon messages">
+            <i class="bi bi-chat-dots-fill"></i>
+          </div>
+          <div class="stat-value" id="totalMessages">-</div>
+          <div class="stat-label">Messages</div>
+          <div class="stat-change positive" id="messagesChange">
+            <i class="bi bi-arrow-up"></i> <span>-</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon listings">
+            <i class="bi bi-houses-fill"></i>
+          </div>
+          <div class="stat-value" id="totalListings">-</div>
+          <div class="stat-label">Active Listings</div>
+          <div class="stat-change positive" id="listingsChange">
+            <i class="bi bi-arrow-up"></i> <span>-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <div class="chart-container">
+          <h5><i class="bi bi-graph-up"></i> Views Over Time</h5>
+          <canvas id="viewsChart" height="100"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-container">
+          <h5><i class="bi bi-pie-chart-fill"></i> Traffic Sources</h5>
+          <canvas id="sourcesChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Listings & Engagement -->
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="top-listings">
+          <h5><i class="bi bi-trophy-fill"></i> Top Performing Listings</h5>
+          <div id="topListingsContainer">
+            <div class="loading-state">
+              <div class="spinner-border text-info"></div>
+              <p class="mt-2">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="chart-container">
+          <h5><i class="bi bi-geo-alt-fill"></i> Views by Location</h5>
+          <canvas id="locationChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    class MerchantAnalytics {
+      constructor() {
+        this.currentPeriod = '7d';
+        this.charts = {};
+        this.init();
+      }
+
+      async init() {
+        this.attachEvents();
+        await this.loadAnalytics();
+      }
+
+      attachEvents() {
+        document.querySelectorAll('.time-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentPeriod = e.target.dataset.period;
+            this.loadAnalytics();
+          });
+        });
+      }
+
+      async loadAnalytics() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          if (!client) throw new Error('Supabase not initialized');
+
+          const { data: { user } } = await client.auth.getUser();
+          if (!user) {
+            window.location.href = 'signin.html';
+            return;
+          }
+
+          // Load stats based on period
+          const days = this.getDaysFromPeriod(this.currentPeriod);
+          const startDate = new Date();
+          startDate.setDate(startDate.getDate() - days);
+
+          // Get listing views
+          const { data: views } = await client
+            .from('listing_views')
+            .select('*')
+            .eq('owner_id', user.id)
+            .gte('created_at', startDate.toISOString());
+
+          // Get user's listings
+          const { data: listings } = await client
+            .from('listings')
+            .select('*')
+            .eq('user_id', user.id);
+
+          // Get favorites
+          const { data: favorites } = await client
+            .from('favorites')
+            .select('listing_id')
+            .in('listing_id', listings?.map(l => l.id) || []);
+
+          // Get messages
+          const { data: messages } = await client
+            .from('messages')
+            .select('*')
+            .eq('recipient_id', user.id)
+            .gte('created_at', startDate.toISOString());
+
+          this.updateStats({
+            views: views || [],
+            listings: listings || [],
+            favorites: favorites || [],
+            messages: messages || []
+          });
+
+          this.renderCharts({
+            views: views || [],
+            listings: listings || []
+          });
+
+          this.renderTopListings(views || [], listings || []);
+
+        } catch (err) {
+          console.error('Error loading analytics:', err);
+          this.showError('Failed to load analytics. Please try again.');
+        }
+      }
+
+      getDaysFromPeriod(period) {
+        switch(period) {
+          case '7d': return 7;
+          case '30d': return 30;
+          case '90d': return 90;
+          case '1y': return 365;
+          default: return 7;
+        }
+      }
+
+      updateStats(data) {
+        document.getElementById('totalViews').textContent = data.views.length.toLocaleString();
+        document.getElementById('totalFavorites').textContent = data.favorites.length.toLocaleString();
+        document.getElementById('totalMessages').textContent = data.messages.length.toLocaleString();
+        document.getElementById('totalListings').textContent = data.listings.length.toLocaleString();
+
+        // Calculate changes (mock for now - would compare with previous period)
+        document.getElementById('viewsChange').querySelector('span').textContent = '+12%';
+        document.getElementById('favoritesChange').querySelector('span').textContent = '+8%';
+        document.getElementById('messagesChange').querySelector('span').textContent = '+15%';
+        document.getElementById('listingsChange').querySelector('span').textContent = '+2';
+      }
+
+      renderCharts(data) {
+        // Views over time chart
+        const viewsCtx = document.getElementById('viewsChart').getContext('2d');
+        
+        // Group views by date
+        const viewsByDate = {};
+        data.views.forEach(v => {
+          const date = new Date(v.created_at).toLocaleDateString();
+          viewsByDate[date] = (viewsByDate[date] || 0) + 1;
+        });
+
+        const labels = Object.keys(viewsByDate).slice(-30);
+        const values = labels.map(d => viewsByDate[d]);
+
+        if (this.charts.views) this.charts.views.destroy();
+        
+        this.charts.views = new Chart(viewsCtx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Views',
+              data: values,
+              borderColor: '#0ff',
+              backgroundColor: 'rgba(0, 255, 255, 0.1)',
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+          }
+        });
+
+        // Sources pie chart (mock data - would come from analytics)
+        const sourcesCtx = document.getElementById('sourcesChart').getContext('2d');
+        
+        if (this.charts.sources) this.charts.sources.destroy();
+        
+        this.charts.sources = new Chart(sourcesCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Direct', 'Search', 'Social', 'Map Explorer'],
+            datasets: [{
+              data: [45, 30, 15, 10],
+              backgroundColor: ['#0ff', '#8fff00', '#ff0088', '#ff8800']
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#fff' } }
+            }
+          }
+        });
+
+        // Location bar chart
+        const locationCtx = document.getElementById('locationChart').getContext('2d');
+        
+        // Group by location
+        const viewsByLocation = {};
+        data.views.forEach(v => {
+          const loc = v.listing_location || 'Unknown';
+          viewsByLocation[loc] = (viewsByLocation[loc] || 0) + 1;
+        });
+
+        const locLabels = Object.keys(viewsByLocation).slice(0, 5);
+        const locValues = locLabels.map(l => viewsByLocation[l]);
+
+        if (this.charts.location) this.charts.location.destroy();
+        
+        this.charts.location = new Chart(locationCtx, {
+          type: 'bar',
+          data: {
+            labels: locLabels,
+            datasets: [{
+              label: 'Views',
+              data: locValues,
+              backgroundColor: '#8fff00'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { display: false } },
+              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+          }
+        });
+      }
+
+      renderTopListings(views, listings) {
+        const container = document.getElementById('topListingsContainer');
+        
+        if (listings.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="bi bi-house-x" style="font-size: 3rem;"></i>
+              <p class="mt-2">No listings yet. Create your first listing!</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Count views per listing
+        const viewsPerListing = {};
+        views.forEach(v => {
+          viewsPerListing[v.listing_id] = (viewsPerListing[v.listing_id] || 0) + 1;
+        });
+
+        // Sort listings by views
+        const sortedListings = listings
+          .map(l => ({ ...l, viewCount: viewsPerListing[l.id] || 0 }))
+          .sort((a, b) => b.viewCount - a.viewCount)
+          .slice(0, 5);
+
+        container.innerHTML = sortedListings.map((l, i) => `
+          <div class="listing-row">
+            <div style="width: 30px; font-weight: 700; color: ${i < 3 ? '#0ff' : 'rgba(255,255,255,0.5)'};">
+              #${i + 1}
+            </div>
+            <img src="${l.images?.[0] || l.image || 'images/placeholder.jpg'}" class="listing-thumb">
+            <div class="listing-info">
+              <div class="listing-title">${l.title || 'Untitled'}</div>
+              <div class="listing-views">
+                <i class="bi bi-geo-alt"></i> ${l.location || l.district || 'Unknown'}
+              </div>
+            </div>
+            <div class="listing-stat">
+              <div class="listing-stat-value">${l.viewCount}</div>
+              <small style="color: rgba(255,255,255,0.5);">views</small>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      showError(message) {
+        document.getElementById('topListingsContainer').innerHTML = `
+          <div class="error-state">
+            <i class="bi bi-exclamation-circle" style="font-size: 3rem;"></i>
+            <p class="mt-2">${message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      window.analytics = new MerchantAnalytics();
+    });
+  </script>
+</body>
+</html>

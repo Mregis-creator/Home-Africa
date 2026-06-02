@@ -46,6 +46,13 @@ class SupabaseListings {
         }
       }
 
+      // Get logged-in user ID
+      let userId = null;
+      try {
+        const { data: { session } } = await this.supabase.auth.getSession();
+        if (session?.user) userId = session.user.id;
+      } catch (e) { /* ignore */ }
+
       // Prepare listing record
       const listingRecord = {
         type: listingData.type || 'apartment',
@@ -65,6 +72,8 @@ class SupabaseListings {
         views: 0,
         favorites: 0
       };
+
+      if (userId) listingRecord.user_id = userId;
       
       // Only add merchant_id if we found one (to avoid foreign key constraint errors)
       if (merchantId) {
@@ -203,6 +212,24 @@ class SupabaseListings {
    * @param {string} type - Listing type (optional)
    * @returns {Promise<array>} List of listings
    */
+  async getListingsByUser(userId, type = null) {
+    if (!this.supabase || !userId) return [];
+    try {
+      let query = this.supabase
+        .from('listings')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      if (type) query = query.eq('type', type);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting listings by user:', error);
+      return [];
+    }
+  }
+
   async getListingsByMerchant(merchantName, type = null) {
     if (!this.supabase) {
       return [];

@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HOME AFRICA - Find Property in Rwanda</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA — Rwanda's premier real estate and lifestyle platform. Find verified apartments, land plots, and cars. Instant contact, trusted sellers, and AI-powered search." />
 
   <!-- Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -13,7 +16,6 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
   />
-
   <!-- ✨ Custom Styles -->
 <style>
   #particles-js {
@@ -46,7 +48,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('images/hero-bg.jpeg') center center/cover no-repeat;
+      background: #0a0f1c;
       overflow-x: hidden;
       display: flex;
       flex-direction: column;
@@ -256,6 +258,54 @@
       transform: scale(1.04);
     }
 
+    /* 🔍 Hero search bar */
+    .search-bar {
+      background: rgba(11, 29, 81, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(0, 255, 255, 0.35);
+      border-radius: 18px;
+      padding: 1.25rem 1.25rem 1rem;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        0 0 24px rgba(0, 255, 255, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .search-bar .form-control,
+    .search-bar .form-select {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1.5px solid transparent;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-size: 0.98rem;
+      color: #0B1D51;
+      font-weight: 500;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .search-bar .form-control::placeholder {
+      color: #6c757d;
+      font-weight: 400;
+    }
+    .search-bar .form-control:focus,
+    .search-bar .form-select:focus {
+      border-color: #0ff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 255, 255, 0.35);
+      background: #fff;
+      outline: none;
+    }
+    .search-bar .form-control:hover,
+    .search-bar .form-select:hover {
+      border-color: rgba(0, 255, 255, 0.5);
+    }
+    @media (max-width: 575.98px) {
+      .search-bar {
+        padding: 1rem;
+        border-radius: 14px;
+      }
+    }
+
     .bottom-link {
       margin-top: 1rem;
       text-align: center;
@@ -353,7 +403,7 @@
       box-shadow: 0 0 60px #0ff, 0 0 120px #8fff00;
       opacity: 0;
       transform: scale(0.7) rotate(-10deg);
-      animation: logoPopIn 2.2s 3.3s cubic-bezier(0.4,0,0.4,1) forwards;
+      animation: logoPopIn 1.6s 0.2s cubic-bezier(0.4,0,0.4,1) forwards;
     }
     @keyframes logoPopIn {
       0% { opacity: 0; transform: scale(0.7) rotate(-10deg); }
@@ -391,20 +441,192 @@
       0% { opacity: 0; transform: translateY(40px) scale(0.95); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
+
+    /* Social Proof Badges */
+    .social-proof-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .social-proof-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .social-proof-badge.hot {
+      background: linear-gradient(135deg, rgba(255,51,102,0.3) 0%, rgba(255,51,102,0.15) 100%);
+      border: 1px solid #ff3366;
+      color: #ff6688;
+    }
+
+    .social-proof-badge.trending {
+      background: linear-gradient(135deg, rgba(255,170,0,0.3) 0%, rgba(255,170,0,0.15) 100%);
+      border: 1px solid #ffaa00;
+      color: #ffcc44;
+    }
+
+    .social-proof-badge.active {
+      background: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.1) 100%);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .social-proof-badge.high {
+      background: linear-gradient(135deg, rgba(255,51,102,0.25) 0%, rgba(255,51,102,0.1) 100%);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    .social-proof-badge.medium {
+      background: linear-gradient(135deg, rgba(255,170,0,0.25) 0%, rgba(255,170,0,0.1) 100%);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+    }
+
+    .social-proof-badge.new {
+      background: linear-gradient(135deg, rgba(102,170,255,0.3) 0%, rgba(102,170,255,0.15) 100%);
+      border: 1px solid var(--info);
+      color: var(--info);
+    }
+
+    .social-proof-badge.fresh {
+      background: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.1) 100%);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .badge-icon {
+      font-size: 0.9rem;
+    }
+
+    .badge-savings {
+      background: rgba(0,255,136,0.3);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      margin-left: 0.25rem;
+    }
+
+    @keyframes pulse-animation {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .pulse-animation {
+      animation: pulse-animation 0.5s ease;
+    }
+
+    /* Smart Feed Styles */
+    .smart-feed {
+      background: rgba(0,0,0,0.3);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .feed-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .feed-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .feed-icon {
+      font-size: 1.5rem;
+    }
+
+    .feed-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .feed-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #fff;
+    }
+
+    .feed-description {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 0.75rem;
+    }
+
+    .feed-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .feed-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .feed-pull-indicator {
+      text-align: center;
+      padding: 1rem;
+      color: var(--primary);
+      transition: all 0.3s ease;
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dismiss-btn {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .feed-card:hover .dismiss-btn {
+      opacity: 1;
+    }
 </style>
 
 
 </head>
 <body>
     <!-- 🌌 Particle Background -->
-    <div id="particles-js" style="z-index: 10000;"></div>
+    <div id="particles-js"></div>
     <!-- Splash Screen Overlay -->
-    <div id="splash-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
+    <div id="splash-screen" role="status" aria-label="Loading HOME AFRICA">
       <div style="text-align:center;">
-        <img src="images/hero-bg.jpeg" alt="HOME AFRICA" style="max-width:40vw;max-height:40vh;border-radius:50%;box-shadow:0 0 60px #0ff,0 0 120px #8fff00;">
-        <h1 style="margin-top:2rem;font-size:3.5rem;font-weight:bold;background:linear-gradient(90deg,#0ff 10%,#8fff00 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.2em;">HOME AFRICA</h1>
-        <h2 style="color:#fff;margin-top:1.5rem;">Beyond Horizons</h2>
-        <p style="color:#fff;font-size:1.2rem;">Sign in to continue managing your properties and bookings.</p>
+        <img src="homeafricabanneralternative_III.png" alt="HOME AFRICA logo">
+        <h1>HOME AFRICA</h1>
+        <h2>Beyond Horizons</h2>
+        <p>Sign in to continue managing your properties and bookings.</p>
       </div>
     </div>
     <div id="main-content" style="display:none;">
@@ -412,7 +634,7 @@
       <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
           <a class="navbar-brand" href="#">
-            <img src="images/hero-bg.jpeg" alt="Logo" />
+            <img src="homeafricabanneralternative_III.png" alt="HOME AFRICA logo" />
             HOME AFRICA
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -434,20 +656,61 @@
               <li class="nav-item">
                 <a class="nav-link active" href="cars.html">Cars</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="rejo-reward.html" style="color: #0ff; font-weight: 700;">🎮 Rejo Reward</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="idle-landlord.html" style="color: #ffd700; font-weight: 700;">🏘️ Idle Landlord</a>
+              </li>
+              <li class="nav-item" id="messagesNavItem" style="display: none;">
+                <a class="nav-link active" href="messages.html">
+                  <i class="bi bi-chat-dots"></i> Messages
+                  <span class="badge bg-danger rounded-pill ms-1" id="messages-count-badge" style="display:none;">0</span>
+                </a>
+              </li>
+              <li class="nav-item" id="feedNavItem">
+                <a class="nav-link active" href="property-feed.html" style="color: #0a66c2; font-weight: 700;">
+                  <i class="bi bi-rss"></i> Property Feed
+                </a>
+              </li>
+              <li class="nav-item" id="merchantDashboardNavItem" style="display: none;">
+                <a class="nav-link active" href="merchant-dashboard.html" style="color: #00c853; font-weight: 700;">
+                  <i class="bi bi-shop"></i> Merchant Dashboard
+                </a>
+              </li>
                <li class="nav-item">
                 <a class="nav-link active" href="land.html">Land Plots</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" href="post.html">Post your property</a>
               </li>
-                <li class="nav-item">
+              <li class="nav-item" id="loginNavItem">
                 <a class="nav-link active" href="signin.html">Log In</a>
               </li>
-                <li class="nav-item">
+              <li class="nav-item" id="signupNavItem">
                 <a class="nav-link active" href="signup.html">Buy a Merchant Account </a>
               </li>
-                <li class="nav-item">
+              <li class="nav-item" id="logoutNavItem" style="display: none;">
+                <a class="nav-link active" href="#" onclick="handleLogout(); return false;">Log Out</a>
+              </li>
+              <li class="nav-item" id="adminPaymentsNavItem" style="display: none;">
+                <a class="nav-link active" href="admin-payments.html" style="color: #dc3545; font-weight: 700;">
+                  <i class="bi bi-shield-lock"></i> Payments
+                  <span class="badge bg-danger rounded-pill ms-1" id="pending-payments-badge" style="display:none;">0</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="favorites.html">
+                  <i class="bi bi-heart"></i> Favorites
+                  <span class="badge bg-danger rounded-pill ms-1" id="favorites-count-badge" style="display:none;">0</span>
+              <li class="nav-item"><a class="nav-link active" href="compare.html"><i class="bi bi-columns"></i> Compare <span class="badge bg-danger rounded-pill ms-1" id="compare-count-badge" style="display:none;">0</span></a></li>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link active" href="about.html">About Us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="partnerships.html" style="color: #8fff00; font-weight: 700;">💎 Partnerships</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" href="search.html" title="Search HOME AFRICA">
@@ -526,49 +789,155 @@
           retina_detect: true
         });
 
-        // Redirect user on form submit based on property type selected
+        // Redirect user on form submit based on property type, forwarding filters
         document.getElementById('searchForm').addEventListener('submit', function(event) {
           event.preventDefault();
 
           const propertyType = document.getElementById('propertyTypeSelect').value;
+          const location = document.getElementById('locationInput').value.trim();
+          const maxPriceRaw = document.getElementById('maxPriceInput').value.trim();
+          // Strip non-digits so users can type "1,500,000 RWF" etc.
+          const maxPrice = maxPriceRaw.replace(/[^\d]/g, '');
 
           if (!propertyType) {
             alert('Please select a property type.');
             return;
           }
 
-          // Map property types to their pages
+          if (maxPriceRaw && !maxPrice) {
+            alert('Please enter a valid number for Max Price.');
+            return;
+          }
+
           const pageMap = {
             apartment: 'apartment.html',
             cars: 'cars.html',
-            land: 'land.html' // Make sure you have this page or adjust accordingly
+            land: 'land.html'
           };
 
           const redirectPage = pageMap[propertyType];
-
-          if (redirectPage) {
-            window.location.href = redirectPage;
-          } else {
+          if (!redirectPage) {
             alert('Selected property type page not found.');
+            return;
           }
+
+          const params = new URLSearchParams();
+          if (location) params.set('location', location);
+          if (maxPrice) params.set('maxPrice', maxPrice);
+
+          const qs = params.toString();
+          window.location.href = qs ? `${redirectPage}?${qs}` : redirectPage;
         });
 
-        // Splash screen logic - only on index page, 1.3 seconds
+        // Splash screen logic - shown once per session, ~2.6s for animations to play
         window.addEventListener('DOMContentLoaded', function() {
+          var splash = document.getElementById('splash-screen');
+          var main = document.getElementById('main-content');
+          var heroTitle = document.getElementById('main-hero-title');
+
+          // Skip splash if already shown this session
+          if (sessionStorage.getItem('splashShown')) {
+            splash.style.display = 'none';
+            main.style.display = '';
+            if (heroTitle) heroTitle.classList.add('fade-in-hero');
+            return;
+          }
+
           setTimeout(function() {
-            document.getElementById('splash-screen').style.opacity = 0;
+            splash.style.opacity = 0;
             setTimeout(function() {
-              document.getElementById('splash-screen').style.display = 'none';
-              document.getElementById('main-content').style.display = '';
-              // Add fade-in animation to hero h1
-              var heroTitle = document.getElementById('main-hero-title');
-              if(heroTitle) heroTitle.classList.add('fade-in-hero');
-            }, 300);
-          }, 1300); // 1.3 seconds
+              splash.style.display = 'none';
+              main.style.display = '';
+              if (heroTitle) heroTitle.classList.add('fade-in-hero');
+              sessionStorage.setItem('splashShown', '1');
+            }, 700);
+          }, 2600);
         });
       </script>
 
-    <!-- 🌍 Footer -->
+    <!-- 📱 Smart Alert Feed Section -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <h2 class="text-center mb-4">
+              <span style="background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                🔥 For You
+              </span>
+            </h2>
+            <p class="text-center text-muted mb-4">Personalized updates based on your interests</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <div id="smartFeedContainer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- � Rejo Reward Game Banner -->
+    <section class="py-5" style="background: linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(255,0,255,0.1) 100%); border-top: 1px solid rgba(255,255,255,0.1);">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h3 class="mb-2" style="background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+              🎮 Bored? Play Rejo Reward!
+            </h3>
+            <p class="text-muted mb-3">
+              Two addictive games to keep you entertained while discovering properties.
+              Test your market knowledge or build a virtual real estate empire!
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+              <a href="rejo-reward.html" class="btn btn-lg px-4" style="background: linear-gradient(135deg, #0ff, #ff00ff); color: #000; font-weight: 700;">
+                <i class="bi bi-controller"></i> Rejo Reward
+              </a>
+              <a href="idle-landlord.html" class="btn btn-lg px-4" style="background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; font-weight: 700;">
+                <i class="bi bi-building"></i> Idle Landlord
+              </a>
+            </div>
+          </div>
+          <div class="col-md-4 text-center mt-4 mt-md-0">
+            <div style="font-size: 3rem;">🎮 🏘️</div>
+            <div class="text-muted small">Play while you browse</div>
+          </div>
+        </div>
+        
+        <!-- Game Cards -->
+        <div class="row mt-5">
+          <div class="col-md-6 mb-3">
+            <div class="card" style="background: rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.2);">
+              <div class="card-body">
+                <h5 class="card-title" style="color: #0ff;">🎮 Rejo Reward</h5>
+                <p class="card-text text-muted">Guess property prices in the daily challenge. How well do you know the Kigali market?</p>
+                <ul class="list-unstyled text-muted small">
+                  <li><i class="bi bi-check text-success"></i> 5 properties daily</li>
+                  <li><i class="bi bi-check text-success"></i> Earn points & badges</li>
+                  <li><i class="bi bi-check text-success"></i> Compete on leaderboard</li>
+                </ul>
+                <a href="rejo-reward.html" class="btn btn-outline-info">Play Now</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="card" style="background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.2);">
+              <div class="card-body">
+                <h5 class="card-title" style="color: #ffd700;">🏘️ Idle Landlord</h5>
+                <p class="card-text text-muted">Build a virtual real estate empire! Click to earn, buy properties, hire managers.</p>
+                <ul class="list-unstyled text-muted small">
+                  <li><i class="bi bi-check text-success"></i> Idle clicker gameplay</li>
+                  <li><i class="bi bi-check text-success"></i> 8 property types to collect</li>
+                  <li><i class="bi bi-check text-success"></i> Prestige system</li>
+                </ul>
+                <a href="idle-landlord.html" class="btn btn-outline-warning">Start Building</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- �� Footer -->
     <footer class="bg-dark text-light pt-4 pb-3 mt-5">
       <div class="container">
         <div class="row">
@@ -605,13 +974,15 @@
             <h6>Follow Us</h6>
             <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
             <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
-            <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
+            <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
             <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
         <hr style="border-color: rgba(255,255,255,0.1)" />
         <div class="text-center small">
-          &copy; 2025 HOME AFRICA. All rights reserved.
+          &copy; 2025 HOME AFRICA. All rights reserved. | 
+          <a href="privacy-policy.html" class="footer-link">Privacy Policy</a> | 
+          <a href="terms-of-service.html" class="footer-link">Terms of Service</a>
         </div>
       </div>
     </footer>
@@ -624,11 +995,176 @@
   <!-- Auth System -->
   <script src="js/auth.js"></script>
   
+  <!-- Navbar User Indicator -->
+  <script src="js/navbar-user-indicator.js"></script>
+  <script src="js/navbar-auth-status.js"></script>
+  
   <!-- AI Chatbot -->
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
+
+  <!-- Social Proof & Activity Tracking -->
+  <script src="js/social-proof.js"></script>
+
+  <!-- Smart Feed System -->
+  <script src="js/smart-feed.js"></script>
+
+  <script src="js/analytics.js"></script>
+<script src="js/dark-mode.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/accessibility.js"></script>
   
   <!-- Footer Fix - Dynamic padding to prevent content overlap -->
   <script src="js/footer-fix.js"></script>
+
+  <!-- Initialize Smart Feed -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Wait for smart feed to be ready
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      if (window.smartFeed) {
+        await window.smartFeed.mount('smartFeedContainer', {
+          showPullToRefresh: true,
+          infiniteScroll: true
+        });
+      }
+    });
+  </script>
+
+  <!-- Auth-based Navigation Handler -->
+  <script>
+    // Check auth state and update navigation
+    async function updateAuthNav() {
+      const supabaseClient = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+      if (!supabaseClient) return;
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        const messagesNav = document.getElementById('messagesNavItem');
+        const merchantDashboardNav = document.getElementById('merchantDashboardNavItem');
+        const loginNav = document.getElementById('loginNavItem');
+        const signupNav = document.getElementById('signupNavItem');
+        const logoutNav = document.getElementById('logoutNavItem');
+        
+        if (session?.user) {
+          // User is logged in
+          if (messagesNav) messagesNav.style.display = 'block';
+          if (loginNav) loginNav.style.display = 'none';
+          if (signupNav) signupNav.style.display = 'none';
+          if (logoutNav) logoutNav.style.display = 'block';
+          
+          // Check if user is merchant or admin
+          const { data: profile } = await supabaseClient
+            .from('user_profiles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (profile?.role === 'merchant' && merchantDashboardNav) {
+            merchantDashboardNav.style.display = 'block';
+          }
+          
+          if (profile?.role === 'admin') {
+            const adminPaymentsNav = document.getElementById('adminPaymentsNavItem');
+            if (adminPaymentsNav) adminPaymentsNav.style.display = 'block';
+            // Check for pending payments
+            checkPendingPayments(supabaseClient);
+          }
+          
+          // Check for unread messages
+          checkUnreadMessages(supabaseClient, session.user.id);
+        } else {
+          // User is not logged in
+          if (messagesNav) messagesNav.style.display = 'none';
+          if (merchantDashboardNav) merchantDashboardNav.style.display = 'none';
+          if (loginNav) loginNav.style.display = 'block';
+          if (signupNav) signupNav.style.display = 'block';
+          if (logoutNav) logoutNav.style.display = 'none';
+        }
+      } catch (e) {
+        console.error('Auth check error:', e);
+      }
+    }
+
+    // Check unread messages count
+    async function checkUnreadMessages(supabase, userId) {
+      try {
+        const { data: threads, error } = await supabase
+          .from('message_threads')
+          .select('unread_count_p1, unread_count_p2, participant_1_id')
+          .or(`participant_1_id.eq.${userId},participant_2_id.eq.${userId}`);
+        
+        if (error) return;
+        
+        let totalUnread = 0;
+        threads?.forEach(thread => {
+          if (thread.participant_1_id === userId) {
+            totalUnread += thread.unread_count_p1 || 0;
+          } else {
+            totalUnread += thread.unread_count_p2 || 0;
+          }
+        });
+        
+        const badge = document.getElementById('messages-count-badge');
+        if (badge) {
+          if (totalUnread > 0) {
+            badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+            badge.style.display = 'inline';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        console.error('Unread check error:', e);
+      }
+    }
+
+    // Check pending payments count (for admin badge)
+    async function checkPendingPayments(supabase) {
+      try {
+        const { data: payments, error } = await supabase
+          .from('payment_transactions')
+          .select('id', { count: 'exact' })
+          .in('status', ['pending', 'awaiting_confirmation']);
+        
+        if (error) return;
+        
+        const badge = document.getElementById('pending-payments-badge');
+        if (badge) {
+          if (payments?.length > 0) {
+            badge.textContent = payments.length > 99 ? '99+' : payments.length;
+            badge.style.display = 'inline';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        console.error('Pending payments check error:', e);
+      }
+    }
+
+    // Handle logout
+    async function handleLogout() {
+      const supabaseClient = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userId');
+        window.location.reload();
+      }
+    }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', updateAuthNav);
+    // Also run when auth state changes
+    const supabaseClient = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+    if (supabaseClient) {
+      supabaseClient.auth.onAuthStateChange(updateAuthNav);
+    }
+  </script>
 </body>
 
 </html>
+

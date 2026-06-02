@@ -418,8 +418,39 @@
 
     <!-- ✨ Updated Sign-Up Form Section -->
     <section class="signup-form mt-4">
-      <h2><i class="bi bi-person-plus-fill"></i> Merchant Account</h2>
-      
+      <h2><i class="bi bi-person-plus-fill"></i> Create Account</h2>
+
+      <!-- Account Type Selection -->
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-person-badge"></i> Account Type</label>
+        <div class="row">
+          <div class="col-4">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="signupRole" id="roleUser" value="user" checked>
+              <label class="form-check-label" for="roleUser">
+                <i class="bi bi-person"></i> Buyer
+              </label>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="signupRole" id="roleMerchant" value="merchant">
+              <label class="form-check-label" for="roleMerchant">
+                <i class="bi bi-shop"></i> Merchant
+              </label>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="signupRole" id="roleAgent" value="agent">
+              <label class="form-check-label" for="roleAgent">
+                <i class="bi bi-briefcase"></i> Agent
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Sign-in Method Toggle -->
       <div class="mb-3 text-center">
         <div class="btn-group" role="group">
@@ -433,7 +464,7 @@
           </label>
         </div>
       </div>
-      
+
       <form id="signupForm" action="#" method="POST" novalidate>
         <div class="mb-3">
           <label for="signupName" class="form-label">Full Name</label>
@@ -551,6 +582,8 @@
   <!-- EmailJS for email notifications -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="js/email-notifications.js"></script>
+  <script src="js/email-service-emailjs.js"></script>
+  <script src="js/navbar-auth-status.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/supabase-merchants.js"></script>
   <script>
@@ -679,7 +712,7 @@
                 id: user.id,
                 email: user.email,
                 full_name: name,
-                role: 'merchant',
+                role: localStorage.getItem('pendingSignupRole') || 'user',
                 created_at: user.created_at || new Date().toISOString()
               }, {
                 onConflict: 'id'
@@ -707,19 +740,24 @@
           localStorage.removeItem('pendingMerchantPhone');
           localStorage.removeItem('pendingMerchantCategories');
           
-          // Send welcome email
-          if (window.emailNotifications) {
+          // Send welcome email via EmailJS
+          const signupRole = localStorage.getItem('pendingSignupRole') || 'user';
+          if (typeof emailService !== 'undefined' && emailService) {
             try {
-              await window.emailNotifications.sendWelcomeEmail(email, name, true); // true = isMerchant
-              console.log('✅ Welcome email sent');
+              await emailService.init();
+              await emailService.sendWelcomeEmail(email, name, signupRole);
+              console.log('✅ Welcome email sent via EmailJS');
             } catch (emailError) {
-              console.warn('⚠️ Welcome email failed (stored in database):', emailError);
+              console.warn('⚠️ Welcome email failed:', emailError);
             }
           }
           
+          // Clean up
+          localStorage.removeItem('pendingSignupRole');
+          
           // Show success and redirect
-          alert('✅ Account created successfully! You can now access the admin panel.');
-          window.location.href = 'admin.html';
+          alert('✅ Account created successfully! Please log in with your credentials.');
+          window.location.href = 'signin.html?registered=true&from=signup';
           
         } catch (error) {
           console.error('Magic link sign-in error:', error);
@@ -799,6 +837,10 @@
               throw new Error('Supabase client not loaded. Please refresh the page.');
             }
             
+            // Get selected role
+            const selectedRole = document.querySelector('input[name="signupRole"]:checked')?.value || 'user';
+            localStorage.setItem('pendingSignupRole', selectedRole);
+            
             // Store merchant data for after signup
             localStorage.setItem('pendingMerchantName', name);
             localStorage.setItem('pendingMerchantPhone', phone);
@@ -810,7 +852,7 @@
               options: {
                 data: {
                   full_name: name,
-                  role: 'merchant',
+                  role: selectedRole,
                   merchant_categories: selectedCategories
                 },
                 emailRedirectTo: window.location.origin + '/signup.html?email=' + encodeURIComponent(email)
@@ -838,6 +880,9 @@
               throw new Error('Supabase client not loaded. Please refresh the page.');
             }
             
+            // Get selected role
+            const signupRole = document.querySelector('input[name="signupRole"]:checked')?.value || 'user';
+            
             // Create user in Supabase Auth
             const { data: authData, error: signUpError } = await supabase.auth.signUp({
               email: email,
@@ -845,7 +890,7 @@
               options: {
                 data: {
                   full_name: name,
-                  role: 'merchant'
+                  role: signupRole
                 }
               }
             });
@@ -893,7 +938,7 @@
                   id: user.id,
                   email: user.email,
                   full_name: name,
-                  role: 'merchant',
+                  role: signupRole,
                   created_at: user.created_at || new Date().toISOString()
                 }, {
                   onConflict: 'id'
@@ -904,8 +949,8 @@
             }
             
             // Save to localStorage for backward compatibility
-            localStorage.setItem('merchantRegistered', 'true');
-            localStorage.setItem('isMerchant', 'true');
+            localStorage.setItem('merchantRegistered', signupRole === 'merchant' ? 'true' : 'false');
+            localStorage.setItem('isMerchant', signupRole === 'merchant' ? 'true' : 'false');
             localStorage.setItem('merchantCategories', JSON.stringify(selectedCategories));
             localStorage.setItem('merchantName', name);
             localStorage.setItem('merchantEmail', email);
@@ -916,13 +961,14 @@
               user_metadata: user.user_metadata
             }));
             
-            // Send welcome email
-            if (window.emailNotifications) {
+            // Send welcome email via EmailJS
+            if (typeof emailService !== 'undefined' && emailService) {
               try {
-                await window.emailNotifications.sendWelcomeEmail(email, name, true); // true = isMerchant
-                console.log('✅ Welcome email sent');
+                await emailService.init();
+                await emailService.sendWelcomeEmail(email, name, signupRole);
+                console.log('✅ Welcome email sent via EmailJS');
               } catch (emailError) {
-                console.warn('⚠️ Welcome email failed (stored in database):', emailError);
+                console.warn('⚠️ Welcome email failed:', emailError);
               }
             }
             

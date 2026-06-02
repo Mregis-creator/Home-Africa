@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rejo Reward - Guess the Price | HOME AFRICA</title>
+  <meta name="description" content="Test your market knowledge! Guess property prices and win rewards on HOME AFRICA by REJO Group.">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #ff00ff;
+      --bg-dark: #0a0a0a;
+      --card-bg: rgba(255,255,255,0.05);
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --danger: #ff3366;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: #fff;
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .game-header {
+      background: linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(255,0,255,0.1) 100%);
+      padding: 2rem 0;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .game-logo {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-tagline {
+      color: #888;
+      font-size: 1.1rem;
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 0.75rem 1.5rem;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .game-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .property-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .property-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    .property-info {
+      padding: 1.5rem;
+    }
+
+    .property-type {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(0,255,255,0.2);
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .property-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .property-details {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .property-location {
+      color: #aaa;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .guess-section {
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .guess-input-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .guess-input {
+      flex: 1;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      color: #fff;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .guess-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,255,255,0.2);
+    }
+
+    .guess-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .guess-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0,255,255,0.4);
+    }
+
+    .guess-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result-section {
+      padding: 0 1.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .result-badge {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      animation: slideInDown 0.5s ease;
+    }
+
+    .result-perfect {
+      background: linear-gradient(135deg, rgba(0,255,136,0.3), rgba(0,255,136,0.15));
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .result-close {
+      background: linear-gradient(135deg, rgba(255,170,0,0.3), rgba(255,170,0,0.15));
+      border: 1px solid var(--warning);
+      color: var(--warning);
+    }
+
+    .result-miss {
+      background: linear-gradient(135deg, rgba(255,51,102,0.3), rgba(255,51,102,0.15));
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    .actual-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .price-difference {
+      color: #888;
+      margin-bottom: 1rem;
+    }
+
+    .points-earned {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-view-listing {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .btn-view-listing:hover {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      color: #000;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-next:hover {
+      transform: scale(1.05);
+    }
+
+    .streak-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .streak-flame {
+      font-size: 1.5rem;
+      opacity: 0.3;
+      transition: all 0.3s;
+    }
+
+    .streak-flame.active {
+      opacity: 1;
+      animation: flameFlicker 0.5s ease infinite alternate;
+    }
+
+    @keyframes flameFlicker {
+      from { transform: scale(1); }
+      to { transform: scale(1.2); }
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .leaderboard-section {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .leaderboard-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .leaderboard-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .leaderboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+
+    .leaderboard-rank {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); color: #fff; }
+    .rank-other { background: rgba(255,255,255,0.1); color: #888; }
+
+    .leaderboard-name {
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
+    .leaderboard-score {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .badges-section {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      opacity: 0.4;
+      transition: all 0.3s;
+    }
+
+    .badge-item.unlocked {
+      opacity: 1;
+    }
+
+    .badge-icon {
+      font-size: 1.5rem;
+    }
+
+    .badge-name {
+      font-size: 0.7rem;
+      color: #888;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 300px;
+    }
+
+    .loading-spinner .spinner-border {
+      color: var(--primary);
+    }
+
+    .game-over-card {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .game-over-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .final-score {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+
+    .share-section {
+      margin-top: 1.5rem;
+    }
+
+    .btn-share {
+      background: #1877f2;
+      border: none;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+    }
+
+    .btn-share:hover {
+      background: #166fe5;
+    }
+
+    @media (max-width: 576px) {
+      .game-logo {
+        font-size: 1.75rem;
+      }
+
+      .property-image {
+        height: 220px;
+      }
+
+      .stats-bar {
+        gap: 0.75rem;
+      }
+
+      .stat-item {
+        padding: 0.5rem 1rem;
+      }
+
+      .guess-input-group {
+        flex-direction: column;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <span style="color: #0ff;">🏠</span> HOME <span style="color: #ff00ff;">AFRICA</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land</a></li>
+          <li class="nav-item"><a class="nav-link active" href="rejo-reward.html">🎮 Rejo Reward</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div style="margin-top: 56px;">
+    <!-- Game Header -->
+    <header class="game-header">
+      <div class="game-logo">🎮 REJO REWARD</div>
+      <p class="game-tagline">Guess the price. Test your market knowledge. Win rewards.</p>
+      
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-value" id="currentScore">0</div>
+          <div class="stat-label">Points</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="currentStreak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalGuesses">0</div>
+          <div class="stat-label">Guesses</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="accuracyRate">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+      </div>
+
+      <!-- Streak Flames -->
+      <div class="streak-indicator" id="streakIndicator">
+        <span class="streak-flame">🔥</span>
+        <span class="streak-flame">🔥</span>
+        <span class="streak-flame">🔥</span>
+        <span class="streak-flame">🔥</span>
+        <span class="streak-flame">🔥</span>
+      </div>
+
+      <!-- Badges -->
+      <div class="badges-section" id="badgesSection">
+        <div class="badge-item" id="badgeRookie">
+          <span class="badge-icon">🌱</span>
+          <span class="badge-name">Rookie</span>
+        </div>
+        <div class="badge-item" id="badgeExpert">
+          <span class="badge-icon">🏆</span>
+          <span class="badge-name">Expert</span>
+        </div>
+        <div class="badge-item" id="badgeStreak">
+          <span class="badge-icon">⚡</span>
+          <span class="badge-name">Streak Master</span>
+        </div>
+        <div class="badge-item" id="badgeProphet">
+          <span class="badge-icon">🔮</span>
+          <span class="badge-name">Price Prophet</span>
+        </div>
+        <div class="badge-item" id="badgeKigali">
+          <span class="badge-icon">🌍</span>
+          <span class="badge-name">Kigali Know-it-all</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Game Container -->
+    <main class="game-container">
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-spinner">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Property Card -->
+      <div id="gameCard" class="property-card" style="display: none;">
+        <img id="propertyImage" class="property-image" src="" alt="Property">
+        
+        <div class="property-info">
+          <span class="property-type" id="propertyType">Apartment</span>
+          <h3 class="property-title" id="propertyTitle">Loading...</h3>
+          <p class="property-details" id="propertyDetails">Loading...</p>
+          <p class="property-location">
+            <i class="bi bi-geo-alt"></i>
+            <span id="propertyLocation">Loading...</span>
+          </p>
+        </div>
+
+        <!-- Guess Section -->
+        <div class="guess-section" id="guessSection">
+          <div class="guess-input-group">
+            <input 
+              type="number" 
+              class="guess-input" 
+              id="priceGuess" 
+              placeholder="Your guess (RWF)"
+              min="0"
+              step="100000"
+            >
+            <button class="guess-btn" id="guessBtn" onclick="submitGuess()">
+              Guess! 🎯
+            </button>
+          </div>
+          <small class="text-muted d-block text-center">
+            💡 Tip: Enter your best estimate in RWF (e.g., 45000000 for 45M)
+          </small>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section" id="resultSection" style="display: none;">
+          <div class="result-badge" id="resultBadge">
+            🎯 Perfect Guess!
+          </div>
+          <div class="actual-price" id="actualPrice">
+            Actual: RWF 0
+          </div>
+          <div class="price-difference" id="priceDifference">
+            You were off by 0%
+          </div>
+          <div class="points-earned" id="pointsEarned">
+            +100 points!
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn-view-listing" id="viewListingBtn" target="_blank">
+              <i class="bi bi-eye"></i> View Listing
+            </a>
+            <button class="btn-next" onclick="nextProperty()">
+              Next Property <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Card -->
+      <div id="gameOverCard" class="property-card game-over-card" style="display: none;">
+        <div class="game-over-title">🎉 Daily Challenge Complete!</div>
+        <div class="final-score" id="finalScore">0</div>
+        <p class="text-muted">Total points earned today</p>
+        <div class="share-section">
+          <button class="btn-share" onclick="shareScore()">
+            <i class="bi bi-facebook"></i> Share on Facebook
+          </button>
+        </div>
+        <div class="mt-4">
+          <button class="btn-next" onclick="startNewGame()">
+            <i class="bi bi-arrow-clockwise"></i> Play Again
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Leaderboard -->
+    <section class="leaderboard-section">
+      <div class="leaderboard-card">
+        <h4 class="leaderboard-title">
+          <i class="bi bi-trophy"></i> Today's Top Players
+        </h4>
+        <ul class="leaderboard-list" id="leaderboardList">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5" style="border-top: 1px solid rgba(255,255,255,0.1);">
+      <p class="text-muted small">
+        🎮 <strong>Rejo Reward</strong> by <a href="index.html">HOME AFRICA</a> • Part of REJO Group
+      </p>
+      <p class="text-muted small">
+        Test your market knowledge. Discover real listings. Win rewards.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Game Logic -->
+  <script>
+    // Game State
+    const gameState = {
+      currentProperty: null,
+      score: 0,
+      streak: 0,
+      totalGuesses: 0,
+      correctGuesses: 0,
+      propertiesSeen: 0,
+      maxProperties: 5, // Daily challenge: 5 properties
+      listings: [],
+      currentIndex: 0
+    };
+
+    // Load game state from localStorage
+    function loadGameState() {
+      const saved = localStorage.getItem('rejoRewardState');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const today = new Date().toDateString();
+        
+        // Reset if it's a new day
+        if (parsed.lastPlayed !== today) {
+          gameState.score = 0;
+          gameState.streak = 0;
+          gameState.totalGuesses = 0;
+          gameState.correctGuesses = 0;
+          gameState.propertiesSeen = 0;
+        } else {
+          gameState.score = parsed.score || 0;
+          gameState.streak = parsed.streak || 0;
+          gameState.totalGuesses = parsed.totalGuesses || 0;
+          gameState.correctGuesses = parsed.correctGuesses || 0;
+          gameState.propertiesSeen = parsed.propertiesSeen || 0;
+        }
+      }
+      updateStatsUI();
+      updateStreakUI();
+      updateBadges();
+    }
+
+    // Save game state
+    function saveGameState() {
+      const toSave = {
+        ...gameState,
+        lastPlayed: new Date().toDateString()
+      };
+      localStorage.setItem('rejoRewardState', JSON.stringify(toSave));
+    }
+
+    // Fetch listings from Supabase (or use mock data)
+    async function fetchListings() {
+      const loadingEl = document.getElementById('loadingState');
+      const cardEl = document.getElementById('gameCard');
+
+      try {
+        // Try to get Supabase client
+        const supabase = window.getSupabaseClient ? window.getSupabaseClient() : 
+                        (window.supabaseClient || (typeof supabase !== 'undefined' ? supabase : null));
+
+        if (supabase) {
+          // Fetch random active listings
+          const { data, error } = await supabase
+            .from('listings')
+            .select('*')
+            .eq('status', 'active')
+            .gt('price', 0)
+            .limit(20);
+
+          if (!error && data && data.length > 0) {
+            // Shuffle and pick 5
+            gameState.listings = data
+              .sort(() => Math.random() - 0.5)
+              .slice(0, 5);
+          } else {
+            useMockData();
+          }
+        } else {
+          useMockData();
+        }
+      } catch (err) {
+        console.log('Using mock data:', err);
+        useMockData();
+      }
+
+      // Hide loading, show game
+      loadingEl.style.display = 'none';
+      
+      if (gameState.propertiesSeen >= gameState.maxProperties) {
+        showGameOver();
+      } else {
+        cardEl.style.display = 'block';
+        loadNextProperty();
+      }
+    }
+
+    // Mock data for when Supabase isn't available
+    function useMockData() {
+      gameState.listings = [
+        {
+          id: 'mock1',
+          title: 'Luxury Apartment in Nyarutarama',
+          type: 'apartment',
+          price: 65000000,
+          location: 'Nyarutarama, Kigali',
+          description: '3 bedrooms • 2 bathrooms • Modern kitchen',
+          images: ['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600']
+        },
+        {
+          id: 'mock2',
+          title: 'Family Villa in Kacyiru',
+          type: 'house',
+          price: 95000000,
+          location: 'Kacyiru, Kigali',
+          description: '5 bedrooms • Garden • Parking for 3 cars',
+          images: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600']
+        },
+        {
+          id: 'mock3',
+          title: 'Prime Land Plot in Remera',
+          type: 'land',
+          price: 28000000,
+          location: 'Remera, Kigali',
+          description: '800 sqm • Ready for construction',
+          images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600']
+        },
+        {
+          id: 'mock4',
+          title: 'Modern Apartment in Kimihurura',
+          type: 'apartment',
+          price: 45000000,
+          location: 'Kimihurura, Kigali',
+          description: '2 bedrooms • 1 bathroom • City view',
+          images: ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600']
+        },
+        {
+          id: 'mock5',
+          title: 'Commercial Space in Downtown',
+          type: 'commercial',
+          price: 120000000,
+          location: 'City Center, Kigali',
+          description: '200 sqm • Ground floor • High traffic',
+          images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?w=600']
+        }
+      ];
+    }
+
+    // Load next property
+    function loadNextProperty() {
+      if (gameState.currentIndex >= gameState.listings.length) {
+        showGameOver();
+        return;
+      }
+
+      gameState.currentProperty = gameState.listings[gameState.currentIndex];
+      const prop = gameState.currentProperty;
+
+      // Update UI
+      document.getElementById('propertyImage').src = prop.images?.[0] || 'images/house1.jpg';
+      document.getElementById('propertyType').textContent = prop.type?.toUpperCase() || 'PROPERTY';
+      document.getElementById('propertyTitle').textContent = prop.title || 'Property';
+      document.getElementById('propertyDetails').textContent = prop.description || '';
+      document.getElementById('propertyLocation').textContent = prop.location || 'Kigali, Rwanda';
+
+      // Reset input and sections
+      document.getElementById('priceGuess').value = '';
+      document.getElementById('guessSection').style.display = 'block';
+      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('guessBtn').disabled = false;
+      document.getElementById('priceGuess').disabled = false;
+      document.getElementById('priceGuess').focus();
+    }
+
+    // Submit guess
+    function submitGuess() {
+      const guessInput = document.getElementById('priceGuess');
+      const guess = parseInt(guessInput.value);
+      const actual = gameState.currentProperty.price;
+
+      if (!guess || guess <= 0) {
+        alert('Please enter a valid price guess!');
+        return;
+      }
+
+      // Disable inputs
+      document.getElementById('guessBtn').disabled = true;
+      guessInput.disabled = true;
+
+      // Calculate accuracy
+      const difference = Math.abs(guess - actual);
+      const percentDiff = (difference / actual) * 100;
+      
+      // Calculate points
+      let points = 0;
+      let badgeClass = '';
+      let badgeText = '';
+
+      if (percentDiff <= 5) {
+        points = 100;
+        badgeClass = 'result-perfect';
+        badgeText = '🎯 Perfect Guess!';
+        gameState.streak++;
+        gameState.correctGuesses++;
+      } else if (percentDiff <= 15) {
+        points = 50;
+        badgeClass = 'result-close';
+        badgeText = '👏 Close Enough!';
+        gameState.streak++;
+        gameState.correctGuesses++;
+      } else if (percentDiff <= 30) {
+        points = 25;
+        badgeClass = 'result-miss';
+        badgeText = '😬 Getting Warm...';
+        gameState.streak = 0;
+      } else {
+        points = 10;
+        badgeClass = 'result-miss';
+        badgeText = '😅 Missed By a Mile!';
+        gameState.streak = 0;
+      }
+
+      // Update score
+      gameState.score += points;
+      gameState.totalGuesses++;
+      gameState.propertiesSeen++;
+
+      // Save state
+      saveGameState();
+
+      // Update UI
+      updateStatsUI();
+      updateStreakUI();
+      updateBadges();
+
+      // Show result
+      const resultBadge = document.getElementById('resultBadge');
+      resultBadge.className = 'result-badge ' + badgeClass;
+      resultBadge.textContent = badgeText;
+
+      document.getElementById('actualPrice').textContent = 
+        'Actual: RWF ' + actual.toLocaleString();
+      
+      const diffText = guess > actual 
+        ? `You guessed ${(percentDiff).toFixed(1)}% too high`
+        : `You guessed ${(percentDiff).toFixed(1)}% too low`;
+      document.getElementById('priceDifference').textContent = diffText;
+      
+      document.getElementById('pointsEarned').textContent = `+${points} points!`;
+
+      // Update view listing button
+      const type = gameState.currentProperty.type;
+      let detailPage = 'apartment-detail.html';
+      if (type === 'land') detailPage = 'land-detail.html';
+      else if (type === 'cars') detailPage = 'car-detail.html';
+      
+      document.getElementById('viewListingBtn').href = 
+        `${detailPage}?id=${gameState.currentProperty.id}`;
+
+      // Show result section
+      document.getElementById('guessSection').style.display = 'none';
+      document.getElementById('resultSection').style.display = 'block';
+
+      // Track activity
+      if (window.socialProof && gameState.currentProperty.id) {
+        window.socialProof.trackActivity(gameState.currentProperty.id, 'view', {
+          game: 'rejo-reward',
+          guess: guess,
+          accuracy: 100 - percentDiff
+        });
+      }
+    }
+
+    // Next property
+    function nextProperty() {
+      gameState.currentIndex++;
+      loadNextProperty();
+    }
+
+    // Show game over
+    function showGameOver() {
+      document.getElementById('gameCard').style.display = 'none';
+      document.getElementById('gameOverCard').style.display = 'block';
+      document.getElementById('finalScore').textContent = gameState.score;
+      
+      // Save to leaderboard
+      saveToLeaderboard();
+    }
+
+    // Start new game
+    function startNewGame() {
+      gameState.currentIndex = 0;
+      gameState.propertiesSeen = 0;
+      gameState.score = 0;
+      gameState.streak = 0;
+      gameState.totalGuesses = 0;
+      gameState.correctGuesses = 0;
+      saveGameState();
+      
+      document.getElementById('gameOverCard').style.display = 'none';
+      document.getElementById('gameCard').style.display = 'block';
+      
+      fetchListings();
+    }
+
+    // Update stats UI
+    function updateStatsUI() {
+      document.getElementById('currentScore').textContent = gameState.score;
+      document.getElementById('currentStreak').textContent = gameState.streak;
+      document.getElementById('totalGuesses').textContent = gameState.totalGuesses;
+      
+      const accuracy = gameState.totalGuesses > 0 
+        ? Math.round((gameState.correctGuesses / gameState.totalGuesses) * 100)
+        : 0;
+      document.getElementById('accuracyRate').textContent = accuracy + '%';
+    }
+
+    // Update streak UI
+    function updateStreakUI() {
+      const flames = document.querySelectorAll('.streak-flame');
+      flames.forEach((flame, index) => {
+        if (index < gameState.streak) {
+          flame.classList.add('active');
+        } else {
+          flame.classList.remove('active');
+        }
+      });
+    }
+
+    // Update badges
+    function updateBadges() {
+      // Rookie: 1 guess
+      if (gameState.totalGuesses >= 1) {
+        document.getElementById('badgeRookie').classList.add('unlocked');
+      }
+      
+      // Expert: 10 correct guesses
+      if (gameState.correctGuesses >= 10) {
+        document.getElementById('badgeExpert').classList.add('unlocked');
+      }
+      
+      // Streak Master: 5 streak
+      if (gameState.streak >= 5 || (gameState.streak >= 5)) {
+        document.getElementById('badgeStreak').classList.add('unlocked');
+      }
+      
+      // Price Prophet: 5 perfect guesses (within 5%)
+      // This would need separate tracking - simplified here
+      if (gameState.score >= 300) {
+        document.getElementById('badgeProphet').classList.add('unlocked');
+      }
+      
+      // Kigali Know-it-all: 20 guesses
+      if (gameState.totalGuesses >= 20) {
+        document.getElementById('badgeKigali').classList.add('unlocked');
+      }
+    }
+
+    // Save to leaderboard
+    function saveToLeaderboard() {
+      const leaderboard = JSON.parse(localStorage.getItem('rejoRewardLeaderboard') || '[]');
+      const playerName = localStorage.getItem('playerName') || 'Anonymous';
+      
+      leaderboard.push({
+        name: playerName,
+        score: gameState.score,
+        date: new Date().toISOString()
+      });
+      
+      // Sort by score, keep top 10
+      leaderboard.sort((a, b) => b.score - a.score);
+      leaderboard.splice(10);
+      
+      localStorage.setItem('rejoRewardLeaderboard', JSON.stringify(leaderboard));
+      renderLeaderboard();
+    }
+
+    // Render leaderboard
+    function renderLeaderboard() {
+      const list = document.getElementById('leaderboardList');
+      const leaderboard = JSON.parse(localStorage.getItem('rejoRewardLeaderboard') || '[]');
+      
+      if (leaderboard.length === 0) {
+        list.innerHTML = '<li class="leaderboard-item"><span class="text-muted">Be the first to play!</span></li>';
+        return;
+      }
+      
+      list.innerHTML = leaderboard.map((entry, index) => `
+        <li class="leaderboard-item">
+          <div class="leaderboard-rank rank-${index < 3 ? index + 1 : 'other'}">
+            ${index + 1}
+          </div>
+          <div class="leaderboard-name">${entry.name}</div>
+          <div class="leaderboard-score">${entry.score} pts</div>
+        </li>
+      `).join('');
+    }
+
+    // Share score
+    function shareScore() {
+      const text = `I scored ${gameState.score} points on Rejo Reward by HOME AFRICA! 🎮🏠\n\nCan you guess the property prices better than me?\n\n`;
+      const url = window.location.href;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Rejo Reward Score!',
+          text: text,
+          url: url
+        });
+      } else {
+        // Facebook share fallback
+        const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+        window.open(fbUrl, '_blank', 'width=600,height=400');
+      }
+    }
+
+    // Handle Enter key in input
+    document.getElementById('priceGuess')?.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        submitGuess();
+      }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      loadGameState();
+      renderLeaderboard();
+      fetchListings();
+    });
+  </script>
+</body>
+</html>

@@ -943,17 +943,18 @@ async function loadUsers() {
   const tbody = document.getElementById('usersTableBody');
   if (!tbody) return;
   
-  tbody.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" class="text-center">Loading...</td></tr>';
 
   try {
     if (!supabase) {
       supabase = await waitForSupabase();
     }
     
+    // Load all users (not just merchants) for admin view
     let query = supabase
       .from('users')
       .select('*, merchants(*)')
-      .eq('role', 'merchant');
+      .order('created_at', { ascending: false });
     
     if (!isSuperAdmin && currentMerchant?.id) {
       query = query.eq('id', currentMerchant.id);
@@ -964,31 +965,120 @@ async function loadUsers() {
     if (error) throw error;
     
     if (!users || users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">No users found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center">No users found</td></tr>';
       return;
     }
 
     tbody.innerHTML = '';
     users.forEach(user => {
       const merchantData = user.merchants?.[0] || {};
+      
+      // Check for temporary password
+      let tempPasswordDisplay = '<span class="text-muted">-</span>';
+      if (user.temp_password && user.temp_password_expires) {
+        const expiresAt = new Date(user.temp_password_expires);
+        if (expiresAt > new Date()) {
+          // Decrypt and show temp password
+          try {
+            const decrypted = atob(user.temp_password);
+            tempPasswordDisplay = `
+              <div>
+                <code style="color: #0ff; font-size: 0.85rem;">${decrypted}</code>
+                <br>
+                <small class="text-muted">Expires: ${expiresAt.toLocaleString()}</small>
+              </div>
+            `;
+          } catch (e) {
+            tempPasswordDisplay = '<span class="text-warning">Encrypted</span>';
+          }
+        } else {
+          tempPasswordDisplay = '<span class="text-muted">Expired</span>';
+        }
+      }
+      
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${user.email || 'N/A'}</td>
         <td>${merchantData.business_name || user.full_name || 'N/A'}</td>
-        <td><span class="badge badge-admin">merchant</span></td>
+        <td><span class="badge badge-admin">${user.role || 'user'}</span></td>
         <td><span class="badge ${merchantData.verified ? 'bg-success' : 'bg-warning'}">${merchantData.verified ? 'Yes' : 'No'}</span></td>
+        <td>${tempPasswordDisplay}</td>
         <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
         <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')">
-            <i class="bi bi-trash"></i>
+          <button class="btn btn-sm btn-primary me-1" onclick="resetUserPassword('${user.id}', '${user.email}')" title="Reset Password">
+            <i class="bi bi-key"></i> Reset
           </button>
+          ${isSuperAdmin ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')" title="Delete User">
+            <i class="bi bi-trash"></i>
+          </button>` : ''}
         </td>
       `;
       tbody.appendChild(row);
     });
   } catch (error) {
     console.error('Error loading users:', error);
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading users</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading users</td></tr>';
+  }
+}
+
+// Reset user password (admin function)
+async function resetUserPassword(userId, userEmail) {
+  if (!isSuperAdmin && currentUser?.id !== userId) {
+    alert('Only super admins can reset passwords for other users.');
+    return;
+  }
+
+  if (!confirm(`Reset password for ${userEmail}?\n\nA temporary password will be generated and shown to you. The user will receive a password reset email.`)) {
+    return;
+  }
+
+  try {
+    if (!supabase) {
+      supabase = await waitForSupabase();
+    }
+
+    // Generate random password
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let tempPassword = '';
+    for (let i = 0; i < 12; i++) {
+      tempPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+
+    // Send password reset email via Supabase Auth
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      userEmail,
+      {
+        redirectTo: `${window.location.origin}/signin.html?reset=true`
+      }
+    );
+
+    if (resetError) {
+      console.warn('Password reset email error (non-critical):', resetError);
+    }
+
+    // Store temporary password (encrypted) in users table
+    const encryptedPassword = btoa(tempPassword); // Base64 encoding (simple encryption)
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        temp_password: encryptedPassword,
+        temp_password_expires: expiresAt.toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Show temporary password to admin
+    alert(`✅ Password reset initiated!\n\nTemporary Password: ${tempPassword}\n\nThis password expires in 24 hours.\n\nShare this with the user for immediate access, or they can use the reset link sent to their email.`);
+    
+    // Reload users table
+    loadUsers();
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    alert('Error resetting password: ' + error.message);
   }
 }
 

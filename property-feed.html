@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Feed - HOME AFRICA | Professional Real Estate Network</title>
+  <meta name="description" content="Connect with real estate professionals in Rwanda. Share property updates, listings, and market insights. Only property-related posts allowed.">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <style>
+    :root {
+      --linkedin-blue: #0a66c2;
+      --linkedin-dark: #000000;
+      --linkedin-gray: #666666;
+      --linkedin-light: #f3f2ef;
+      --linkedin-border: #e0e0e0;
+      --success: #057642;
+      --warning: #b24020;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--linkedin-light);
+      min-height: 100vh;
+    }
+
+    /* LinkedIn-style Header */
+    .feed-header {
+      background: #fff;
+      border-bottom: 1px solid var(--linkedin-border);
+      padding: 0.75rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .feed-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--linkedin-blue);
+    }
+
+    .search-box {
+      background: #edf3f8;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      width: 280px;
+    }
+
+    .nav-icon {
+      color: var(--linkedin-gray);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .nav-icon:hover, .nav-icon.active {
+      color: var(--linkedin-dark);
+    }
+
+    /* Main Layout */
+    .feed-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .feed-layout {
+      display: grid;
+      grid-template-columns: 225px 1fr 300px;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .feed-layout {
+        grid-template-columns: 1fr 300px;
+      }
+      .left-sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .feed-layout {
+        grid-template-columns: 1fr;
+      }
+      .right-sidebar {
+        display: none;
+      }
+    }
+
+    /* Left Sidebar - Profile Card */
+    .profile-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--linkedin-border);
+      overflow: hidden;
+    }
+
+    .profile-banner {
+      height: 60px;
+      background: linear-gradient(135deg, var(--linkedin-blue), #0073b1);
+    }
+
+    .profile-info {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      margin-top: -40px;
+      object-fit: cover;
+    }
+
+    .profile-name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .profile-title {
+      font-size: 0.85rem;
+      color: var(--linkedin-gray);
+    }
+
+    .profile-stats {
+      border-top: 1px solid var(--linkedin-border);
+      padding: 0.75rem 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--linkedin-gray);
+    }
+
+    .stat-value {
+      color: var(--linkedin-blue);
+      font-weight: 600;
+    }
+
+    /* Main Feed */
+    .create-post {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--linkedin-border);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .post-input-trigger {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--linkedin-border);
+      border-radius: 35px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .post-input-trigger:hover {
+      background: var(--linkedin-light);
+    }
+
+    .post-input-trigger img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .post-input-trigger span {
+      color: var(--linkedin-gray);
+      font-weight: 600;
+    }
+
+    .post-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--linkedin-border);
+    }
+
+    .post-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--linkedin-gray);
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .post-action-btn:hover {
+      background: var(--linkedin-light);
+    }
+
+    .post-action-btn i {
+      font-size: 1.25rem;
+    }
+
+    .post-action-btn.photo { color: #378fe9; }
+    .post-action-btn.video { color: #5f9b41; }
+    .post-action-btn.property { color: #c37d16; }
+
+    /* Property Update Cards */
+    .property-update {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--linkedin-border);
+      margin-bottom: 1rem;
+    }
+
+    .update-header {
+      padding: 1rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .update-author-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .update-meta {
+      flex: 1;
+    }
+
+    .update-author-name {
+      font-weight: 600;
+      color: var(--linkedin-dark);
+    }
+
+    .update-author-title {
+      font-size: 0.8rem;
+      color: var(--linkedin-gray);
+    }
+
+    .update-time {
+      font-size: 0.75rem;
+      color: var(--linkedin-gray);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-badge.available { background: #e6f7f0; color: var(--success); }
+    .status-badge.sold { background: #fce8e6; color: var(--warning); }
+    .status-badge.price_drop { background: #fff3e0; color: #e65100; }
+    .status-badge.open_house { background: #e3f2fd; color: var(--linkedin-blue); }
+    .status-badge.coming_soon { background: #f3e5f5; color: #7b1fa2; }
+    .status-badge.market_insight { background: #e8f5e9; color: #2e7d32; }
+
+    .update-content {
+      padding: 0 1rem 1rem;
+    }
+
+    .update-text {
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Property Proof Card */
+    .property-proof-card {
+      border: 1px solid var(--linkedin-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .property-image-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .property-image-gallery.single {
+      grid-template-columns: 1fr;
+    }
+
+    .property-image-gallery img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .property-image-gallery img:hover {
+      opacity: 0.9;
+    }
+
+    .property-details {
+      padding: 1rem;
+    }
+
+    .property-type-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.85rem;
+      color: var(--linkedin-gray);
+      margin-bottom: 0.5rem;
+    }
+
+    .property-location {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--linkedin-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .property-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--linkedin-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .property-specs {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--linkedin-gray);
+    }
+
+    .property-specs span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Engagement Bar */
+    .engagement-bar {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--linkedin-border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .engagement-stats {
+      font-size: 0.8rem;
+      color: var(--linkedin-gray);
+    }
+
+    .engagement-actions {
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--linkedin-border);
+    }
+
+    .engage-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      color: var(--linkedin-gray);
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .engage-btn:hover {
+      background: var(--linkedin-light);
+    }
+
+    .engage-btn.liked {
+      color: var(--linkedin-blue);
+    }
+
+    .engage-btn i {
+      font-size: 1.25rem;
+    }
+
+    /* Comments Section */
+    .comments-section {
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--linkedin-border);
+    }
+
+    .comment-input {
+      display: flex;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .comment-input img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+
+    .comment-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--linkedin-light);
+      border-radius: 35px;
+      padding: 0.5rem 1rem;
+    }
+
+    .comment-input-wrapper input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+    }
+
+    /* Right Sidebar */
+    .trending-properties {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--linkedin-border);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .trending-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      cursor: pointer;
+    }
+
+    .trending-item:hover {
+      background: var(--linkedin-light);
+      margin: 0 -1rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .trending-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+
+    .trending-info {
+      flex: 1;
+    }
+
+    .trending-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .trending-price {
+      font-size: 0.8rem;
+      color: var(--linkedin-gray);
+    }
+
+    /* Post Composer Modal */
+    .composer-modal .modal-content {
+      border-radius: 8px;
+    }
+
+    .composer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid var(--linkedin-border);
+    }
+
+    .composer-header h5 {
+      margin: 0;
+    }
+
+    .composer-body {
+      padding: 1rem;
+    }
+
+    .composer-textarea {
+      width: 100%;
+      min-height: 120px;
+      border: none;
+      resize: none;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .composer-textarea::placeholder {
+      color: var(--linkedin-gray);
+    }
+
+    .property-proof-form {
+      background: var(--linkedin-light);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .proof-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .proof-title i {
+      color: var(--success);
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--linkedin-dark);
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--linkedin-gray);
+    }
+
+    .media-preview {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .media-preview-item {
+      width: 100px;
+      height: 100px;
+      border-radius: 4px;
+      object-fit: cover;
+      position: relative;
+    }
+
+    .media-preview-item .remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: var(--linkedin-dark);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-type-selector {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .status-type-option {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--linkedin-border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .status-type-option:hover {
+      border-color: var(--linkedin-blue);
+    }
+
+    .status-type-option.selected {
+      background: var(--linkedin-blue);
+      color: #fff;
+      border-color: var(--linkedin-blue);
+    }
+
+    /* Loading State */
+    .feed-loading {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .feed-loading i {
+      font-size: 2rem;
+      color: var(--linkedin-blue);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .feed-empty {
+      text-align: center;
+      padding: 3rem;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--linkedin-border);
+    }
+
+    .feed-empty i {
+      font-size: 4rem;
+      color: var(--linkedin-border);
+      margin-bottom: 1rem;
+    }
+
+    /* Contact Button */
+    .contact-btn {
+      background: var(--linkedin-blue);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 24px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .contact-btn:hover {
+      background: #004182;
+    }
+
+    /* Verified Badge */
+    .verified-badge {
+      color: var(--linkedin-blue);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="feed-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-4">
+          <a href="index.html" class="feed-logo text-decoration-none">
+            🏠 HOME <span style="color: #000;">AFRICA</span>
+          </a>
+          <div class="position-relative">
+            <i class="bi bi-search position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: var(--linkedin-gray);"></i>
+            <input type="text" class="search-box ps-5" placeholder="Search properties, people, posts...">
+          </div>
+        </div>
+        
+        <nav class="d-flex align-items-center gap-4">
+          <a href="property-feed.html" class="nav-icon active" title="Feed">
+            <i class="bi bi-house-door-fill"></i>
+          </a>
+          <a href="apartment.html" class="nav-icon" title="Properties">
+            <i class="bi bi-building"></i>
+          </a>
+          <a href="messages.html" class="nav-icon" title="Messages">
+            <i class="bi bi-chat-dots"></i>
+          </a>
+          <a href="favorites.html" class="nav-icon" title="Saved">
+            <i class="bi bi-bookmark"></i>
+          </a>
+          <div class="dropdown">
+            <img src="images/hero-bg.jpeg" alt="Profile" width="32" height="32" class="rounded-circle dropdown-toggle" data-bs-toggle="dropdown" style="cursor: pointer;">
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" onclick="showPostComposer()"><i class="bi bi-plus-circle me-2"></i>Create Post</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="signin.html">Sign Out</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Feed -->
+  <div class="feed-container">
+    <div class="feed-layout">
+      <!-- Left Sidebar -->
+      <aside class="left-sidebar">
+        <div class="profile-card">
+          <div class="profile-banner"></div>
+          <div class="profile-info">
+            <img src="images/hero-bg.jpeg" alt="Profile" class="profile-avatar" id="userAvatar">
+            <div class="profile-name" id="userName">Loading...</div>
+            <div class="profile-title" id="userTitle">Real Estate Professional</div>
+          </div>
+          <div class="profile-stats">
+            <div class="stat-row">
+              <span class="stat-label">Who viewed your profile</span>
+              <span class="stat-value">42</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Post impressions</span>
+              <span class="stat-value">156</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card mt-3">
+          <div class="profile-stats">
+            <div class="stat-row">
+              <i class="bi bi-bookmark-fill" style="color: var(--linkedin-gray);"></i>
+              <span class="stat-label">My Items</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Feed -->
+      <main class="feed-main">
+        <!-- Create Post -->
+        <div class="create-post">
+          <div class="post-input-trigger" onclick="showPostComposer()">
+            <img src="images/hero-bg.jpeg" alt="Profile" id="composerAvatar">
+            <span>Start a property post...</span>
+          </div>
+          <div class="post-actions-bar">
+            <button class="post-action-btn photo" onclick="showPostComposer('photo')">
+              <i class="bi bi-image"></i> Photo
+            </button>
+            <button class="post-action-btn video" onclick="showPostComposer('video')">
+              <i class="bi bi-camera-video"></i> Video
+            </button>
+            <button class="post-action-btn property" onclick="showPostComposer('property')">
+              <i class="bi bi-house-door"></i> Property
+            </button>
+          </div>
+        </div>
+
+        <!-- Feed Content -->
+        <div id="feedContent">
+          <div class="feed-loading">
+            <i class="bi bi-arrow-repeat"></i>
+            <p class="mt-2 text-muted">Loading property updates...</p>
+          </div>
+        </div>
+
+        <!-- Load More -->
+        <div class="text-center mt-3">
+          <button class="btn btn-outline-secondary" id="loadMoreBtn" onclick="loadMorePosts()">
+            Load more posts
+          </button>
+        </div>
+      </main>
+
+      <!-- Right Sidebar -->
+      <aside class="right-sidebar">
+        <div class="trending-properties">
+          <div class="sidebar-title">Trending Properties</div>
+          <div id="trendingProperties">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+
+        <div class="trending-properties">
+          <div class="sidebar-title">Market Insights</div>
+          <div class="trending-item">
+            <div class="trending-info">
+              <div class="trending-title">Kigali Market Report</div>
+              <div class="trending-price">Prices up 8% this quarter</div>
+            </div>
+          </div>
+          <div class="trending-item">
+            <div class="trending-info">
+              <div class="trending-title">New Developments</div>
+              <div class="trending-price">12 projects launching</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Post Composer Modal -->
+  <div class="modal fade composer-modal" id="postComposerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="composer-header">
+          <h5>Create Property Update</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="composer-body">
+          <div class="d-flex gap-3 mb-3">
+            <img src="images/hero-bg.jpeg" alt="Profile" width="48" height="48" class="rounded-circle" id="modalAvatar">
+            <div>
+              <div class="fw-bold" id="modalUserName">User Name</div>
+              <select class="form-select form-select-sm" style="width: auto;">
+                <option>🌐 Anyone</option>
+                <option>👥 Connections only</option>
+              </select>
+            </div>
+          </div>
+          
+          <textarea class="composer-textarea" id="postContent" placeholder="What property update would you like to share?
+
+Remember: Only property-related posts allowed. Include property photos, location, and details."></textarea>
+          
+          <!-- Property Proof Requirements -->
+          <div class="property-proof-form">
+            <div class="proof-title">
+              <i class="bi bi-check-circle-fill"></i>
+              Property Proof (Required)
+            </div>
+            
+            <!-- Status Type -->
+            <div class="mb-3">
+              <label class="form-label">Update Type *</label>
+              <div class="status-type-selector" id="statusTypeSelector">
+                <div class="status-type-option selected" data-value="available">Available</div>
+                <div class="status-type-option" data-value="sold">Sold</div>
+                <div class="status-type-option" data-value="price_drop">Price Drop</div>
+                <div class="status-type-option" data-value="open_house">Open House</div>
+                <div class="status-type-option" data-value="coming_soon">Coming Soon</div>
+                <div class="status-type-option" data-value="market_insight">Market Insight</div>
+              </div>
+            </div>
+
+            <!-- Property Type -->
+            <div class="mb-3">
+              <label class="form-label">Property Type *</label>
+              <select class="form-select" id="propertyType" required>
+                <option value="">Select property type...</option>
+                <option value="apartment">Apartment</option>
+                <option value="house">House</option>
+                <option value="land">Land</option>
+                <option value="commercial">Commercial</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+              <label class="form-label">Location * <span class="form-hint">(e.g., Nyarutarama, Kigali)</span></label>
+              <input type="text" class="form-control" id="propertyLocation" placeholder="Enter property location" required>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-3">
+              <label class="form-label">Price Estimate (RWF)</label>
+              <input type="number" class="form-control" id="propertyPrice" placeholder="e.g., 50000000">
+            </div>
+
+            <!-- Size -->
+            <div class="mb-3">
+              <label class="form-label">Property Size (sqm)</label>
+              <input type="number" class="form-control" id="propertySize" placeholder="e.g., 450">
+            </div>
+
+            <!-- Media Upload -->
+            <div class="mb-3">
+              <label class="form-label">Property Photos/Videos * <span class="form-hint">(At least 1 photo required as proof)</span></label>
+              <input type="file" class="form-control" id="propertyMedia" accept="image/*,video/*" multiple onchange="handleMediaUpload(this)">
+              <div class="form-hint mt-1">
+                <i class="bi bi-info-circle"></i> Upload clear photos of the property exterior, interior, and surroundings
+              </div>
+              <div class="media-preview" id="mediaPreview"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="contact-btn" onclick="submitPost()" id="submitPostBtn">
+            <i class="bi bi-send"></i> Post
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Feed Logic -->
+  <script>
+    // Feed State
+    const feedState = {
+      posts: [],
+      currentPage: 1,
+      hasMore: true,
+      userId: null,
+      userProfile: null,
+      supabase: window.supabaseClient || (typeof supabase !== 'undefined' ? supabase : null)
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initFeed();
+    });
+
+    async function initFeed() {
+      // Check auth
+      const { data: { session } } = await feedState.supabase?.auth?.getSession() || { data: { session: null } };
+      
+      if (!session?.user) {
+        // Redirect to login
+        window.location.href = 'signin.html?redirect=property-feed';
+        return;
+      }
+
+      feedState.userId = session.user.id;
+      
+      // Load user profile
+      await loadUserProfile();
+      
+      // Load feed posts
+      await loadFeedPosts();
+      
+      // Load trending
+      await loadTrendingProperties();
+    }
+
+    async function loadUserProfile() {
+      try {
+        const { data, error } = await feedState.supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', feedState.userId)
+          .single();
+        
+        if (error) throw error;
+        
+        feedState.userProfile = data;
+        
+        // Update UI
+        document.getElementById('userName').textContent = data.display_name || 'User';
+        document.getElementById('userTitle').textContent = data.title || 'Real Estate Professional';
+        document.getElementById('userAvatar').src = data.profile_image_url || 'images/hero-bg.jpeg';
+        document.getElementById('composerAvatar').src = data.profile_image_url || 'images/hero-bg.jpeg';
+        document.getElementById('modalAvatar').src = data.profile_image_url || 'images/hero-bg.jpeg';
+        document.getElementById('modalUserName').textContent = data.display_name || 'User';
+        
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    async function loadFeedPosts() {
+      const feedContent = document.getElementById('feedContent');
+      
+      try {
+        // Load organic posts
+        const { data: posts, error } = await feedState.supabase
+          .from('property_status_updates')
+          .select(`
+            *,
+            user:user_profiles!user_id(display_name, profile_image_url, title)
+          `)
+          .eq('is_approved', true)
+          .eq('is_flagged', false)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+
+        // Load sponsored posts
+        const { data: sponsoredPosts, error: sponsoredError } = await feedState.supabase
+          .from('sponsored_posts')
+          .select(`
+            *,
+            merchant:user_profiles!merchant_id(display_name, profile_image_url, title)
+          `)
+          .eq('status', 'active')
+          .lte('start_date', new Date().toISOString())
+          .gte('end_date', new Date().toISOString())
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (sponsoredError) console.error('Sponsored posts error:', sponsoredError);
+
+        if (posts?.length === 0 && (!sponsoredPosts || sponsoredPosts.length === 0)) {
+          feedContent.innerHTML = `
+            <div class="feed-empty">
+              <i class="bi bi-house-door"></i>
+              <h4>No property updates yet</h4>
+              <p class="text-muted">Be the first to share a property update!</p>
+              <button class="contact-btn mt-3" onclick="showPostComposer()">
+                <i class="bi bi-plus-lg"></i> Create First Post
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        // Mix sponsored posts with organic (1 sponsored per 5 organic)
+        const mixedPosts = [];
+        let sponsoredIndex = 0;
+        
+        posts?.forEach((post, index) => {
+          mixedPosts.push({ ...post, type: 'organic' });
+          // Insert sponsored post after every 5th organic post
+          if ((index + 1) % 5 === 0 && sponsoredPosts && sponsoredPosts[sponsoredIndex]) {
+            mixedPosts.push({ ...sponsoredPosts[sponsoredIndex], type: 'sponsored' });
+            sponsoredIndex++;
+          }
+        });
+
+        feedState.posts = mixedPosts;
+        renderPosts(mixedPosts);
+
+      } catch (error) {
+        console.error('Error loading posts:', error);
+        feedContent.innerHTML = `
+          <div class="alert alert-danger">
+            Error loading feed. Please try again.
+          </div>
+        `;
+      }
+    }
+
+    function renderPosts(posts) {
+      const feedContent = document.getElementById('feedContent');
+      
+      feedContent.innerHTML = posts.map(post => {
+        const isSponsored = post.type === 'sponsored';
+        
+        if (isSponsored) {
+          // Render sponsored post
+          return `
+            <article class="property-update sponsored" data-post-id="${post.id}" data-type="sponsored">
+              <div class="update-header" style="background: linear-gradient(90deg, #fff3e0 0%, #fff 100%);">
+                <img src="${post.merchant?.profile_image_url || 'images/hero-bg.jpeg'}" alt="${post.merchant?.display_name}" class="update-author-img">
+                <div class="update-meta">
+                  <div class="update-author-name">
+                    ${post.merchant?.display_name || 'Sponsored'}
+                    <i class="bi bi-patch-check-fill verified-badge" title="Verified Merchant"></i>
+                  </div>
+                  <div class="update-author-title">${post.merchant?.title || 'Real Estate Professional'}</div>
+                  <div class="update-time">
+                    <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">
+                      <i class="bi bi-badge-ad"></i> SPONSORED
+                    </span>
+                  </div>
+                </div>
+                <div class="ms-auto">
+                  <span class="status-badge available">Promoted</span>
+                </div>
+              </div>
+              
+              <div class="update-content">
+                <div class="update-text">${escapeHtml(post.content)}</div>
+                
+                ${post.media_urls?.length > 0 ? `
+                  <div class="property-proof-card">
+                    <div class="property-image-gallery ${post.media_urls.length === 1 ? 'single' : ''}">
+                      ${post.media_urls.slice(0, 4).map((url, i) => `
+                        <img src="${url}" alt="Property" onclick="openLightbox('${url}', ${i})">
+                      `).join('')}
+                    </div>
+                    <div class="property-details">
+                      <div class="property-type-tag">
+                        <i class="bi bi-house-door"></i> ${capitalize(post.property_type || 'Property')}
+                      </div>
+                      <div class="property-location">
+                        <i class="bi bi-geo-alt"></i> ${escapeHtml(post.location || 'Location not specified')}
+                      </div>
+                      ${post.price ? `
+                        <div class="property-price">RWF ${formatNumber(post.price)}</div>
+                      ` : ''}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+              
+              <div class="engagement-bar" style="background: #fff8e1;">
+                <span class="engagement-stats">
+                  <i class="bi bi-eye-fill" style="color: var(--warning);"></i> 
+                  ${post.impressions_count || 0} impressions • ${post.clicks_count || 0} clicks
+                </span>
+              </div>
+              
+              <div class="engagement-actions">
+                <button class="engage-btn" onclick="trackSponsoredClick('${post.id}', '${post.merchant_id}')">
+                  <i class="bi bi-box-arrow-up-right"></i> Learn More
+                </button>
+                <button class="engage-btn" onclick="messageAuthor('${post.merchant_id}', true)">
+                  <i class="bi bi-send"></i> Contact
+                </button>
+                <button class="engage-btn" onclick="hideSponsored('${post.id}')">
+                  <i class="bi bi-x-circle"></i> Hide
+                </button>
+              </div>
+            </article>
+          `;
+        }
+        
+        // Render organic post
+        return `
+          <article class="property-update" data-post-id="${post.id}" data-type="organic">
+            <div class="update-header">
+              <img src="${post.user?.profile_image_url || 'images/hero-bg.jpeg'}" alt="${post.user?.display_name}" class="update-author-img">
+              <div class="update-meta">
+                <div class="update-author-name">
+                  ${post.user?.display_name || 'User'}
+                  ${post.author_type === 'merchant' ? '<i class="bi bi-patch-check-fill verified-badge" title="Verified Merchant"></i>' : ''}
+                </div>
+                <div class="update-author-title">${post.user?.title || 'Real Estate Professional'}</div>
+                <div class="update-time">${formatTime(post.created_at)} • <i class="bi bi-globe"></i></div>
+              </div>
+              <div class="ms-auto">
+                <span class="status-badge ${post.status_type}">
+                  ${getStatusLabel(post.status_type)}
+                </span>
+              </div>
+            </div>
+            
+            <div class="update-content">
+              <div class="update-text">${escapeHtml(post.content)}</div>
+              
+              ${post.media_urls?.length > 0 ? `
+                <div class="property-proof-card">
+                  <div class="property-image-gallery ${post.media_urls.length === 1 ? 'single' : ''}">
+                    ${post.media_urls.slice(0, 4).map((url, i) => `
+                      <img src="${url}" alt="Property" onclick="openLightbox('${url}', ${i})">
+                    `).join('')}
+                  </div>
+                  <div class="property-details">
+                    <div class="property-type-tag">
+                      <i class="bi bi-house-door"></i> ${capitalize(post.property_type)}
+                    </div>
+                    <div class="property-location">
+                      <i class="bi bi-geo-alt"></i> ${escapeHtml(post.location)}
+                    </div>
+                    ${post.price_estimate ? `
+                      <div class="property-price">RWF ${formatNumber(post.price_estimate)}</div>
+                    ` : ''}
+                    <div class="property-specs">
+                      ${post.property_size_sqm ? `<span><i class="bi bi-arrows-angle-expand"></i> ${post.property_size_sqm} sqm</span>` : ''}
+                      <span><i class="bi bi-eye"></i> ${post.views_count} views</span>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="engagement-bar">
+              <span class="engagement-stats">
+                <i class="bi bi-hand-thumbs-up-fill" style="color: var(--linkedin-blue);"></i> 
+                ${post.likes_count} likes • ${post.comments_count} comments
+              </span>
+            </div>
+            
+            <div class="engagement-actions">
+              <button class="engage-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                <i class="bi bi-hand-thumbs-up${post.user_liked ? '-fill' : ''}"></i> Like
+              </button>
+              <button class="engage-btn" onclick="toggleComments('${post.id}')">
+                <i class="bi bi-chat-text"></i> Comment
+              </button>
+              <button class="engage-btn" onclick="sharePost('${post.id}')">
+                <i class="bi bi-share"></i> Share
+              </button>
+              <button class="engage-btn" onclick="messageAuthor('${post.user_id}')">
+                <i class="bi bi-send"></i> Message
+              </button>
+            </div>
+            
+            <div class="comments-section" id="comments-${post.id}" style="display: none;">
+              <div class="comment-input">
+                <img src="${feedState.userProfile?.profile_image_url || 'images/hero-bg.jpeg'}" alt="Profile">
+                <div class="comment-input-wrapper">
+                  <input type="text" placeholder="Add a comment..." id="comment-input-${post.id}" onkeypress="if(event.key==='Enter')submitComment('${post.id}')">
+                  <button class="btn btn-sm btn-primary ms-2" onclick="submitComment('${post.id}')">Post</button>
+                </div>
+              </div>
+              <div id="comments-list-${post.id}">
+                <!-- Comments loaded dynamically -->
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Track sponsored post click
+    async function trackSponsoredClick(postId, merchantId) {
+      try {
+        // Track the click
+        await feedState.supabase
+          .from('sponsored_posts')
+          .update({ clicks_count: feedState.supabase.rpc('increment') })
+          .eq('id', postId);
+        
+        // Record as lead if logged in
+        if (feedState.userId && typeof recordMerchantContact === 'function') {
+          await recordMerchantContact(merchantId, postId, null, 'sponsored_post');
+        }
+        
+      } catch (error) {
+        console.error('Error tracking sponsored click:', error);
+      }
+    }
+
+    function hideSponsored(postId) {
+      const post = document.querySelector(`[data-post-id="${postId}"]`);
+      if (post) {
+        post.style.opacity = '0.5';
+        post.style.filter = 'grayscale(100%)';
+      }
+    }
+
+    async function loadTrendingProperties() {
+      try {
+        const { data: properties } = await feedState.supabase
+          .from('apartments')
+          .select('id, title, price, images')
+          .eq('status', 'available')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        const container = document.getElementById('trendingProperties');
+        if (properties?.length > 0) {
+          container.innerHTML = properties.map(p => `
+            <div class="trending-item" onclick="window.location.href='apartment-details.html?id=${p.id}'">
+              <img src="${p.images?.[0] || 'images/hero-bg.jpeg'}" alt="${p.title}" class="trending-img">
+              <div class="trending-info">
+                <div class="trending-title">${escapeHtml(p.title)}</div>
+                <div class="trending-price">RWF ${formatNumber(p.price)}</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Error loading trending:', error);
+      }
+    }
+
+    // Post Composer
+    let selectedStatusType = 'available';
+    let uploadedMedia = [];
+
+    function showPostComposer(type = null) {
+      const modal = new bootstrap.Modal(document.getElementById('postComposerModal'));
+      modal.show();
+      
+      if (type === 'photo') {
+        document.getElementById('propertyMedia')?.click();
+      }
+    }
+
+    // Status type selector
+    document.getElementById('statusTypeSelector')?.addEventListener('click', (e) => {
+      if (e.target.classList.contains('status-type-option')) {
+        document.querySelectorAll('.status-type-option').forEach(el => el.classList.remove('selected'));
+        e.target.classList.add('selected');
+        selectedStatusType = e.target.dataset.value;
+      }
+    });
+
+    function handleMediaUpload(input) {
+      const files = Array.from(input.files);
+      const preview = document.getElementById('mediaPreview');
+      
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedMedia.push(e.target.result);
+          
+          const item = document.createElement('div');
+          item.className = 'media-preview-item';
+          item.innerHTML = `
+            <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+            <button class="remove-btn" onclick="removeMedia(this, '${e.target.result}')">×</button>
+          `;
+          preview.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function removeMedia(btn, url) {
+      uploadedMedia = uploadedMedia.filter(u => u !== url);
+      btn.parentElement.remove();
+    }
+
+    async function submitPost() {
+      const content = document.getElementById('postContent').value.trim();
+      const propertyType = document.getElementById('propertyType').value;
+      const location = document.getElementById('propertyLocation').value.trim();
+      const price = document.getElementById('propertyPrice').value;
+      const size = document.getElementById('propertySize').value;
+
+      // Validation
+      if (!content) {
+        alert('Please describe your property update');
+        return;
+      }
+      if (!propertyType) {
+        alert('Please select a property type');
+        return;
+      }
+      if (!location) {
+        alert('Please provide the property location');
+        return;
+      }
+      if (uploadedMedia.length === 0) {
+        alert('Please upload at least one photo of the property as proof');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitPostBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Posting...';
+
+      try {
+        // Upload media to Supabase Storage (simplified - using base64 for demo)
+        const mediaUrls = uploadedMedia; // In production, upload to Supabase Storage
+
+        const { data, error } = await feedState.supabase
+          .from('property_status_updates')
+          .insert([{
+            user_id: feedState.userId,
+            author_type: feedState.userProfile?.role === 'merchant' ? 'merchant' : 'user',
+            content,
+            property_type: propertyType,
+            location,
+            price_estimate: price ? parseFloat(price) : null,
+            property_size_sqm: size ? parseFloat(size) : null,
+            media_urls: mediaUrls,
+            status_type: selectedStatusType
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Close modal and refresh
+        bootstrap.Modal.getInstance(document.getElementById('postComposerModal')).hide();
+        
+        // Reset form
+        document.getElementById('postContent').value = '';
+        document.getElementById('propertyType').value = '';
+        document.getElementById('propertyLocation').value = '';
+        document.getElementById('propertyPrice').value = '';
+        document.getElementById('propertySize').value = '';
+        document.getElementById('mediaPreview').innerHTML = '';
+        uploadedMedia = [];
+        
+        // Reload feed
+        await loadFeedPosts();
+
+      } catch (error) {
+        console.error('Error posting:', error);
+        alert('Error creating post: ' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-send"></i> Post';
+      }
+    }
+
+    // Engagement Actions
+    async function toggleLike(postId) {
+      try {
+        // Check if already liked
+        const { data: existing } = await feedState.supabase
+          .from('property_status_likes')
+          .select('id')
+          .eq('status_id', postId)
+          .eq('user_id', feedState.userId)
+          .single();
+
+        if (existing) {
+          // Unlike
+          await feedState.supabase
+            .from('property_status_likes')
+            .delete()
+            .eq('id', existing.id);
+        } else {
+          // Like
+          await feedState.supabase
+            .from('property_status_likes')
+            .insert([{ status_id: postId, user_id: feedState.userId }]);
+        }
+
+        // Refresh posts
+        await loadFeedPosts();
+
+      } catch (error) {
+        console.error('Error toggling like:', error);
+      }
+    }
+
+    async function toggleComments(postId) {
+      const section = document.getElementById(`comments-${postId}`);
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+      
+      if (section.style.display === 'block') {
+        await loadComments(postId);
+      }
+    }
+
+    async function loadComments(postId) {
+      try {
+        const { data: comments } = await feedState.supabase
+          .from('property_status_comments')
+          .select(`
+            *,
+            user:user_profiles!user_id(display_name, profile_image_url)
+          `)
+          .eq('status_id', postId)
+          .eq('is_deleted', false)
+          .order('created_at', { ascending: true });
+
+        const container = document.getElementById(`comments-list-${postId}`);
+        if (comments?.length > 0) {
+          container.innerHTML = comments.map(c => `
+            <div class="d-flex gap-2 mb-2">
+              <img src="${c.user?.profile_image_url || 'images/hero-bg.jpeg'}" width="32" height="32" class="rounded-circle">
+              <div>
+                <div class="fw-bold">${c.user?.display_name || 'User'}</div>
+                <div>${escapeHtml(c.content)}</div>
+                <div class="text-muted small">${formatTime(c.created_at)}</div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div class="text-muted small">No comments yet. Be the first!</div>';
+        }
+      } catch (error) {
+        console.error('Error loading comments:', error);
+      }
+    }
+
+    async function submitComment(postId) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      const content = input.value.trim();
+      
+      if (!content) return;
+
+      try {
+        await feedState.supabase
+          .from('property_status_comments')
+          .insert([{
+            status_id: postId,
+            user_id: feedState.userId,
+            content
+          }]);
+
+        input.value = '';
+        await loadComments(postId);
+        await loadFeedPosts();
+
+      } catch (error) {
+        console.error('Error posting comment:', error);
+      }
+    }
+
+    function sharePost(postId) {
+      const url = `${window.location.origin}/property-feed.html?post=${postId}`;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Property Update on HOME AFRICA',
+          url: url
+        });
+      } else {
+        navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+      }
+    }
+
+    function messageAuthor(userId) {
+      window.location.href = `messages.html?start=${userId}&type=user`;
+    }
+
+    // Load more posts
+    async function loadMorePosts() {
+      // Implement pagination logic
+      alert('Load more functionality coming soon!');
+    }
+
+    // Helper functions
+    function getStatusLabel(type) {
+      const labels = {
+        available: 'Available',
+        sold: 'Sold',
+        price_drop: 'Price Drop',
+        open_house: 'Open House',
+        coming_soon: 'Coming Soon',
+        market_insight: 'Market Insight'
+      };
+      return labels[type] || type;
+    }
+
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(hours / 24);
+
+      if (hours < 1) return 'Just now';
+      if (hours < 24) return `${hours}h ago`;
+      if (days < 7) return `${days}d ago`;
+      return date.toLocaleDateString();
+    }
+
+    function formatNumber(num) {
+      if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toLocaleString();
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function openLightbox(url, index) {
+      // Implement lightbox for viewing images
+      window.open(url, '_blank');
+    }
+  </script>
+</body>
+</html>

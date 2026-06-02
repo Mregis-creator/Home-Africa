@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Log In - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA � Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
 
   <!-- Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -326,6 +329,83 @@
         font-size: 1.1rem;
       }
     }
+
+    /* Role Selection Modal */
+    .role-select-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInOverlay 0.4s ease;
+    }
+    @keyframes fadeInOverlay { 0% { opacity:0; } 100% { opacity:1; } }
+    .role-select-content {
+      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,255,136,0.15) 100%);
+      border: 3px solid #0ff;
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      animation: slideInModal 0.4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes slideInModal {
+      0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .role-select-content h2 {
+      background: linear-gradient(90deg, #0ff 30%, #8fff00 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .role-select-content p {
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .role-cards {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .role-card {
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(0,255,255,0.3);
+      border-radius: 14px;
+      padding: 1.2rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+      min-width: 110px;
+      max-width: 140px;
+    }
+    .role-card:hover {
+      background: rgba(0,255,255,0.15);
+      border-color: #0ff;
+      transform: scale(1.06);
+      box-shadow: 0 6px 30px rgba(0,255,255,0.35);
+    }
+    .role-card .role-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .role-card .role-label {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .role-card .role-desc {
+      color: #aaa;
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+    }
   </style>
 </head>
 <body>
@@ -495,6 +575,7 @@
   <!-- EmailJS for password reset -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="js/email-notifications.js"></script>
+  <script src="js/email-service-emailjs.js"></script>
   <script>
     particlesJS("particles-js", {
       particles: {
@@ -743,6 +824,12 @@
             // successDiv is already initialized above, safe to use
             showPasswordResetForm(resetToken, resetEmail, supabase, errorDiv, successDiv);
             return; // Don't continue with normal login flow
+          } else if (urlParams.get('registered') === 'true') {
+            // User just registered - show welcome message
+            if (successDiv) {
+              successDiv.innerHTML = '<i class="bi bi-envelope-check"></i> <strong>Welcome to HOME AFRICA!</strong><br>Your account has been created successfully. Please log in with your credentials.';
+              successDiv.style.display = 'block';
+            }
           } else if (urlParams.get('reset') === 'true') {
             // Old Supabase reset callback (without token)
             if (successDiv) {
@@ -912,7 +999,8 @@
                 console.log('✅ Login successful! Redirecting to:', redirectDestination, 'Role:', userRole);
                 
                 // Redirect immediately after successful login
-                window.location.href = redirectDestination;
+                // Show role selection modal instead of redirecting directly
+                showRoleSelectModal(userRole, redirectDestination);
               } else {
                 // No user data - this shouldn't happen if error check worked, but just in case
                 throw new Error('Login failed: Authentication did not return user data.');
@@ -1031,7 +1119,7 @@
         }
       }
       
-      // Forgot Password function - Using EmailJS
+      // Forgot Password function - Using EmailJS via emailService
       async function sendPasswordReset(email, supabase, errorDiv, successDiv) {
         if (!email) {
           if (errorDiv) {
@@ -1040,38 +1128,37 @@
           }
           return;
         }
-        
+
         // Hide previous messages
         if (errorDiv) errorDiv.style.display = 'none';
         if (successDiv) successDiv.style.display = 'none';
-        
+
         // Show loading state
         if (successDiv) {
           successDiv.innerHTML = '<i class="bi bi-hourglass-split"></i> <strong>Sending password reset email...</strong>';
           successDiv.style.display = 'block';
           successDiv.className = 'alert alert-info mt-3';
         }
-        
+
         try {
           console.log('📧 Attempting to send password reset email via EmailJS to:', email);
-          
+
           // First, verify user exists in Supabase
           const { data: userData, error: userError } = await supabase
             .from('users')
-            .select('id, email')
+            .select('id, email, full_name')
             .eq('email', email)
             .single();
-          
+
           if (userError || !userData) {
             throw new Error('No account found with this email address. Please check your email or sign up for a new account.');
           }
-          
+
           // Generate secure reset token
           const resetToken = crypto.randomUUID() + '-' + Date.now();
           const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
-          
+
           // Store reset token in Supabase
-          // We'll use a password_reset_tokens table or store in users table metadata
           const { error: tokenError } = await supabase
             .from('users')
             .update({
@@ -1079,66 +1166,50 @@
               reset_token_expires: expiresAt.toISOString()
             })
             .eq('id', userData.id);
-          
+
           if (tokenError) {
             console.warn('Could not store reset token, but continuing:', tokenError);
-            // Continue anyway - token is in the URL
           }
-          
+
           // Create reset link
           const resetLink = `${window.location.origin}/signin.html?reset=true&token=${resetToken}&email=${encodeURIComponent(email)}`;
-          
-          // Prepare email content
-          const emailContent = `
-            <h2 style="color: #00c853; margin-bottom: 20px;">Reset Your Password</h2>
-            <p>Hello,</p>
-            <p>You requested to reset your password for your HOME AFRICA account.</p>
-            <p style="margin: 30px 0;">
-              <a href="${resetLink}" style="background: linear-gradient(90deg, #0ff 0%, #8fff00 100%); color: #222; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                Reset Password
-              </a>
-            </p>
-            <p>Or copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #666; font-size: 12px;">${resetLink}</p>
-            <p style="margin-top: 30px; color: #999; font-size: 12px;">
-              This link will expire in 1 hour.<br>
-              If you didn't request this, please ignore this email.
-            </p>
-          `;
-          
-          // Send email via EmailJS
-          if (window.emailNotificationSystem && window.emailNotificationSystem.isEmailJSConfigured()) {
-            const emailResult = await window.emailNotificationSystem.sendEmail({
-              to: email,
-              subject: 'Reset Your HOME AFRICA Password',
-              html: emailContent,
-              text: `Reset your password: ${resetLink}\n\nThis link expires in 1 hour.`,
-              type: 'password_reset'
-            });
-            
-            console.log('✅ Password reset email sent via EmailJS:', emailResult);
-            
-            // Show success message
-            if (successDiv) {
-              successDiv.innerHTML = `
-                <i class="bi bi-envelope-check"></i> <strong>Password reset email sent!</strong><br>
-                <small style="display: block; margin-top: 8px;">
-                  Please check your inbox at <strong>${email}</strong> and click the link to reset your password.<br>
-                  The link will expire in 1 hour.
-                </small>
-              `;
-              successDiv.style.display = 'block';
-              successDiv.className = 'alert alert-success mt-3';
+
+          // Send email via EmailJS using emailService
+          if (typeof emailService !== 'undefined' && emailService) {
+            await emailService.init();
+            const result = await emailService.sendPasswordReset(
+              email,
+              userData.full_name || email.split('@')[0],
+              resetLink,
+              resetToken
+            );
+
+            if (result.success) {
+              console.log('✅ Password reset email sent via EmailJS:', result);
+
+              if (successDiv) {
+                successDiv.innerHTML = `
+                  <i class="bi bi-envelope-check"></i> <strong>Password reset email sent!</strong><br>
+                  <small style="display: block; margin-top: 8px;">
+                    Please check your inbox at <strong>${email}</strong> and click the link to reset your password.<br>
+                    The link will expire in 1 hour.
+                  </small>
+                `;
+                successDiv.style.display = 'block';
+                successDiv.className = 'alert alert-success mt-3';
+              }
+            } else {
+              throw new Error(result.error || 'EmailJS send failed');
             }
           } else {
-            // Fallback: Try Supabase Auth (if EmailJS not configured)
-            console.warn('⚠️ EmailJS not configured, falling back to Supabase Auth');
+            // Fallback: Try Supabase Auth
+            console.warn('⚠️ EmailJS not loaded, falling back to Supabase Auth');
             const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
               redirectTo: resetLink
             });
-            
+
             if (supabaseError) throw supabaseError;
-            
+
             if (successDiv) {
               successDiv.innerHTML = `
                 <i class="bi bi-envelope-check"></i> <strong>Password reset email sent!</strong><br>
@@ -1150,7 +1221,7 @@
               successDiv.className = 'alert alert-success mt-3';
             }
           }
-          
+
           // Hide error if showing
           if (errorDiv) errorDiv.style.display = 'none';
           
@@ -1369,52 +1440,24 @@
       }
     })();
   </script>
-  <!-- 🌍 Footer -->
-<footer class="bg-dark text-light pt-4 pb-3 mt-5">
+  <!-- 🌍 Minimal Footer -->
+<footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff;">
   <div class="container">
-    <div class="row">
-      <!-- Brand Info -->
-      <div class="col-md-3 mb-3">
-        <h5>🏠 HOME AFRICA</h5>
-        <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div class="small">
+        &copy; <span class="footer-year">2026</span> HOME AFRICA ·
+        <a href="privacy-policy.html" class="footer-link text-white">Privacy</a> ·
+        <a href="terms-of-service.html" class="footer-link text-white">Terms</a>
       </div>
-
-      <!-- Quick Links -->
-      <div class="col-md-3 mb-3">
-        <h6>Quick Links</h6>
-        <ul class="list-unstyled">
-          <li><a href="index.html" class="footer-link">Home</a></li>
-          <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
-          <li><a href="apartment.html" class="footer-link">Apartments</a></li>
-          <li><a href="land.html" class="footer-link">Land</a></li>
-          <li><a href="cars.html" class="footer-link">Cars</a></li>
-        </ul>
+      <div>
+        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+        <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>
       </div>
-
-      <!-- Contact Info -->
-      <div class="col-md-3 mb-3">
-        <h6>Contact Us</h6>
-        <ul class="list-unstyled">
-          <li>Phone: +250 788 123 456</li>
-          <li>Email: info@home.africa</li>
-          <li>Address: Kigali, Rwanda</li>
-        </ul>
-      </div>
-
-<!-- Social Links -->
-<div class="col-md-3 mb-3">
-  <h6>Follow Us</h6>
-        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
-        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
-        <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
-        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-</div>
-    </div>
-    <hr style="border-color: rgba(255,255,255,0.1)" />
-    <div class="text-center small">
-      &copy; 2025 HOME AFRICA. All rights reserved.
     </div>
   </div>
+  <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
 </footer>
 
   <!-- Supabase Client -->
@@ -1422,7 +1465,77 @@
   <script src="js/supabase-config.js"></script>
   
   <!-- AI Chatbot -->
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
   </div>
+
+  <!-- Role Selection Modal (shown after login) -->
+  <div id="roleSelectModal" class="role-select-modal" style="display:none;">
+    <div class="role-select-content">
+      <h2>&#128075; Welcome Back!</h2>
+      <p>How would you like to continue?</p>
+      <div class="role-cards" id="roleCards">
+        <div class="role-card" onclick="selectRole('user')">
+          <div class="role-icon">&#128100;</div>
+          <div class="role-label">User</div>
+          <div class="role-desc">Browse properties &amp; listings</div>
+        </div>
+        <div class="role-card" onclick="selectRole('merchant')">
+          <div class="role-icon">&#128188;</div>
+          <div class="role-label">Merchant</div>
+          <div class="role-desc">Manage listings &amp; leads</div>
+        </div>
+        <div class="role-card" id="agentRoleCard" onclick="selectRole('agent')" style="display:none;">
+          <div class="role-icon">&#127968;</div>
+          <div class="role-label">Agent</div>
+          <div class="role-desc">Manage clients &amp; deals</div>
+        </div>
+        <div class="role-card" id="supportRoleCard" onclick="selectRole('support')" style="display:none;">
+          <div class="role-icon">&#127911;</div>
+          <div class="role-label">Support</div>
+          <div class="role-desc">Help users &amp; resolve issues</div>
+        </div>
+        <div class="role-card" id="devRoleCard" onclick="selectRole('dev')" style="display:none;">
+          <div class="role-icon">&#128187;</div>
+          <div class="role-label">Developer</div>
+          <div class="role-desc">Feature flags &amp; tools</div>
+        </div>
+        <div class="role-card" id="adminRoleCard" onclick="selectRole('admin')" style="display:none;">
+          <div class="role-icon">&#9881;&#65039;</div>
+          <div class="role-label">Admin</div>
+          <div class="role-desc">Full platform control</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var _pendingRoleRedirect = null;
+    var _userActualRole = 'user';
+    function showRoleSelectModal(defaultRole, pendingUrl) {
+      _pendingRoleRedirect = pendingUrl;
+      _userActualRole = defaultRole;
+      if (defaultRole === 'admin') document.getElementById('adminRoleCard').style.display = '';
+      if (defaultRole === 'admin' || defaultRole === 'agent') document.getElementById('agentRoleCard').style.display = '';
+      if (defaultRole === 'admin' || defaultRole === 'support') document.getElementById('supportRoleCard').style.display = '';
+      if (defaultRole === 'admin' || defaultRole === 'dev') document.getElementById('devRoleCard').style.display = '';
+      document.getElementById('roleSelectModal').style.display = 'flex';
+    }
+    function selectRole(role) {
+      document.getElementById('roleSelectModal').style.display = 'none';
+      var dest;
+      if (role === 'admin') dest = 'admin-payments.html';
+      else if (role === 'merchant') dest = 'merchant-dashboard.html';
+      else if (role === 'agent') dest = 'agent-dashboard.html';
+      else if (role === 'support') dest = 'support-dashboard.html';
+      else if (role === 'dev') dest = 'dev-dashboard.html';
+      else dest = 'profile.html';
+      window.location.href = dest;
+    }
+  </script>
+  <script src="js/navbar-auth-status.js"></script>
 </body>
 </html>
+
+
+

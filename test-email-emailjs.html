@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Test - EmailJS Version - HOME AFRICA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #0a1929;
+      color: #fff;
+    }
+    h1 {
+      color: #00e6d8;
+      text-align: center;
+    }
+    h2 {
+      color: #00c853;
+      font-size: 18px;
+      margin-top: 30px;
+    }
+    button {
+      background: linear-gradient(90deg, #00e6d8 10%, #00c853 90%);
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 10px 5px;
+      display: inline-block;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .success {
+      background: rgba(0, 200, 83, 0.2);
+      color: #00c853;
+      border: 1px solid #00c853;
+    }
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      color: #ff4444;
+      border: 1px solid #ff4444;
+    }
+    .info {
+      background: rgba(0, 230, 216, 0.2);
+      color: #00e6d8;
+      border: 1px solid #00e6d8;
+    }
+    .warning {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .buttons {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .setup-steps {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .setup-steps ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .setup-steps li {
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    .setup-steps a {
+      color: #00e6d8;
+    }
+    code {
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px 0;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background: #1a2a3a;
+      color: #fff;
+      box-sizing: border-box;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏠 HOME AFRICA Email Test</h1>
+  <h2 style="text-align: center; color: #00e6d8;">EmailJS Version (No Domain Required)</h2>
+  
+  <div class="warning">
+    ⚠️ <strong>Setup Required:</strong> You need to configure EmailJS before testing.
+  </div>
+
+  <div class="setup-steps">
+    <h3>📋 Setup Steps (One-time):</h3>
+    <ol>
+      <li>Go to <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> and sign up (free)</li>
+      <li>Add an Email Service (Gmail, Outlook, or SMTP)</li>
+      <li>Create <strong>ONE</strong> email template with these variables: <code>{{to_email}}</code>, <code>{{to_name}}</code>, <code>{{subject}}</code>, <code>{{html_content}}</code></li>
+      <li>In the template body, paste: <code>{{html_content}}</code> (this renders the full HTML email)</li>
+      <li>Copy your Service ID, Template ID, and Public Key into <code>js/email-service-emailjs.js</code></li>
+      <li>Reload this page and test all 4 email types!</li>
+    </ol>
+    <p style="margin-top: 15px; color: #aaa;">
+      💡 <strong>Free tier:</strong> 200 emails/month. One template handles Welcome, Lead, Payment, and Password Reset emails!
+    </p>
+  </div>
+
+  <h2>📧 Enter Test Email</h2>
+  <label>Recipient Email (for testing):</label>
+  <input type="email" id="testEmail" value="regismuhakwa@gmail.com" placeholder="Enter email for testing">
+  
+  <label>Recipient Name:</label>
+  <input type="text" id="testName" value="Test User" placeholder="Enter name">
+
+  <h2>🧪 Test Email Types</h2>
+  <div class="buttons">
+    <button onclick="testWelcome()">1️⃣ Send Welcome</button>
+    <button onclick="testLead()">2️⃣ Send Lead Alert</button>
+    <button onclick="testPayment()">3️⃣ Send Payment</button>
+    <button onclick="testPasswordReset()">4️⃣ Send Password Reset</button>
+  </div>
+
+  <div id="result"></div>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  
+  <!-- Email Service -->
+  <script src="js/email-service-emailjs.js"></script>
+  
+  <script>
+    function showResult(message, type) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = type;
+      resultDiv.innerHTML = message;
+    }
+
+    function getTestData() {
+      return {
+        email: document.getElementById('testEmail').value,
+        name: document.getElementById('testName').value
+      };
+    }
+
+    // Test 1: Welcome Email
+    async function testWelcome() {
+      const data = getTestData();
+      showResult('⏳ Sending welcome email to ' + data.email + '...', 'info');
+      
+      const result = await emailService.sendWelcomeEmail(
+        data.email,
+        data.name,
+        'user'
+      );
+      
+      if (result.success) {
+        showResult('✅ Welcome email sent! Check inbox at ' + data.email, 'success');
+      } else {
+        showResult('❌ Failed: ' + result.error + '<br><br>💡 Make sure you updated the Service ID and Template IDs in email-service-emailjs.js', 'error');
+      }
+    }
+
+    // Test 2: Lead Notification
+    async function testLead() {
+      const data = getTestData();
+      showResult('⏳ Sending lead notification...', 'info');
+      
+      const result = await emailService.sendLeadNotification(
+        data.email,
+        data.name,
+        {
+          name: 'John Interested',
+          email: 'interested@example.com',
+          phone: '+250788123456',
+          message: 'Is this property still available? I want to schedule a viewing this weekend.',
+          productTitle: '3BR Modern Apartment in Kacyiru',
+          productType: 'apartment',
+          productUrl: 'https://homeafrica.it.com/apartment/123'
+        }
+      );
+      
+      if (result.success) {
+        showResult('✅ Lead notification sent!', 'success');
+      } else {
+        showResult('❌ Failed: ' + result.error, 'error');
+      }
+    }
+
+    // Test 3: Payment Confirmation
+    async function testPayment() {
+      const data = getTestData();
+      showResult('⏳ Sending payment confirmation...', 'info');
+      
+      const result = await emailService.sendPaymentConfirmation(
+        data.email,
+        data.name,
+        {
+          amount: 75000,
+          currency: 'RWF',
+          paymentMethod: 'MTN Mobile Money',
+          reference: 'PAY-TEST-' + Date.now(),
+          status: 'confirmed',
+          description: 'Premium Subscription - Monthly',
+          productTitle: 'Premium Plan'
+        }
+      );
+      
+      if (result.success) {
+        showResult('✅ Payment confirmation sent!', 'success');
+      } else {
+        showResult('❌ Failed: ' + result.error, 'error');
+      }
+    }
+
+    // Test 4: Password Reset
+    async function testPasswordReset() {
+      const data = getTestData();
+      showResult('⏳ Sending password reset email...', 'info');
+
+      const result = await emailService.sendPasswordReset(
+        data.email,
+        data.name,
+        'https://homeafrica.it.com/reset-password.html?token=TEST-' + Date.now(),
+        'TEST-' + Date.now()
+      );
+
+      if (result.success) {
+        showResult('✅ Password reset email sent! Check inbox at ' + data.email, 'success');
+      } else {
+        showResult('❌ Failed: ' + result.error, 'error');
+      }
+    }
+
+    // Check if EmailJS is loaded
+    window.addEventListener('load', () => {
+      if (typeof emailjs === 'undefined') {
+        showResult('⚠️ EmailJS SDK not loaded. Check your internet connection.', 'warning');
+      } else {
+        console.log('✅ EmailJS SDK loaded');
+      }
+    });
+  </script>
+</body>
+</html>

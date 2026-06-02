@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Land Plot Details | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA ? Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   
@@ -243,6 +246,54 @@
       }
     }
   </style>
+  <!-- Leaflet Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Rwanda district coordinates lookup
+    const rwandaDistricts = {
+      'kigali': [-1.9441, 30.0619], 'nyarugenge': [-1.9500, 30.0588], 'gasabo': [-1.9106, 30.0945],
+      'kicukiro': [-2.0000, 30.0938], 'huye': [-2.5967, 29.7411], 'musanze': [-1.4990, 29.6350],
+      'rubavu': [-1.6833, 29.2500], 'muhanga': [-2.0833, 29.7667], 'nyanza': [-2.3500, 29.7333],
+      'gicumbi': [-1.5833, 30.0667], 'rwamagana': [-1.9500, 30.4333], 'kayonza': [-1.9833, 30.6500],
+      'kirehe': [-2.2500, 30.6833], 'ngoma': [-2.1500, 30.4667], 'bugesera': [-2.2167, 30.2500],
+      'rulindo': [-1.7167, 30.0667], 'gakenke': [-1.6167, 29.8000], 'burera': [-1.4167, 29.8000],
+      'nyabihu': [-1.6500, 29.5000], 'ngororero': [-1.8500, 29.5333], 'karongi': [-2.0667, 29.4000],
+      'rutsiro': [-2.0667, 29.3000], 'nyamasheke': [-2.3333, 29.2833], 'rusizi': [-2.4833, 28.9167],
+      'nyaruguru': [-2.7167, 29.5333], 'gisagara': [-2.6333, 29.8333], 'nyamagabe': [-2.4667, 29.4833],
+      'ruhango': [-2.2333, 29.7833], 'kamonyi': [-2.0500, 29.8667]
+    };
+
+    function initListingMap(locationStr) {
+      let coords = [-1.9441, 30.0619]; // Default: Kigali
+      let label = locationStr || 'Rwanda';
+
+      if (locationStr) {
+        const lower = locationStr.toLowerCase();
+        for (const [district, latLng] of Object.entries(rwandaDistricts)) {
+          if (lower.includes(district)) { coords = latLng; break; }
+        }
+      }
+
+      const map = L.map('listingMap', { zoomControl: true }).setView(coords, 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '� OpenStreetMap contributors', maxZoom: 18
+      }).addTo(map);
+
+      const icon = L.divIcon({
+        html: '<div style="background:linear-gradient(90deg,#0ff,#8fff00);width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>',
+        iconSize: [32, 32], iconAnchor: [16, 32], className: ''
+      });
+
+      L.marker(coords, { icon })
+        .addTo(map)
+        .bindPopup(`<b style="color:#000">${label}</b>`, { maxWidth: 200 })
+        .openPopup();
+
+      const labelEl = document.getElementById('mapLocationLabel');
+      if (labelEl) labelEl.innerHTML = `<i class="bi bi-geo-alt-fill" style="color:#0ff"></i> ${label}`;
+    }
+  </script>
 </head>
 <body>
   <div id="particles-js"></div>
@@ -331,7 +382,7 @@
             <div class="contact-section">
               <h4 class="text-white mb-3">
                 <i class="bi bi-person-badge"></i> Seller Information
-                <span id="verifiedBadge" class="verified-badge" style="display:none;">
+                <span id="verifiedBadge" class="verified-badge" style="display:inline-block;background:linear-gradient(90deg,#0ff 0%,#8fff00 100%);color:#222;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.75rem;font-weight:bold;margin-left:0.5rem;">
                   <i class="bi bi-check-circle-fill"></i> Verified
                 </span>
               </h4>
@@ -351,6 +402,9 @@
               </div>
             </div>
 
+                            <a id="messageSeller" href="messages.html" class="btn w-100 mt-2 contact-btn" style="background:linear-gradient(90deg,#0ff,#8fff00);color:#000;font-weight:bold;border:none;">
+                  <i class="bi bi-chat-dots-fill"></i> Message Seller
+                </a>
             <!-- Booking Section -->
             <div class="mt-3">
               <button class="btn btn-primary w-100 contact-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
@@ -450,6 +504,14 @@
     </div>
   </div>
 
+    <!-- Map Section -->
+  <div style="position:relative;z-index:1;max-width:1200px;margin:2rem auto;padding:0 1rem;">
+    <div style="background:linear-gradient(120deg,rgba(0,0,0,0.95) 60%,rgba(0,255,136,0.1) 100%);border:2px solid #0ff;border-radius:16px;padding:1.5rem;box-shadow:0 0 24px rgba(0,255,136,0.15);">
+      <h3 class="text-white mb-3"><i class="bi bi-geo-alt-fill" style="color:#0ff"></i> Location on Map</h3>
+      <div id="listingMap" style="height:350px;border-radius:10px;border:1px solid rgba(0,255,255,0.3);"></div>
+      <p class="text-white-50 mt-2 mb-0" id="mapLocationLabel" style="font-size:0.9rem;"><i class="bi bi-info-circle"></i> Approximate location shown</p>
+    </div>
+  </div>
   <!-- Comments Section -->
   <div class="comments-section-container" style="position: relative; z-index: 1; max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
     <div class="comments-card" style="background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%); border: 2px solid #ff0088; border-radius: 16px; padding: 2rem; box-shadow: 0 0 24px 0 rgba(255,0,136,0.2);">
@@ -551,11 +613,24 @@
     }
   </style>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container text-center">
-      <p class="mb-0 text-white">&copy; 2025 HOME AFRICA. All rights reserved.</p>
+  <!-- ?? Minimal Footer -->
+  <footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff;">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="small">
+          &copy; <span class="footer-year">2026</span> HOME AFRICA �
+          <a href="privacy-policy.html" class="footer-link text-white">Privacy</a> �
+          <a href="terms-of-service.html" class="footer-link text-white">Terms</a>
+        </div>
+        <div>
+          <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+          <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+          <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+          <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
     </div>
+    <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
   </footer>
 
   <!-- Scripts -->
@@ -567,6 +642,7 @@
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="js/notifications.js"></script>
+  <script src="js/email-service-emailjs.js"></script>
   
   <script>
 
@@ -612,12 +688,12 @@
               displayLand(land, landId);
               // Track view in Supabase
               await window.supabaseListings.incrementViews(landId);
-              console.log('✅ Loaded land from Supabase');
+              console.log('? Loaded land from Supabase');
               return;
             }
           }
         } catch (supabaseError) {
-          console.error('❌ Failed to load land from Supabase:', supabaseError);
+          console.error('? Failed to load land from Supabase:', supabaseError);
           const loadingSpinner = document.getElementById('loadingSpinner');
           if (loadingSpinner) {
             loadingSpinner.innerHTML = '<p class="text-white">Error loading land details. Please refresh the page.</p>';
@@ -654,9 +730,11 @@
       document.getElementById('landTitle').textContent = land.title || 'Land Plot';
       document.getElementById('landPrice').textContent = `RWF ${parseInt(land.price || 0).toLocaleString()}`;
       document.getElementById('landLocation').textContent = land.location || 'N/A';
+      initListingMap(land.location || 'N/A');
       document.getElementById('landSize').textContent = land.size ? land.size + ' sqm' : 'N/A';
       document.getElementById('landDescription').textContent = land.description || 'No description available.';
       document.getElementById('merchantName').textContent = land.merchantName || 'Seller';
+      window.currentListing = land;
       document.getElementById('merchantContact').textContent = land.merchantContact || 'Contact not available';
 
       // Set images
@@ -687,6 +765,15 @@
       document.getElementById('whatsappBtn').href = whatsappLink;
       document.getElementById('callBtn').href = telLink;
       document.getElementById('emailBtn').href = emailLink;
+
+      // Set message seller link
+      const sellerId = land.user_id || land.userId || null;
+      const msgBtn = document.getElementById('messageSeller');
+      if (msgBtn && sellerId) {
+        msgBtn.href = `messages.html?start=${sellerId}&type=user`;
+      } else if (msgBtn) {
+        msgBtn.style.display = 'none';
+      }
 
       // Set social share links
       const shareUrl = encodeURIComponent(window.location.href);
@@ -724,6 +811,54 @@
 
     // Booking form submission
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    // Inquiry form submission
+    document.getElementById('inquiryForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
+      
+      try {
+        const inquiryData = {
+          listingId: document.getElementById('inquiryLandId').value,
+          listingTitle: document.getElementById('inquiryLandTitle').value,
+          name: document.getElementById('inquiryName').value,
+          email: document.getElementById('inquiryEmail').value,
+          phone: document.getElementById('inquiryPhone').value,
+          message: document.getElementById('inquiryMessage').value,
+          inquiryType: 'land'
+        };
+        
+        // Send lead notification to merchant via EmailJS
+        if (typeof emailService !== 'undefined' && emailService && window.currentListing) {
+          await emailService.init();
+          const leadResult = await emailService.sendLeadNotification(
+            window.currentListing.merchantEmail || 'regismuhakwa@gmail.com',
+            window.currentListing.merchantName || 'Seller',
+            {
+              productTitle: window.currentListing.title,
+              buyerName: inquiryData.name,
+              buyerEmail: inquiryData.email,
+              buyerPhone: inquiryData.phone,
+              buyerMessage: inquiryData.message,
+              listingUrl: window.location.href
+            }
+          );
+          console.log('Lead notification result:', leadResult);
+        }
+        alert('? Inquiry sent successfully! The seller will contact you shortly.'); if (window.HomeAfricaAnalytics) { window.HomeAfricaAnalytics.trackInquirySubmitted(document.getElementById('inquiryLandId').value, 'land'); }
+        bootstrap.Modal.getInstance(document.getElementById('inquiryModal')).hide();
+        document.getElementById('inquiryForm').reset();
+      } catch (error) {
+        console.error('Inquiry error:', error);
+        alert('Error sending inquiry: ' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
       e.preventDefault();
       
       const submitBtn = this.querySelector('button[type="submit"]');
@@ -745,7 +880,7 @@
         
         if (window.bookingSystem) {
           await window.bookingSystem.createBooking(bookingData);
-          alert('✅ Booking submitted successfully! You will receive a confirmation email shortly.');
+          alert('? Booking submitted successfully! You will receive a confirmation email shortly.');
           bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
           document.getElementById('bookingForm').reset();
         } else {
@@ -764,7 +899,7 @@
     document.getElementById('reviewForm').addEventListener('submit', function(e) {
       e.preventDefault();
       // TODO: Implement review submission in Supabase
-      alert('Reviews feature coming soon. This will be implemented in Supabase.');
+      alert('window.HomeAfricaReviews.displayReviews(landId, 'reviewsContainer');.');
       bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
       document.getElementById('reviewForm').reset();
     });
@@ -786,6 +921,7 @@
   <script src="js/comments-system.js"></script>
   
   <!-- AI Chatbot -->
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
   
   <!-- Footer Fix -->
@@ -985,6 +1121,6 @@
       });
     });
   </script>
-</body>
+  <script src="js/mortgage-calculator.js"></script>`n  <script src="js/mortgage-calculator.js"></script>`n</body>
 </html>
 

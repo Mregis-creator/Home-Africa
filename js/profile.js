@@ -12,21 +12,23 @@ class HomeAfricaProfile {
   }
 
   async init() {
-    // Get current user ID
-    if (window.homeAfricaAuth && window.homeAfricaAuth.isAuthenticated()) {
-      this.currentUserId = window.homeAfricaAuth.getCurrentUserId();
-    } else {
-      // Check URL parameter for viewing other users
+    // Get current user from Supabase auth session (authoritative)
+    try {
+      if (this.supabase) {
+        const { data: { session } } = await this.supabase.auth.getSession();
+        if (session?.user) this.currentUserId = session.user.id;
+      }
+    } catch (e) { /* ignore */ }
+
+    // Fallback: URL param for viewing other profiles
+    if (!this.currentUserId) {
       const urlParams = new URLSearchParams(window.location.search);
       const userIdParam = urlParams.get('userId');
       if (userIdParam) {
         this.currentUserId = userIdParam;
       } else {
-        // Require auth for own profile
-        if (window.homeAfricaAuth) {
-          window.homeAfricaAuth.requireAuth('signin.html');
-          return;
-        }
+        window.location.href = 'signin.html';
+        return;
       }
     }
 
@@ -42,26 +44,23 @@ class HomeAfricaProfile {
     if (!this.supabase || !this.currentUserId) return;
 
     try {
-      // Load user data from Supabase
-      const { data: user, error } = await this.supabase
-        .from('users')
+      // Load from user_profiles table
+      const { data: profile, error } = await this.supabase
+        .from('user_profiles')
         .select('*')
-        .eq('id', this.currentUserId)
-        .single();
+        .eq('user_id', this.currentUserId)
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading user profile:', error);
-        return;
-      }
+      // Get auth user for email fallback
+      const { data: { session } } = await this.supabase.auth.getSession();
+      const authUser = session?.user;
 
-      if (user) {
-        this.currentUserData = user;
-        this.displayUserProfile(user);
-      } else {
-        // User not found in Supabase - show guest view or redirect to login
-        console.log('User not found in Supabase');
-        // Could redirect to login or show guest profile view
-      }
+      const user = profile
+        ? { ...profile, email: authUser?.email || profile.email }
+        : { user_id: this.currentUserId, email: authUser?.email || '', full_name: authUser?.email?.split('@')[0] || 'User' };
+
+      this.currentUserData = user;
+      this.displayUserProfile(user);
     } catch (error) {
       console.error('Error loading profile:', error);
     }
@@ -79,24 +78,105 @@ class HomeAfricaProfile {
       el.textContent = user.email || '';
     });
 
-    // Update avatar
+    // Update avatar with profile picture
     const avatarElements = document.querySelectorAll('.profile-avatar');
     avatarElements.forEach(el => {
-      const initial = (user.full_name || user.email || 'U')[0].toUpperCase();
-      if (!el.querySelector('img')) {
+      if (user.profile_picture_url) {
+        el.innerHTML = `<img src="${user.profile_picture_url}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+      } else {
+        const initial = (user.full_name || user.email || 'U')[0].toUpperCase();
         el.innerHTML = `<span style="font-size: 3rem; color: #222;">${initial}</span>`;
       }
     });
 
-    // Update role badge
+    // Update role badge + verified badge
     const roleBadges = document.querySelectorAll('.user-role-badge');
     roleBadges.forEach(el => {
-      if (user.role === 'merchant') {
-        el.innerHTML = '<span class="badge bg-primary">Merchant</span>';
-        el.style.display = 'block';
-      } else {
-        el.style.display = 'none';
+      let badges = '';
+      if (user.role === 'merchant') badges += '<span class="badge bg-primary me-1">Merchant</span>';
+      if (user.verified) badges += '<span class="badge me-1" style="background:linear-gradient(90deg,#00b4d8,#0077b6);"><i class="bi bi-patch-check-fill"></i> Verified Seller</span>';
+      if (badges) { el.innerHTML = badges; el.style.display = 'block'; }
+      else el.style.display = 'none';
+    });
+
+    // Show bio / phone / location under the email
+    const emailEl = document.getElementById('userEmail');
+    if (emailEl) {
+      let extra = '';
+      if (user.bio) extra += `<p class="text-white-50 mt-1 mb-0" style="font-size:0.9rem;">${user.bio}</p>`;
+      if (user.phone) extra += `<p class="text-white-50 mb-0" style="font-size:0.85rem;"><i class="bi bi-telephone"></i> ${user.phone}</p>`;
+      if (user.location) extra += `<p class="text-white-50 mb-0" style="font-size:0.85rem;"><i class="bi bi-geo-alt"></i> ${user.location}</p>`;
+      if (extra) {
+        const infoDiv = document.getElementById('profileExtraInfo');
+        if (infoDiv) infoDiv.innerHTML = extra;
       }
+    }
+
+    // Store user data globally for navbar indicator
+    window.currentUserProfile = user;
+    this.updateNavbarUserIndicator(user);
+  }
+
+  async uploadProfilePicture(file) {
+    if (!this.supabase || !this.currentUserId) {
+      throw new Error('Supabase client or user ID not available');
+    }
+
+    if (!window.supabaseStorage) {
+      throw new Error('Supabase Storage helper not loaded');
+    }
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      throw new Error('File must be an image');
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error('Image size must be less than 5MB');
+    }
+
+    try {
+      // Upload to Supabase Storage in profiles folder
+      const folder = `profiles/${this.currentUserId}`;
+      const urls = await window.supabaseStorage.uploadImages(
+        [file],
+        'listings', // Using listings bucket (or create a profiles bucket)
+        folder
+      );
+
+      if (!urls || urls.length === 0) {
+        throw new Error('Failed to upload profile picture');
+      }
+
+      return urls[0]; // Return the URL of the uploaded image
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      throw error;
+    }
+  }
+
+  updateNavbarUserIndicator(user) {
+    // Update navbar user indicator across all pages
+    const navbarIndicators = document.querySelectorAll('.navbar-user-indicator, .user-profile-indicator');
+    navbarIndicators.forEach(indicator => {
+      if (user.profile_picture_url) {
+        indicator.innerHTML = `
+          <img src="${user.profile_picture_url}" alt="${user.full_name || 'User'}" 
+               style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #0ff; object-fit: cover; cursor: pointer;"
+               onclick="window.location.href='profile.html'"
+               title="${user.full_name || user.email}">
+        `;
+      } else {
+        const initial = (user.full_name || user.email || 'U')[0].toUpperCase();
+        indicator.innerHTML = `
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #0ff; background: linear-gradient(90deg, #0ff 0%, #8fff00 100%); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #222; font-weight: bold;"
+               onclick="window.location.href='profile.html'"
+               title="${user.full_name || user.email}">
+            ${initial}
+          </div>
+        `;
+      }
+      indicator.style.display = 'block';
     });
   }
 
@@ -107,7 +187,7 @@ class HomeAfricaProfile {
       const { data: listings, error } = await this.supabase
         .from('listings')
         .select('*')
-        .eq('merchant_id', this.currentUserId)
+        .eq('user_id', this.currentUserId)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -249,16 +329,23 @@ class HomeAfricaProfile {
     if (!this.supabase || !this.currentUserId) return;
 
     try {
+      const updateData = {
+        full_name: profileData.full_name,
+        bio: profileData.bio,
+        phone: profileData.phone,
+        location: profileData.location,
+        updated_at: new Date().toISOString()
+      };
+
+      // Add profile picture URL if provided
+      if (profileData.profile_picture_url) {
+        updateData.profile_picture_url = profileData.profile_picture_url;
+      }
+
+      updateData.user_id = this.currentUserId;
       const { data, error } = await this.supabase
-        .from('users')
-        .update({
-          full_name: profileData.full_name,
-          bio: profileData.bio,
-          phone: profileData.phone,
-          location: profileData.location,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', this.currentUserId)
+        .from('user_profiles')
+        .upsert(updateData, { onConflict: 'user_id' })
         .select()
         .single();
 

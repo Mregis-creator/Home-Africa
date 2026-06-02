@@ -46,10 +46,34 @@ class RBACSystem {
         'edit_merchant_profile',
         'verify_merchant_account',
         'view_merchant_analytics',
+        'view_personal_analytics',
         'use_ai_chatbot' // AI chatbot available to merchants
       ],
-      'admin': [
+      'vip_merchant': [
         // All merchant permissions plus:
+        'create_listings',
+        'edit_own_listings',
+        'delete_own_listings',
+        'view_own_listings',
+        'manage_own_listings',
+        'view_merchant_bookings',
+        'manage_merchant_bookings',
+        'view_merchant_dashboard',
+        'create_merchant_posts',
+        'edit_merchant_profile',
+        'verify_merchant_account',
+        'view_merchant_analytics',
+        'view_personal_analytics',
+        'view_market_intelligence',
+        'view_industry_analytics',
+        'view_competitor_data',
+        'view_price_benchmarks',
+        'export_analytics_data',
+        'set_market_alerts',
+        'use_ai_chatbot' // AI chatbot available to VIP merchants
+      ],
+      'admin': [
+        // All VIP merchant permissions plus:
         'view_all_listings',
         'edit_all_listings',
         'delete_all_listings',
@@ -63,6 +87,13 @@ class RBACSystem {
         'view_admin_panel',
         'manage_verification_requests',
         'view_analytics',
+        'view_business_intelligence',
+        'view_platform_analytics',
+        'view_revenue_metrics',
+        'view_user_acquisition',
+        'view_system_health',
+        'export_all_data',
+        'manage_analytics_settings',
         'manage_settings',
         'view_email_notifications',
         'manage_subscriptions',
@@ -81,7 +112,6 @@ class RBACSystem {
       'view_listings',
       'search_listings'
     ];
-    };
     
     this.init();
   }
@@ -134,16 +164,29 @@ class RBACSystem {
 
       const { data, error } = await this.supabase
         .from('users')
-        .select('id, role, verified')
+        .select('id, role, verified, is_vip, merchant_tier')
         .eq('id', userId)
         .single();
 
       if (error || !data) {
         // Check if user is merchant via localStorage
         const isMerchant = localStorage.getItem('isMerchant') === 'true';
-        this.currentRole = isMerchant ? 'merchant' : 'user';
+        const isVIP = localStorage.getItem('isVIP') === 'true';
+        
+        if (isMerchant && isVIP) {
+          this.currentRole = 'vip_merchant';
+        } else if (isMerchant) {
+          this.currentRole = 'merchant';
+        } else {
+          this.currentRole = 'user';
+        }
       } else {
-        this.currentRole = data.role || 'user';
+        // Check for VIP merchant status
+        if (data.role === 'merchant' && (data.is_vip || data.merchant_tier === 'vip')) {
+          this.currentRole = 'vip_merchant';
+        } else {
+          this.currentRole = data.role || 'user';
+        }
       }
 
       // Load permissions for role (merge with universal permissions)
@@ -410,11 +453,37 @@ class RBACSystem {
   getRoleBadge(role) {
     const badges = {
       'admin': '<span class="badge bg-danger"><i class="bi bi-shield-check"></i> Admin</span>',
+      'vip_merchant': '<span class="badge bg-warning text-dark"><i class="bi bi-gem"></i> VIP Merchant</span>',
       'merchant': '<span class="badge bg-primary"><i class="bi bi-shop"></i> Merchant</span>',
       'user': '<span class="badge bg-secondary"><i class="bi bi-person"></i> User</span>',
       'ai_bot': '<span class="badge bg-info"><i class="bi bi-robot"></i> AI Bot</span>'
     };
     return badges[role] || '';
+  }
+
+  /**
+   * Get the analytics dashboard URL for the current user role
+   * @returns {string} Dashboard URL
+   */
+  getAnalyticsDashboard() {
+    const role = this.currentRole || 'guest';
+    
+    const dashboardMap = {
+      'admin': 'admin-business-dashboard.html',
+      'vip_merchant': 'vip-analytics.html',
+      'merchant': 'analytics.html',
+      'user': 'user-dashboard.html',
+      'guest': 'public-analytics.html'
+    };
+    
+    return dashboardMap[role] || 'public-analytics.html';
+  }
+
+  /**
+   * Redirect to appropriate analytics dashboard
+   */
+  redirectToAnalytics() {
+    window.location.href = this.getAnalyticsDashboard();
   }
 }
 

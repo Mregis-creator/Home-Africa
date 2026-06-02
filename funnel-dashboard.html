@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conversion Funnel | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #8fff00;
+      --danger: #ff3366;
+      --warning: #ffaa00;
+      --info: #66aaff;
+      --success: #00ff88;
+      --bg-dark: #0a0f1c;
+      --card-bg: rgba(0,0,0,0.92);
+    }
+    
+    html, body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.15) 0%, rgba(0,136,255,0.15) 50%, rgba(255,0,136,0.1) 100%);
+      pointer-events: none;
+    }
+    
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid var(--primary);
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+      position: relative;
+      z-index: 1000;
+    }
+    
+    .navbar-brand {
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary) 10%, var(--secondary) 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .dashboard-container {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 0;
+    }
+    
+    .funnel-card {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      margin-bottom: 1.5rem;
+    }
+    
+    .metric-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    
+    .metric-box:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-2px);
+    }
+    
+    .metric-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .metric-label {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+    
+    .metric-change {
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+    
+    .funnel-stage-bar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.3), rgba(0,136,255,0.3));
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s;
+      min-height: 60px;
+    }
+    
+    .funnel-stage-bar:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0,255,136,0.2);
+    }
+    
+    .stage-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stage-label {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    .stage-count {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--secondary);
+    }
+    
+    .drop-off {
+      font-size: 0.8rem;
+      color: var(--danger);
+      background: rgba(255,51,102,0.2);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .conversion-rate {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--success);
+    }
+    
+    .opportunity-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .recovery-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .recovery-stat {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+    
+    .recovery-stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .recovery-stat-label {
+      font-size: 0.75rem;
+      color: #888;
+    }
+    
+    .nav-pills .nav-link {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid transparent;
+      margin-right: 0.5rem;
+      border-radius: 8px;
+    }
+    
+    .nav-pills .nav-link.active {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #000;
+      border-color: var(--primary);
+    }
+    
+    .btn-funnel {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border: none;
+      color: #000;
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .btn-funnel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,136,0.3);
+    }
+    
+    .urgency-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .urgency-urgent { background: rgba(255,51,102,0.3); color: var(--danger); }
+    .urgency-high { background: rgba(255,170,0,0.3); color: var(--warning); }
+    .urgency-medium { background: rgba(102,170,255,0.3); color: var(--info); }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .animate-pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="homeafricabanneralternative_III.png" height="40" alt="HOME AFRICA" />
+        Conversion Funnel
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html">
+              <i class="bi bi-grid"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="analytics.html">
+              <i class="bi bi-graph-up"></i> Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="crm-dashboard.html">
+              <i class="bi bi-funnel"></i> Leads
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container dashboard-container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="bi bi-filter-circle"></i> Conversion Funnel</h2>
+        <p class="text-muted mb-0">Track & recover abandoned visitors</p>
+      </div>
+      <div class="d-flex gap-2">
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" onclick="changePeriod('30days')">30 Days</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="changePeriod('7days')">7 Days</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="changePeriod('90days')">90 Days</a>
+          </li>
+        </ul>
+        <button class="btn btn-outline-light" onclick="refreshData()">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="metric-box">
+          <div class="metric-value" id="totalVisitors">--</div>
+          <div class="metric-label">Unique Visitors</div>
+          <div class="metric-change text-success">
+            <i class="bi bi-arrow-up"></i> 12% vs last period
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="metric-box">
+          <div class="metric-value" id="contactRate">--%</div>
+          <div class="metric-label">Contact Rate</div>
+          <div class="metric-change text-info">
+            Industry avg: 8.5%
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="metric-box">
+          <div class="metric-value" id="recoveryRate">--%</div>
+          <div class="metric-label">Recovery Rate</div>
+          <div class="metric-change text-success">
+            <i class="bi bi-check-circle"></i> Automated
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="metric-box">
+          <div class="metric-value" id="recoveredSales">--</div>
+          <div class="metric-label">Recovered Sales</div>
+          <div class="metric-change text-warning">
+            Potential revenue
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+      <!-- Left Column - Funnel -->
+      <div class="col-lg-8">
+        <div class="funnel-card">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Conversion Funnel</h5>
+            <span class="badge bg-success">Live Tracking</span>
+          </div>
+          
+          <div id="funnelVisualization">
+            <div class="text-center py-4">
+              <i class="bi bi-arrow-repeat spin" style="font-size: 2rem;"></i>
+              <p class="mt-2 text-muted">Loading funnel data...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recovery Campaign Stats -->
+        <div class="funnel-card">
+          <h5 class="mb-3"><i class="bi bi-envelope-open"></i> Recovery Campaign Performance</h5>
+          <div class="recovery-stats" id="recoveryStats">
+            <div class="recovery-stat">
+              <div class="recovery-stat-value" style="color: var(--info);" id="scheduledCount">--</div>
+              <div class="recovery-stat-label">Scheduled</div>
+            </div>
+            <div class="recovery-stat">
+              <div class="recovery-stat-value" style="color: var(--primary);" id="sentCount">--</div>
+              <div class="recovery-stat-label">Sent</div>
+            </div>
+            <div class="recovery-stat">
+              <div class="recovery-stat-value" style="color: var(--warning);" id="clickedCount">--</div>
+              <div class="recovery-stat-label">Clicked</div>
+            </div>
+            <div class="recovery-stat">
+              <div class="recovery-stat-value" style="color: var(--success);" id="convertedCount">--</div>
+              <div class="recovery-stat-label">Converted</div>
+            </div>
+          </div>
+          <div class="mt-3 text-center">
+            <small class="text-muted">
+              <i class="bi bi-info-circle"></i> 
+              Recovery emails sent automatically at 1hr, 24hr, and 72hr intervals
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Opportunities -->
+      <div class="col-lg-4">
+        <div class="funnel-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="bi bi-lightning"></i> Recovery Opportunities</h5>
+            <span class="badge bg-danger" id="opportunityCount">0</span>
+          </div>
+          
+          <div id="opportunitiesList">
+            <div class="text-center py-4 text-muted">
+              <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+              <p class="mt-2">No active opportunities</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Abandonment Insights -->
+        <div class="funnel-card">
+          <h5 class="mb-3"><i class="bi bi-graph-down"></i> Drop-off Analysis</h5>
+          <div id="dropOffAnalysis">
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <small>View → Favorite</small>
+                <small id="viewToFavRate">--%</small>
+              </div>
+              <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1);">
+                <div class="progress-bar bg-warning" id="viewToFavBar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <small>Favorite → Contact</small>
+                <small id="favToContactRate">--%</small>
+              </div>
+              <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1);">
+                <div class="progress-bar bg-info" id="favToContactBar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <small>Contact → Message</small>
+                <small id="contactToMsgRate">--%</small>
+              </div>
+              <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1);">
+                <div class="progress-bar bg-success" id="contactToMsgBar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-3 p-3 rounded" style="background: rgba(255,170,0,0.1); border: 1px solid var(--warning);">
+            <small><i class="bi bi-lightbulb"></i> <strong>Tip:</strong> Adding more photos can increase favorite rate by up to 40%</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/funnel-analytics.js"></script>
+  
+  <script>
+    let currentPeriod = '30days';
+    let funnelData = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadFunnelData();
+    });
+
+    async function loadFunnelData() {
+      try {
+        if (!window.funnelAnalytics) {
+          console.warn('Funnel Analytics not initialized');
+          showMockData();
+          return;
+        }
+
+        await window.funnelAnalytics.init();
+        
+        // Get current user
+        const { data: { user } } = await window.funnelAnalytics.supabase.auth.getUser();
+        if (!user) {
+          showMockData();
+          return;
+        }
+
+        // Load merchant funnel data
+        funnelData = await window.funnelAnalytics.getMerchantFunnel(user.id, currentPeriod);
+        renderDashboard(funnelData);
+      } catch (err) {
+        console.error('Error loading funnel data:', err);
+        showMockData();
+      }
+    }
+
+    function showMockData() {
+      const mockData = {
+        period: '30days',
+        funnel: {
+          counts: { view_listing: 156, favorite: 42, contact_click: 28, message_sent: 12 },
+          unique_users: { view_listing: 134, favorite: 38, contact_click: 24, message_sent: 10 },
+          conversion_rates: { view_to_contact: 18, view_to_favorite: 27, overall: 9 },
+          total_events: 238
+        },
+        abandonments: { total: 44, recovered: 8, recovery_rate: 18, by_stage: { view_listing: 32, favorite: 12 } },
+        recoveries: { scheduled: 44, sent: 38, clicked: 12, converted: 8 },
+        top_opportunities: [
+          { listing_title: '3BR Apartment Nyarutarama', hours_abandoned: 2, recovery_potential: 'high', listing_price: 65000000, listing_id: '1' },
+          { listing_title: 'Land Plot Kacyiru', hours_abandoned: 5, recovery_potential: 'medium', listing_price: 28000000, listing_id: '2' },
+          { listing_title: '2BR House Remera', hours_abandoned: 8, recovery_potential: 'medium', listing_price: 45000000, listing_id: '3' }
+        ]
+      };
+      renderDashboard(mockData);
+    }
+
+    function renderDashboard(data) {
+      // Update metrics
+      document.getElementById('totalVisitors').textContent = data.funnel.unique_users.view_listing || 0;
+      document.getElementById('contactRate').textContent = (data.funnel.conversion_rates.view_to_contact || 0) + '%';
+      document.getElementById('recoveryRate').textContent = (data.abandonments.recovery_rate || 0) + '%';
+      document.getElementById('recoveredSales').textContent = data.recoveries.converted || 0;
+
+      // Render funnel visualization
+      renderFunnel(data.funnel);
+
+      // Render recovery stats
+      document.getElementById('scheduledCount').textContent = data.recoveries.scheduled || 0;
+      document.getElementById('sentCount').textContent = data.recoveries.sent || 0;
+      document.getElementById('clickedCount').textContent = data.recoveries.clicked || 0;
+      document.getElementById('convertedCount').textContent = data.recoveries.converted || 0;
+
+      // Render opportunities
+      renderOpportunities(data.top_opportunities || []);
+
+      // Update drop-off analysis
+      updateDropOffAnalysis(data.funnel.conversion_rates);
+    }
+
+    function renderFunnel(funnel) {
+      const container = document.getElementById('funnelVisualization');
+      const stages = [
+        { key: 'view_listing', label: 'Viewed Listing' },
+        { key: 'favorite', label: 'Added to Favorites' },
+        { key: 'contact_click', label: 'Clicked Contact' },
+        { key: 'message_sent', label: 'Sent Message' }
+      ];
+
+      const maxCount = Math.max(...stages.map(s => funnel.counts[s.key] || 0), 1);
+
+      container.innerHTML = stages.map((stage, index) => {
+        const count = funnel.counts[stage.key] || 0;
+        const width = (count / maxCount) * 100;
+        const prevCount = index > 0 ? (funnel.counts[stages[index - 1].key] || 0) : count;
+        const dropOff = index > 0 && prevCount > 0 ? Math.round(((prevCount - count) / prevCount) * 100) : 0;
+        const conversionRate = index > 0 && prevCount > 0 ? Math.round((count / prevCount) * 100) : 100;
+
+        return `
+          <div class="funnel-stage-bar" style="width: ${Math.max(width, 30)}%;">
+            <div class="stage-info">
+              <span class="stage-label">${stage.label}</span>
+              <span style="font-size: 0.8rem; color: #888;">${funnel.unique_users[stage.key] || 0} unique users</span>
+            </div>
+            <div class="text-end">
+              <div class="stage-count">${count.toLocaleString()}</div>
+              ${index > 0 ? `
+                <div class="d-flex align-items-center gap-2">
+                  <span class="conversion-rate">${conversionRate}%</span>
+                  ${dropOff > 0 ? `<span class="drop-off"><i class="bi bi-arrow-down"></i> ${dropOff}% drop</span>` : ''}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderOpportunities(opportunities) {
+      const container = document.getElementById('opportunitiesList');
+      document.getElementById('opportunityCount').textContent = opportunities.length;
+
+      if (opportunities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+            <p class="mt-2">All caught up! No active recovery opportunities.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = opportunities.map(opp => `
+        <div class="opportunity-item">
+          <div>
+            <span class="urgency-badge urgency-${opp.recovery_potential === 'high' ? 'urgent' : 'medium'}">
+              ${opp.recovery_potential.toUpperCase()}
+            </span>
+            <div class="mt-1">
+              <strong>${opp.listing_title}</strong>
+              <div class="text-muted" style="font-size: 0.85rem;">
+                ${opp.listing_price ? (opp.listing_price / 1000000).toFixed(1) + 'M RWF' : ''} · 
+                ${opp.hours_abandoned}h ago
+              </div>
+            </div>
+          </div>
+          <a href="${getListingUrl(opp.listing_id)}" class="btn btn-sm btn-outline-light">
+            <i class="bi bi-eye"></i>
+          </a>
+        </div>
+      `).join('');
+    }
+
+    function getListingUrl(listingId) {
+      // Determine listing type from the data or default to apartment
+      return `apartment-detail.html?id=${listingId}`;
+    }
+
+    function updateDropOffAnalysis(rates) {
+      document.getElementById('viewToFavRate').textContent = (rates.view_to_favorite || 0) + '%';
+      document.getElementById('viewToFavBar').style.width = (rates.view_to_favorite || 0) + '%';
+      
+      // Calculate fav to contact (approximate)
+      const favToContact = Math.round((rates.view_to_contact || 0) * 0.6);
+      document.getElementById('favToContactRate').textContent = favToContact + '%';
+      document.getElementById('favToContactBar').style.width = favToContact + '%';
+      
+      // Calculate contact to message (approximate)
+      const contactToMsg = Math.round((rates.view_to_contact || 0) * 0.4);
+      document.getElementById('contactToMsgRate').textContent = contactToMsg + '%';
+      document.getElementById('contactToMsgBar').style.width = contactToMsg + '%';
+    }
+
+    function changePeriod(period) {
+      currentPeriod = period;
+      
+      // Update UI
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // Reload data
+      loadFunnelData();
+    }
+
+    function refreshData() {
+      const btn = event.target.closest('button');
+      const originalContent = btn.innerHTML;
+      btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i>';
+      btn.disabled = true;
+      
+      loadFunnelData().then(() => {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>

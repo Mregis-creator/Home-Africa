@@ -37,3 +37,6 @@ build/
 # Supabase local (if using Supabase CLI)
 .supabase/
 
+# Large video files
+*.mp4
+Impossible.mp4

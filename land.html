@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>All Listings | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA Land — Discover verified land plots for sale in Rwanda. Residential, commercial, and agricultural land with verified titles." />
 
   <!-- Offline Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -159,7 +162,7 @@
     }
     .hero-mini {
       background: url('images/hero-bg.jpeg') center center/cover no-repeat;
-      height: 200px;
+      height: 120px;
       color: white;
       display: flex;
       align-items: center;
@@ -333,13 +336,43 @@
         height: 140px;
       }
     }
+    .property-card .featured-badge {
+      position: absolute;
+      top: 12px;
+      right: 60px;
+      background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      z-index: 4;
+      box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+      animation: pulse 2s infinite;
+    }
+        .property-card .verified-badge {
+      position: absolute;
+      top: 48px;
+      right: 12px;
+      background: linear-gradient(90deg, #00b4d8 0%, #0077b6 100%);
+      color: white;
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      z-index: 4;
+      box-shadow: 0 2px 8px rgba(0,119,182,0.4);
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
   </style>
     <!-- Particle.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
-    <script>
 </head>
 <body>
 
@@ -347,14 +380,14 @@
   <div id="particles-js"></div>
   
   <!-- Splash Screen Overlay -->
-  <div id="splash-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
+  <div id="splash-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:none;visibility:hidden;opacity:0;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
     <div style="text-align:center;">
       <img src="images/hero-bg.jpeg" alt="HOME AFRICA" style="max-width:40vw;max-height:40vh;border-radius:50%;box-shadow:0 0 60px #0ff,0 0 120px #8fff00;">
       <h1 style="margin-top:2rem;font-size:3.5rem;font-weight:bold;background:linear-gradient(90deg,#0ff 10%,#8fff00 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.2em;">HOME AFRICA</h1>
       <h2 style="color:#fff;margin-top:1.5rem;">Beyond Horizons</h2>
     </div>
   </div>
-  <div id="main-content" style="display:none;">
+  <div id="main-content" style="display:block;visibility:visible;opacity:1;position:relative;z-index:1;">
   <!-- 🚀 Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
@@ -376,6 +409,8 @@
           <li class="nav-item"><a class="nav-link" href="land.html">Land Plots</a></li>
           <li class="nav-item"><a class="nav-link" href="post.html">Post your property</a></li>
           <li class="nav-item"><a class="nav-link" href="signin.html">Log In</a></li>
+          <li class="nav-item"><a class="nav-link" href="favorites.html"><i class="bi bi-heart"></i> Favorites <span class="badge bg-danger rounded-pill ms-1" id="favorites-count-badge" style="display:none;">0</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="compare.html"><i class="bi bi-columns"></i> Compare <span class="badge bg-danger rounded-pill ms-1" id="compare-count-badge" style="display:none;">0</span></a></li>
           <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
           <li class="nav-item">
             <a class="nav-link nav-link-chatbot" href="#" data-chatbot-trigger="true" title="Chat with REJO AI">
@@ -406,7 +441,12 @@
       <!-- Car 1 -->
       <div class="col-md-4">
         <div class="card shadow property-card position-relative">
+          <button class="favorite-btn" data-listing-id="land-1" data-listing-type="land" title="Add to favorites">
+            <i class="bi bi-heart"></i>
+          </button>
+          <button class="compare-btn" data-listing-id="land-1" data-listing-type="land" title="Add to compare"><i class="bi bi-columns"></i></button>
           <span class="property-status-label property-status-sale">For Sale</span>
+              <span class="featured-badge"><i class="bi bi-lightning-fill"></i> Featured</span>
           <img src="images/land1.jpg" class="card-img-top" alt="Car 1">
           <div class="card-body">
             <h5 class="card-title">Kimironko</h5>
@@ -419,6 +459,10 @@
       <!-- Car 2 -->
       <div class="col-md-4">
         <div class="card shadow property-card position-relative">
+          <button class="favorite-btn" data-listing-id="land-2" data-listing-type="land" title="Add to favorites">
+            <i class="bi bi-heart"></i>
+          </button>
+          <button class="compare-btn" data-listing-id="land-2" data-listing-type="land" title="Add to compare"><i class="bi bi-columns"></i></button>
           <span class="property-status-label property-status-sale">For Sale</span>
           <img src="images/land2.jpg" class="card-img-top" alt="Car 2">
           <div class="card-body">
@@ -432,6 +476,10 @@
       <!-- Car 3 -->
       <div class="col-md-4">
         <div class="card shadow property-card position-relative">
+          <button class="favorite-btn" data-listing-id="land-3" data-listing-type="land" title="Add to favorites">
+            <i class="bi bi-heart"></i>
+          </button>
+          <button class="compare-btn" data-listing-id="land-3" data-listing-type="land" title="Add to compare"><i class="bi bi-columns"></i></button>
           <span class="property-status-label property-status-sale">For Sale</span>
           <img src="images/land3.jpg" class="card-img-top" alt="Car 3">
           <div class="card-body">
@@ -472,17 +520,39 @@
     });
 
         // Hide splash screen and show content immediately
-        (function() {
+        function hideSplashAndShowContent() {
           const splashScreen = document.getElementById('splash-screen');
           const mainContent = document.getElementById('main-content');
           
+          console.log('Splash screen element:', !!splashScreen);
+          console.log('Main content element:', !!mainContent);
+          
           if (splashScreen) {
             splashScreen.style.display = 'none';
+            splashScreen.style.visibility = 'hidden';
+            splashScreen.style.opacity = '0';
+            splashScreen.style.zIndex = '-1';
+            console.log('✅ Splash screen hidden');
           }
           if (mainContent) {
-            mainContent.style.display = '';
+            mainContent.style.display = 'block';
+            mainContent.style.visibility = 'visible';
+            mainContent.style.opacity = '1';
+            mainContent.style.position = 'relative';
+            mainContent.style.zIndex = '1';
+            console.log('✅ Main content shown');
+          } else {
+            console.error('❌ Main content element not found!');
           }
-        })();
+        }
+        
+        // Run immediately and also on DOM ready
+        hideSplashAndShowContent();
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', hideSplashAndShowContent);
+        } else {
+          setTimeout(hideSplashAndShowContent, 100);
+        }
 
     // Time ago utility function
     function timeAgo(timestamp) {
@@ -547,6 +617,7 @@
                 createdAtSeconds: listing.created_at ? Math.floor(new Date(listing.created_at).getTime() / 1000) : Math.floor(Date.now() / 1000)
               };
               
+              window._allListingsForMap.push({ title: land.title, price: land.price, location: land.location, detailUrl: 'land-detail.html?id=' + land.id });
               const timestamp = land.createdAt || { createdAtSeconds: land.createdAtSeconds };
               // Card HTML
               const card = document.createElement('div');
@@ -559,7 +630,12 @@
               
               card.innerHTML = `
                 <div class="card shadow property-card position-relative">
+                  <button class="favorite-btn" data-listing-id="${landId}" data-listing-type="land" title="Add to favorites">
+                    <i class="bi bi-heart"></i>
+                  </button>
                   <span class="property-status-label property-status-sale">For Sale</span>
+                  ${land.featured ? '<span class="featured-badge"><i class="bi bi-lightning-fill"></i> Featured</span>' : ''
+                  ${land.verified ? '<span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>' : ''}}
                   <span class="time-ago-badge" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.8);color:#8fff00;padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;font-weight:bold;z-index:3;border:1px solid #0ff;">
                     <i class="bi bi-clock"></i> <span class="time-ago" data-timestamp='${JSON.stringify(timestamp)}'>${timeAgo(timestamp)}</span>
                   </span>
@@ -625,62 +701,187 @@
       }
       });
   </script>
+
+  <!-- Leaflet for map view -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const rwandaDistricts = {
+      kigali:[-1.9441,30.0619],nyarugenge:[-1.95,30.0588],gasabo:[-1.9106,30.0945],
+      kicukiro:[-2.0,30.0938],huye:[-2.5967,29.7411],musanze:[-1.499,29.635],
+      rubavu:[-1.6833,29.25],muhanga:[-2.0833,29.7667],nyanza:[-2.35,29.7333],
+      gicumbi:[-1.5833,30.0667],rwamagana:[-1.95,30.4333],kayonza:[-1.9833,30.65],
+      kirehe:[-2.25,30.6833],ngoma:[-2.15,30.4667],bugesera:[-2.2167,30.25],
+      rulindo:[-1.7167,30.0667],gakenke:[-1.6167,29.8],burera:[-1.4167,29.8],
+      nyabihu:[-1.65,29.5],ngororero:[-1.85,29.5333],karongi:[-2.0667,29.4],
+      rutsiro:[-2.0667,29.3],nyamasheke:[-2.3333,29.2833],rusizi:[-2.4833,28.9167]
+    };
+
+    function getCoords(locationStr) {
+      if (!locationStr) return [-1.9441,30.0619];
+      const l = locationStr.toLowerCase();
+      for (const [k,v] of Object.entries(rwandaDistricts)) { if (l.includes(k)) return v; }
+      return [-1.9441,30.0619];
+    }
+
+    let _listingsMap = null;
+    window._allListingsForMap = [];
+
+    function setView(mode) {
+      const grid = document.querySelector('.container.py-5 .row.g-4');
+      const mapDiv = document.getElementById('mapViewContainer');
+      const gridBtn = document.getElementById('gridViewBtn');
+      const mapBtn = document.getElementById('mapViewBtn');
+
+      if (mode === 'map') {
+        if (grid) grid.style.display = 'none';
+        if (mapDiv) mapDiv.style.display = 'block';
+        gridBtn.classList.remove('active');
+        mapBtn.classList.add('active');
+        initListingsMap();
+      } else {
+        if (grid) grid.style.display = '';
+        if (mapDiv) mapDiv.style.display = 'none';
+        mapBtn.classList.remove('active');
+        gridBtn.classList.add('active');
+      }
+    }
+
+    function initListingsMap() {
+      if (_listingsMap) { _listingsMap.invalidateSize(); return; }
+      _listingsMap = L.map('listingsMapView').setView([-1.9441,30.0619], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:'© OpenStreetMap', maxZoom:18
+      }).addTo(_listingsMap);
+
+      const icon = L.divIcon({
+        html:'<div style="background:linear-gradient(90deg,#0ff,#8fff00);width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>',
+        iconSize:[28,28], iconAnchor:[14,28], className:''
+      });
+
+      window._allListingsForMap.forEach(item => {
+        const coords = getCoords(item.location);
+        const price = parseInt(item.price||0).toLocaleString();
+        const detailUrl = item.detailUrl || '#';
+        L.marker(coords, {icon})
+          .addTo(_listingsMap)
+          .bindPopup(`<a href="${detailUrl}" style="text-decoration:none;color:#000;font-weight:bold;">${item.title||'Listing'}</a><br><span style="color:#0077b6;">RWF ${price}</span>${item.location ? '<br><small>'+item.location+'</small>' : ''}`, {maxWidth:220});
+      });
+
+      setTimeout(()=>_listingsMap.invalidateSize(), 200);
+    }
+  </script>
 </body>
 
-<!-- 🌍 Footer -->
-<footer class="bg-dark text-light pt-4 pb-3 mt-5">
+<!-- 🌍 Minimal Footer -->
+<footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff;">
   <div class="container">
-    <div class="row">
-      <!-- Brand Info -->
-      <div class="col-md-3 mb-3">
-        <h5>🏠 HOME AFRICA</h5>
-        <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div class="small">
+        &copy; <span class="footer-year">2026</span> HOME AFRICA ·
+        <a href="privacy-policy.html" class="footer-link text-white">Privacy</a> ·
+        <a href="terms-of-service.html" class="footer-link text-white">Terms</a>
       </div>
-      <!-- Quick Links -->
-      <div class="col-md-3 mb-3">
-        <h6>Quick Links</h6>
-        <ul class="list-unstyled">
-          <li><a href="index.html" class="footer-link">Home</a></li>
-          <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
-          <li><a href="apartment.html" class="footer-link">Apartments</a></li>
-          <li><a href="land.html" class="footer-link">Land</a></li>
-          <li><a href="cars.html" class="footer-link">Cars</a></li>
-        </ul>
+      <div>
+        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+        <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>
       </div>
-      <!-- Contact Info -->
-      <div class="col-md-3 mb-3">
-        <h6>Contact Us</h6>
-        <ul class="list-unstyled">
-          <li>Phone: +250 788 123 456</li>
-          <li>Email: info@home.africa</li>
-          <li>Address: Kigali, Rwanda</li>
-        </ul>
-      </div>
-      <!-- Social Links -->
-      <div class="col-md-3 mb-3">
-        <h6>Follow Us</h6>
-        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
-        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
-        <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
-        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-      </div>
-    </div>
-    <hr style="border-color: rgba(255,255,255,0.1)" />
-    <div class="text-center small">
-      &copy; 2025 HOME AFRICA. All rights reserved.
     </div>
   </div>
+  <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
 </footer>
 
-  <!-- Supabase Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-config.js"></script>
+  <!-- Supabase Listings -->
   <script src="js/supabase-listings.js"></script>
   
+  <!-- URL search params (location, maxPrice from homepage form) -->
+  <script src="js/url-search-params.js"></script>
+
   <!-- AI Chatbot -->
+  <script src="js/favorites.js"></script>
+<script src="js/saved-searches.js"></script>
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/dark-mode.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/accessibility.js"></script>
+<script src="js/compare-listings.js"></script>
   
   <!-- Footer Fix - Dynamic padding to prevent content overlap -->
   <script src="js/footer-fix.js"></script>
   </div>
+
+  <!-- Leaflet for map view -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const rwandaDistricts = {
+      kigali:[-1.9441,30.0619],nyarugenge:[-1.95,30.0588],gasabo:[-1.9106,30.0945],
+      kicukiro:[-2.0,30.0938],huye:[-2.5967,29.7411],musanze:[-1.499,29.635],
+      rubavu:[-1.6833,29.25],muhanga:[-2.0833,29.7667],nyanza:[-2.35,29.7333],
+      gicumbi:[-1.5833,30.0667],rwamagana:[-1.95,30.4333],kayonza:[-1.9833,30.65],
+      kirehe:[-2.25,30.6833],ngoma:[-2.15,30.4667],bugesera:[-2.2167,30.25],
+      rulindo:[-1.7167,30.0667],gakenke:[-1.6167,29.8],burera:[-1.4167,29.8],
+      nyabihu:[-1.65,29.5],ngororero:[-1.85,29.5333],karongi:[-2.0667,29.4],
+      rutsiro:[-2.0667,29.3],nyamasheke:[-2.3333,29.2833],rusizi:[-2.4833,28.9167]
+    };
+
+    function getCoords(locationStr) {
+      if (!locationStr) return [-1.9441,30.0619];
+      const l = locationStr.toLowerCase();
+      for (const [k,v] of Object.entries(rwandaDistricts)) { if (l.includes(k)) return v; }
+      return [-1.9441,30.0619];
+    }
+
+    let _listingsMap = null;
+    window._allListingsForMap = [];
+
+    function setView(mode) {
+      const grid = document.querySelector('.container.py-5 .row.g-4');
+      const mapDiv = document.getElementById('mapViewContainer');
+      const gridBtn = document.getElementById('gridViewBtn');
+      const mapBtn = document.getElementById('mapViewBtn');
+
+      if (mode === 'map') {
+        if (grid) grid.style.display = 'none';
+        if (mapDiv) mapDiv.style.display = 'block';
+        gridBtn.classList.remove('active');
+        mapBtn.classList.add('active');
+        initListingsMap();
+      } else {
+        if (grid) grid.style.display = '';
+        if (mapDiv) mapDiv.style.display = 'none';
+        mapBtn.classList.remove('active');
+        gridBtn.classList.add('active');
+      }
+    }
+
+    function initListingsMap() {
+      if (_listingsMap) { _listingsMap.invalidateSize(); return; }
+      _listingsMap = L.map('listingsMapView').setView([-1.9441,30.0619], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:'© OpenStreetMap', maxZoom:18
+      }).addTo(_listingsMap);
+
+      const icon = L.divIcon({
+        html:'<div style="background:linear-gradient(90deg,#0ff,#8fff00);width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>',
+        iconSize:[28,28], iconAnchor:[14,28], className:''
+      });
+
+      window._allListingsForMap.forEach(item => {
+        const coords = getCoords(item.location);
+        const price = parseInt(item.price||0).toLocaleString();
+        const detailUrl = item.detailUrl || '#';
+        L.marker(coords, {icon})
+          .addTo(_listingsMap)
+          .bindPopup(`<a href="${detailUrl}" style="text-decoration:none;color:#000;font-weight:bold;">${item.title||'Listing'}</a><br><span style="color:#0077b6;">RWF ${price}</span>${item.location ? '<br><small>'+item.location+'</small>' : ''}`, {maxWidth:220});
+      });
+
+      setTimeout(()=>_listingsMap.invalidateSize(), 200);
+    }
+  </script>
+</body>
 </html>

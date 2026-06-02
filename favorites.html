@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Favorites - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
+
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  />
+
+  <!-- Custom Styles -->
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(143, 255, 0, 0.05) 100%);
+      padding: 3rem 0;
+      border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .favorite-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .favorite-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #0ff;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+    }
+
+    .favorite-card img {
+      height: 200px;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .favorite-type-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      z-index: 5;
+    }
+
+    .remove-favorite-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 68, 68, 0.9);
+      border: 2px solid #ff4444;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .remove-favorite-btn:hover {
+      background: #ff4444;
+      transform: scale(1.1);
+    }
+
+    .remove-favorite-btn i {
+      color: white;
+      font-size: 1rem;
+    }
+
+    .price-tag {
+      background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
+      color: #222;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px dashed rgba(0, 255, 255, 0.3);
+      border-radius: 12px;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      color: rgba(0, 255, 255, 0.5);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.9); border-bottom: 1px solid rgba(0, 255, 255, 0.3);">
+    <div class="container">
+      <a class="navbar-brand" href="index.html" style="font-weight: bold; color: #0ff;">
+        <i class="bi bi-house-heart"></i> HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="apartment.html">Apartments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="cars.html">Cars</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="land.html">Land</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="favorites.html">My Favorites</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-12 text-center">
+          <h1 class="display-4 fw-bold mb-3">
+            <i class="bi bi-heart-fill text-danger"></i> My Favorites
+          </h1>
+          <p class="lead mb-0" style="color: rgba(255, 255, 255, 0.8);">
+            Your saved listings — all in one place
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Favorites Grid -->
+  <section class="py-5">
+    <div class="container">
+      <!-- Filter Tabs -->
+      <div class="d-flex gap-2 mb-4 flex-wrap">
+        <button id="tabAll" class="btn fav-tab active" onclick="setTab('all',this)" style="background:linear-gradient(90deg,#0ff,#8fff00);color:#222;font-weight:bold;border:none;">All (0)</button>
+        <button id="tabApt" class="btn fav-tab btn-outline-light" onclick="setTab('apartment',this)">Apartments (0)</button>
+        <button id="tabCar" class="btn fav-tab btn-outline-light" onclick="setTab('car',this)">Cars (0)</button>
+        <button id="tabLand" class="btn fav-tab btn-outline-light" onclick="setTab('land',this)">Land (0)</button>
+      </div>
+      <div id="favorites-container" class="row g-4">
+        <!-- Favorites will be loaded here -->
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state d-none">
+        <i class="bi bi-heart"></i>
+        <h3>No favorites yet</h3>
+        <p class="text-muted">Start saving your favorite listings by clicking the heart icon on any listing.</p>
+        <a href="index.html" class="btn btn-primary mt-3" style="background: linear-gradient(90deg, #0ff 0%, #8fff00 100%); border: none; color: #222; font-weight: bold;">
+          Browse Listings
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3" style="border-top: 1px solid rgba(0, 255, 255, 0.3);">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <p class="mb-0">&copy; <span class="footer-year"></span> HOME AFRICA. All rights reserved.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <a href="privacy-policy.html" class="text-white me-3 text-decoration-none">Privacy Policy</a>
+          <a href="terms-of-service.html" class="text-white text-decoration-none">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-listings.js"></script>
+
+  <!-- Favorites Script -->
+  <script src="js/favorites.js"></script>
+  <script src="js/nav-active.js"></script>
+
+  <!-- Load Favorites -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadFavorites();
+    });
+
+    async function loadFavorites() {
+      const container = document.getElementById('favorites-container');
+      const emptyState = document.getElementById('empty-state');
+      container.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-info" role="status"></div><p class="text-white-50 mt-3">Loading your favorites...</p></div>';
+
+      let favorites = [];
+
+      // Try Supabase first for logged-in users
+      try {
+        const supabase = window.supabaseClient || window.getSupabaseClient?.();
+        if (supabase) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            const { data, error } = await supabase
+              .from('favorites')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .order('created_at', { ascending: false });
+            if (!error && data?.length) {
+              // Enrich with full listing data from Supabase
+              const enriched = await Promise.all(data.map(async row => {
+                let listing = null;
+                try {
+                  if (window.supabaseListings) {
+                    listing = await window.supabaseListings.getListingById(row.listing_id);
+                  }
+                } catch(e) {}
+                return {
+                  id: row.listing_id,
+                  type: row.listing_type,
+                  data: listing ? {
+                    title: listing.title,
+                    price: listing.price,
+                    image: listing.images?.[0] || '',
+                    location: listing.location?.city || listing.location || '',
+                    verified: listing.verified,
+                    featured: listing.featured
+                  } : (row.data || {})
+                };
+              }));
+              favorites = enriched;
+            }
+          }
+        }
+      } catch(e) { console.warn('Supabase favorites failed, using localStorage', e); }
+
+      // Fallback to localStorage
+      if (favorites.length === 0) {
+        favorites = window.HomeAfricaFavorites?.getFavorites() || [];
+      }
+
+      container.innerHTML = '';
+
+      if (favorites.length === 0) {
+        container.classList.add('d-none');
+        emptyState.classList.remove('d-none');
+        return;
+      }
+
+      emptyState.classList.add('d-none');
+      container.classList.remove('d-none');
+
+      // Tab counts
+      const counts = { all: favorites.length, apartment: 0, car: 0, land: 0 };
+      favorites.forEach(f => { if (counts[f.type] !== undefined) counts[f.type]++; });
+      document.getElementById('tabAll').textContent = 'All (' + counts.all + ')';
+      document.getElementById('tabApt').textContent = 'Apartments (' + counts.apartment + ')';
+      document.getElementById('tabCar').textContent = 'Cars (' + counts.car + ')';
+      document.getElementById('tabLand').textContent = 'Land (' + counts.land + ')';
+
+      window._allFavorites = favorites;
+      renderFavorites('all');
+    }
+
+    function renderFavorites(filter) {
+      const container = document.getElementById('favorites-container');
+      container.innerHTML = '';
+      const list = filter === 'all' ? window._allFavorites : window._allFavorites.filter(f => f.type === filter);
+      if (list.length === 0) {
+        container.innerHTML = '<div class="col-12"><div class="empty-state"><i class="bi bi-heart"></i><h4 class="text-white-50 mt-3">No ' + filter + ' favorites</h4></div></div>';
+        return;
+      }
+      list.forEach(fav => container.appendChild(createFavoriteCard(fav)));
+    }
+
+    function setTab(tab, el) {
+      document.querySelectorAll('.fav-tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      renderFavorites(tab);
+    }
+
+    function createFavoriteCard(fav) {
+      const col = document.createElement('div');
+      col.className = 'col-md-4 col-sm-6';
+      const d = fav.data || {};
+      const title = d.title || 'Untitled Listing';
+      const rawPrice = d.price || 0;
+      const price = isNaN(rawPrice) ? rawPrice : 'RWF ' + parseInt(rawPrice).toLocaleString();
+      const image = d.image || (fav.type === 'car' ? 'images/car1.jpg' : fav.type === 'land' ? 'images/land1.jpg' : 'images/house1.jpg');
+      const location = d.location || '';
+      const type = fav.type || 'listing';
+      const detailPage = type === 'apartment' ? 'apartment-detail.html' : type === 'car' ? 'car-detail.html' : type === 'land' ? 'land-detail.html' : '#';
+      const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+      const verifiedBadge = d.verified ? '<span style="background:linear-gradient(90deg,#00b4d8,#0077b6);color:#fff;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:bold;position:absolute;top:44px;right:12px;z-index:6;"><i class="bi bi-patch-check-fill"></i> Verified</span>' : '';
+      const featuredBadge = d.featured ? '<span style="background:linear-gradient(90deg,#ff0088,#ff8800);color:#fff;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:bold;position:absolute;top:12px;right:12px;z-index:6;"><i class="bi bi-lightning-fill"></i> Featured</span>' : '';
+
+      col.innerHTML = `
+        <div class="favorite-card position-relative">
+          <span class="favorite-type-badge">${typeLabel}</span>
+          ${featuredBadge}${verifiedBadge}
+          <button class="remove-favorite-btn" onclick="removeFavorite('${fav.id}','${type}')" title="Remove from favorites">
+            <i class="bi bi-heart-fill"></i>
+          </button>
+          <a href="${detailPage}?id=${fav.id}"><img src="${image}" alt="${title}" /></a>
+          <div class="p-3">
+            <h5 class="mb-1 text-white">${title}</h5>
+            ${location ? '<p class="mb-1" style="color:rgba(255,255,255,0.5);font-size:0.85rem;"><i class="bi bi-geo-alt"></i> ' + location + '</p>' : ''}
+            <p class="price-tag mb-3">${price}</p>
+            <div class="d-flex gap-2">
+              <a href="${detailPage}?id=${fav.id}" class="btn btn-sm flex-grow-1" style="background:linear-gradient(90deg,#0ff,#8fff00);border:none;color:#222;font-weight:bold;">
+                <i class="bi bi-eye"></i> View
+              </a>
+              <a href="messages.html?listing=${fav.id}&type=${type}" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-chat-dots"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      return col;
+    }
+
+    async function removeFavorite(listingId, listingType) {
+      if (!confirm('Remove this listing from favorites?')) return;
+      window.HomeAfricaFavorites?.removeFavorite(listingId, listingType);
+      // Also remove from Supabase
+      try {
+        const supabase = window.supabaseClient || window.getSupabaseClient?.();
+        if (supabase) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            await supabase.from('favorites').delete()
+              .eq('user_id', session.user.id)
+              .eq('listing_id', listingId)
+              .eq('listing_type', listingType);
+          }
+        }
+      } catch(e) {}
+      location.reload();
+    }
+  </script>
+
+  <!-- Footer Year -->
+  <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
+</body>
+</html>

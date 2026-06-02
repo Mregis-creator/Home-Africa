@@ -13,9 +13,10 @@ class HomeAfricaChatbot {
     this.conversationId = null;
     this.sessionId = this.generateSessionId();
     this.isOpen = false;
+    this.isMinimized = false;
     this.isTyping = false;
     this.supabase = window.supabaseClient;
-    
+
     // Initialize chatbot
     this.init();
   }
@@ -97,8 +98,11 @@ class HomeAfricaChatbot {
             <i class="bi bi-robot"></i>
             <span>Rejo AI</span>
           </div>
-          <button id="chatbot-minimize" class="chatbot-btn-minimize">
+          <button id="chatbot-minimize" class="chatbot-btn-minimize" title="Minimize AI">
             <i class="bi bi-dash"></i>
+          </button>
+          <button id="chatbot-restore" class="chatbot-btn-restore" style="display: none;" title="Restore AI">
+            <i class="bi bi-chevron-up"></i>
           </button>
         </div>
         <div id="chatbot-messages" class="chatbot-messages"></div>
@@ -161,6 +165,15 @@ class HomeAfricaChatbot {
       .chatbot-container.open {
         transform: translateY(0);
         opacity: 1;
+      }
+      .chatbot-container.minimized {
+        height: auto;
+        min-height: 60px;
+      }
+      .chatbot-container.minimized #chatbot-messages,
+      .chatbot-container.minimized #chatbot-typing,
+      .chatbot-container.minimized #chatbot-input-container {
+        display: none;
       }
       .chatbot-header {
         background: linear-gradient(90deg, #0ff 0%, #8fff00 100%);
@@ -354,8 +367,27 @@ class HomeAfricaChatbot {
         background: transparent;
         border: none;
         color: #222;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+      .chatbot-btn-minimize:hover {
+        background: rgba(0,0,0,0.1);
+      }
+      .chatbot-btn-restore {
+        background: transparent;
+        border: none;
+        color: #222;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+      .chatbot-btn-restore:hover {
+        background: rgba(0,0,0,0.1);
       }
       .listing-card-mini {
         background: rgba(255,255,255,0.1);
@@ -426,7 +458,15 @@ class HomeAfricaChatbot {
     const minimizeBtn = document.getElementById('chatbot-minimize');
     if (minimizeBtn) {
       minimizeBtn.addEventListener('click', () => {
-        this.toggleChatbot();
+        this.minimizeChatbot();
+      });
+    }
+
+    // Restore chatbot
+    const restoreBtn = document.getElementById('chatbot-restore');
+    if (restoreBtn) {
+      restoreBtn.addEventListener('click', () => {
+        this.restoreChatbot();
       });
     }
 
@@ -458,10 +498,40 @@ class HomeAfricaChatbot {
     const container = document.getElementById('chatbot-container');
     if (this.isOpen) {
       container.classList.add('open');
+      container.classList.remove('minimized');
       document.getElementById('chatbot-input').focus();
     } else {
       container.classList.remove('open');
     }
+  }
+
+  /**
+   * Minimize chatbot (collapse to header bar)
+   */
+  minimizeChatbot() {
+    this.isMinimized = true;
+    const container = document.getElementById('chatbot-container');
+    const minimizeBtn = document.getElementById('chatbot-minimize');
+    const restoreBtn = document.getElementById('chatbot-restore');
+
+    container.classList.add('minimized');
+    minimizeBtn.style.display = 'none';
+    restoreBtn.style.display = 'block';
+  }
+
+  /**
+   * Restore chatbot from minimized state
+   */
+  restoreChatbot() {
+    this.isMinimized = false;
+    const container = document.getElementById('chatbot-container');
+    const minimizeBtn = document.getElementById('chatbot-minimize');
+    const restoreBtn = document.getElementById('chatbot-restore');
+
+    container.classList.remove('minimized');
+    minimizeBtn.style.display = 'block';
+    restoreBtn.style.display = 'none';
+    document.getElementById('chatbot-input').focus();
   }
 
   /**

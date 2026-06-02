@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dev Dashboard – HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+    #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
+    .dashboard-wrap { position: relative; z-index: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .top-bar h1 { background: linear-gradient(90deg, #0ff 30%, #8fff00 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.8rem; font-weight: 800; }
+    .user-pill { background: rgba(0,255,255,0.1); border: 1px solid #0ff; border-radius: 30px; padding: 0.4rem 1rem; font-size: 0.9rem; color: #0ff; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,255,136,0.08)); border: 1px solid rgba(0,255,255,0.2); border-radius: 14px; padding: 1.4rem; text-align: center; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); border-color: #0ff; }
+    .stat-card .stat-value { font-size: 2rem; font-weight: 800; background: linear-gradient(90deg, #0ff, #8fff00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-card .stat-label { color: #aaa; font-size: 0.85rem; margin-top: 0.2rem; }
+
+    .section-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(0,255,255,0.15); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .section-card h3 { color: #0ff; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+
+    .flag-row { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 0; border-bottom: 1px solid rgba(255,255,255,0.07); flex-wrap: wrap; gap: 0.8rem; }
+    .flag-row:last-child { border-bottom: none; }
+    .flag-name { font-weight: 600; font-size: 0.95rem; }
+    .flag-desc { color: #aaa; font-size: 0.8rem; margin-top: 0.2rem; }
+
+    .toggle-switch { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 28px; transition: 0.3s; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #aaa; border-radius: 50%; transition: 0.3s; }
+    input:checked + .toggle-slider { background: rgba(0,255,136,0.3); border-color: #00ff88; }
+    input:checked + .toggle-slider:before { transform: translateX(24px); background: #00ff88; }
+
+    .env-tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-left: 0.5rem; background: rgba(255,193,7,0.2); color: #ffc107; border: 1px solid #ffc107; }
+
+    .coming-soon-banner { background: linear-gradient(90deg, rgba(0,255,255,0.1), rgba(143,255,0,0.1)); border: 2px dashed rgba(0,255,255,0.4); border-radius: 14px; padding: 2rem; text-align: center; }
+    .coming-soon-banner h4 { color: #0ff; margin-bottom: 0.5rem; }
+    .coming-soon-banner p { color: #aaa; font-size: 0.9rem; }
+
+    .btn-back { background: rgba(0,255,255,0.1); border: 1px solid #0ff; color: #0ff; border-radius: 8px; padding: 0.5rem 1.2rem; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(0,255,255,0.2); color: #0ff; }
+
+    .log-line { font-family: 'Courier New', monospace; font-size: 0.8rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #8fff00; }
+    .log-line.error { color: #ff6b7a; }
+    .log-line.warn { color: #ffc107; }
+    .log-line.info { color: #0ff; }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+
+  <div class="dashboard-wrap">
+    <div class="top-bar">
+      <h1>💻 Dev Dashboard <span class="env-tag">PRODUCTION</span></h1>
+      <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+        <span class="user-pill" id="devName">Loading...</span>
+        <a href="signin.html" class="btn-back"><i class="bi bi-box-arrow-left"></i> Switch Role</a>
+        <a href="index.html" class="btn-back"><i class="bi bi-house"></i> Home</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div style="font-size:2rem;">🚩</div>
+        <div class="stat-value" id="activeFlags">6</div>
+        <div class="stat-label">Active Feature Flags</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2rem;">👤</div>
+        <div class="stat-value" id="totalUsers">—</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2rem;">❌</div>
+        <div class="stat-value">0</div>
+        <div class="stat-label">Errors (24h)</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2rem;">⚡</div>
+        <div class="stat-value">99%</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+    </div>
+
+    <!-- Feature Flags -->
+    <div class="section-card">
+      <h3><i class="bi bi-toggles"></i> Feature Flags</h3>
+      <div id="featureFlags">
+        <div class="flag-row">
+          <div>
+            <div class="flag-name">MoMo Payments</div>
+            <div class="flag-desc">Enable MTN Mobile Money payment flow</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" checked onchange="toggleFlag('momo_payments', this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="flag-row">
+          <div>
+            <div class="flag-name">Bank of Kigali Payments</div>
+            <div class="flag-desc">Enable BK bank transfer payment flow</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" checked onchange="toggleFlag('bok_payments', this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="flag-row">
+          <div>
+            <div class="flag-name">Property Feed</div>
+            <div class="flag-desc">Show property status updates feed</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" checked onchange="toggleFlag('property_feed', this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="flag-row">
+          <div>
+            <div class="flag-name">Sponsored Posts</div>
+            <div class="flag-desc">Show sponsored/promoted listings in feed</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" checked onchange="toggleFlag('sponsored_posts', this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="flag-row">
+          <div>
+            <div class="flag-name">Driving School Module</div>
+            <div class="flag-desc">Show driving school section and popup</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" checked onchange="toggleFlag('driving_school', this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="flag-row">
+          <div>
+            <div class="flag-name">AI Chatbot</div>
+            <div class="flag-desc">Rejo AI assistant across all pages</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" checked onchange="toggleFlag('ai_chatbot', this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Console Log Viewer -->
+    <div class="section-card">
+      <h3><i class="bi bi-terminal"></i> Recent Logs</h3>
+      <div id="logViewer">
+        <div class="log-line info">[INFO] Supabase connection established</div>
+        <div class="log-line info">[INFO] User authenticated: imfuraregis@gmail.com</div>
+        <div class="log-line warn">[WARN] Schema cache miss on 'withdrawals.requested_at' — resolved</div>
+        <div class="log-line info">[INFO] payment_platform_config loaded successfully</div>
+        <div class="log-line info">[INFO] Feature flags initialized</div>
+      </div>
+    </div>
+
+    <!-- Role Impersonation -->
+    <div class="section-card">
+      <h3><i class="bi bi-person-badge"></i> Preview As Role</h3>
+      <div class="coming-soon-banner">
+        <h4>🚧 Role Impersonation Coming Soon</h4>
+        <p>Preview exactly what any user role sees without switching accounts.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    particlesJS('particles-js', { particles: { number: { value: 40 }, color: { value: '#00ffff' }, opacity: { value: 0.15 }, size: { value: 2 }, line_linked: { enable: true, color: '#00ffff', opacity: 0.08 }, move: { enable: true, speed: 1 } }, retina_detect: true });
+
+    function toggleFlag(flag, enabled) {
+      const flags = JSON.parse(localStorage.getItem('ha_feature_flags') || '{}');
+      flags[flag] = enabled;
+      localStorage.setItem('ha_feature_flags', JSON.stringify(flags));
+      addLog(`[INFO] Feature flag '${flag}' set to ${enabled}`, 'info');
+    }
+
+    function addLog(msg, type = 'info') {
+      const viewer = document.getElementById('logViewer');
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      line.textContent = msg;
+      viewer.prepend(line);
+    }
+
+    async function initDashboard() {
+      const waitForSupabase = () => new Promise(resolve => {
+        if (window.supabaseClient) return resolve(window.supabaseClient);
+        const t = setInterval(() => { if (window.supabaseClient) { clearInterval(t); resolve(window.supabaseClient); } }, 100);
+      });
+      const supabase = await waitForSupabase();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { window.location.href = 'signin.html'; return; }
+
+      const { data: profile } = await supabase.from('user_profiles').select('full_name, role').eq('user_id', session.user.id).single();
+      if (profile && profile.role !== 'dev' && profile.role !== 'admin') { window.location.href = 'profile.html'; return; }
+      document.getElementById('devName').textContent = (profile?.full_name || session.user.email) + ' · Dev';
+
+      const { count } = await supabase.from('user_profiles').select('*', { count: 'exact', head: true });
+      if (count !== null) document.getElementById('totalUsers').textContent = count;
+    }
+    initDashboard();
+  </script>
+</body>
+</html>

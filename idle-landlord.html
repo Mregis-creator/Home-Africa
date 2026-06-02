@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idle Landlord - Build Your Empire | HOME AFRICA</title>
+  <meta name="description" content="Build a virtual real estate empire! Click to collect rent, buy properties, and become the richest landlord in Kigali.">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #ff00ff;
+      --gold: #ffd700;
+      --bg-dark: #0a0a0a;
+      --card-bg: rgba(255,255,255,0.05);
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --danger: #ff3366;
+    }
+
+    * {
+      user-select: none;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: #fff;
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .game-header {
+      background: linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(255,0,255,0.1) 100%);
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      position: sticky;
+      top: 56px;
+      z-index: 100;
+    }
+
+    .game-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--gold), var(--warning));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .money-display {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--success);
+      text-shadow: 0 0 20px rgba(0,255,136,0.3);
+    }
+
+    .income-display {
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    .income-display span {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Main Clicker Area */
+    .clicker-section {
+      padding: 2rem 0;
+      text-align: center;
+    }
+
+    .property-showcase {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 2rem;
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.1s;
+      box-shadow: 0 0 40px rgba(0,255,255,0.2);
+    }
+
+    .property-showcase:active {
+      transform: scale(0.95);
+    }
+
+    .property-showcase img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .property-showcase::after {
+      content: '💰 CLICK!';
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 700;
+      color: var(--gold);
+      border: 2px solid var(--gold);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* Floating Money Animation */
+    .floating-money {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--success);
+      pointer-events: none;
+      animation: floatUp 1s ease-out forwards;
+      text-shadow: 0 0 10px rgba(0,255,136,0.5);
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(1.2);
+      }
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .stat-pill {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .stat-pill i {
+      color: var(--primary);
+      margin-right: 0.25rem;
+    }
+
+    /* Property Grid */
+    .properties-section {
+      padding: 2rem 0;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .property-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .property-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,255,255,0.1);
+    }
+
+    .property-card.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .property-card.owned {
+      border-color: var(--success);
+      box-shadow: 0 0 20px rgba(0,255,136,0.1);
+    }
+
+    .property-card-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .property-card-body {
+      padding: 1rem;
+    }
+
+    .property-card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .property-card-location {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.5rem;
+    }
+
+    .property-card-income {
+      font-size: 0.9rem;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .property-card-count {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--success);
+      color: #000;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .buy-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 0 0 16px 16px;
+      color: #000;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+
+    .buy-btn:hover:not(:disabled) {
+      filter: brightness(1.2);
+    }
+
+    .buy-btn:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    /* Managers Section */
+    .managers-section {
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .manager-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+
+    .manager-card:hover {
+      border-color: var(--secondary);
+    }
+
+    .manager-card.purchased {
+      opacity: 0.5;
+      border-color: var(--success);
+    }
+
+    .manager-icon {
+      font-size: 2rem;
+    }
+
+    .manager-info {
+      flex: 1;
+    }
+
+    .manager-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .manager-desc {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .manager-price {
+      font-weight: 700;
+      color: var(--warning);
+    }
+
+    /* Upgrades Section */
+    .upgrades-section {
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .upgrade-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .upgrade-card:hover:not(.maxed) {
+      border-color: var(--gold);
+    }
+
+    .upgrade-card.maxed {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .upgrade-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .upgrade-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .upgrade-level {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    /* Prestige Section */
+    .prestige-section {
+      padding: 2rem 0;
+      background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,170,0,0.1) 100%);
+      border-top: 1px solid rgba(255,215,0,0.3);
+    }
+
+    .prestige-btn {
+      background: linear-gradient(135deg, var(--gold), var(--warning));
+      border: none;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      color: #000;
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 0 30px rgba(255,215,0,0.3);
+    }
+
+    .prestige-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(255,215,0,0.5);
+    }
+
+    .prestige-btn:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Events Overlay */
+    .event-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+
+    .event-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .event-card {
+      background: var(--card-bg);
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      max-width: 400px;
+      animation: eventPop 0.5s ease;
+    }
+
+    @keyframes eventPop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .event-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .event-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .event-desc {
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Achievements */
+    .achievements-section {
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .achievement-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      opacity: 0.4;
+      transition: all 0.3s;
+    }
+
+    .achievement-card.unlocked {
+      opacity: 1;
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05));
+    }
+
+    .achievement-icon {
+      font-size: 1.5rem;
+    }
+
+    .achievement-info {
+      flex: 1;
+    }
+
+    .achievement-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .achievement-desc {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    /* Leaderboard */
+    .leaderboard-section {
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .leaderboard-rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* Mobile Click Effect */
+    @media (max-width: 768px) {
+      .property-showcase {
+        width: 250px;
+        height: 250px;
+      }
+
+      .money-display {
+        font-size: 1.5rem;
+      }
+
+      .stats-bar {
+        gap: 0.5rem;
+      }
+
+      .stat-pill {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Golden Event Animation */
+    .golden-mode {
+      animation: goldenGlow 0.5s ease infinite alternate;
+    }
+
+    @keyframes goldenGlow {
+      from { box-shadow: 0 0 40px rgba(255,215,0,0.2); }
+      to { box-shadow: 0 0 80px rgba(255,215,0,0.6); }
+    }
+
+    /* Offline Earnings Modal */
+    .offline-earnings {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card-bg);
+      border: 2px solid var(--success);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      z-index: 1001;
+      display: none;
+    }
+
+    .offline-earnings.show {
+      display: block;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translate(-50%, -40%); opacity: 0; }
+      to { transform: translate(-50%, -50%); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <span style="color: var(--gold);">🏠</span> HOME <span style="color: var(--secondary);">AFRICA</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Properties</a></li>
+          <li class="nav-item"><a class="nav-link active" href="idle-landlord.html" style="color: var(--gold); font-weight: 700;">🏘️ Idle Landlord</a></li>
+          <li class="nav-item"><a class="nav-link" href="rejo-reward.html">🎮 Rejo Reward</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Game Header -->
+  <header class="game-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-4 text-center text-md-start">
+          <div class="game-logo">🏘️ IDLE LANDLORD</div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="money-display" id="moneyDisplay">RWF 0</div>
+          <div class="income-display">
+            <span id="perClick">+0</span> per click | 
+            <span id="perSecond">+0</span>/sec
+          </div>
+        </div>
+        <div class="col-md-4 text-center text-md-end">
+          <button class="btn btn-sm btn-outline-light" onclick="resetGame()">
+            <i class="bi bi-arrow-clockwise"></i> Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main style="margin-top: 56px;">
+    <!-- Clicker Section -->
+    <section class="clicker-section">
+      <div class="container">
+        <div class="stats-bar">
+          <div class="stat-pill">
+            <i class="bi bi-building"></i>
+            <span id="propertyCount">0</span> Properties
+          </div>
+          <div class="stat-pill">
+            <i class="bi bi-people"></i>
+            <span id="managerCount">0</span> Managers
+          </div>
+          <div class="stat-pill">
+            <i class="bi bi-graph-up"></i>
+            Multiplier: <span id="multiplierDisplay">1.0</span>x
+          </div>
+          <div class="stat-pill">
+            <i class="bi bi-trophy"></i>
+            Prestige: <span id="prestigeLevel">0</span>
+          </div>
+        </div>
+
+        <div class="property-showcase" id="clickTarget" onclick="handleClick(event)">
+          <img id="clickPropertyImage" src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600" alt="Click to earn!">
+        </div>
+
+        <p class="text-muted">💡 Click the property to collect rent! Buy more properties to increase income.</p>
+      </div>
+    </section>
+
+    <!-- Properties Shop -->
+    <section class="properties-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="bi bi-shop"></i> Property Market
+        </h2>
+        <div class="row g-3" id="propertiesGrid">
+          <!-- Properties injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Managers Section -->
+    <section class="managers-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="bi bi-briefcase"></i> Hire Managers (Auto-Collect)
+        </h2>
+        <div id="managersList">
+          <!-- Managers injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Upgrades Section -->
+    <section class="upgrades-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="bi bi-arrow-up-circle"></i> Upgrades
+        </h2>
+        <div class="row g-3" id="upgradesGrid">
+          <!-- Upgrades injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Prestige Section -->
+    <section class="prestige-section">
+      <div class="container text-center">
+        <h2 class="section-title justify-content-center">
+          <i class="bi bi-stars"></i> Prestige System
+        </h2>
+        <p class="text-muted mb-4">
+          Reach <strong>RWF 1 Billion</strong> net worth to prestige.<br>
+          Sell everything for a <strong>permanent 10% income bonus</strong> and start fresh!
+        </p>
+        <div class="progress mb-4" style="height: 30px; max-width: 500px; margin: 0 auto;">
+          <div class="progress-bar" id="prestigeProgress" role="progressbar" style="width: 0%; background: linear-gradient(90deg, var(--gold), var(--warning));">
+            0%
+          </div>
+        </div>
+        <button class="prestige-btn" id="prestigeBtn" onclick="doPrestige()" disabled>
+          🌟 PRESTIGE (Requires 1B RWF)
+        </button>
+        <p class="text-muted mt-2 small" id="prestigeBonus">
+          Current Prestige Bonus: +0%
+        </p>
+      </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section class="achievements-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="bi bi-award"></i> Achievements
+        </h2>
+        <div class="row g-3" id="achievementsGrid">
+          <!-- Achievements injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section class="leaderboard-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="bi bi-trophy"></i> Richest Landlords
+        </h2>
+        <div class="leaderboard-card">
+          <div id="leaderboardList">
+            <!-- Leaderboard injected by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Event Overlay -->
+  <div class="event-overlay" id="eventOverlay">
+    <div class="event-card">
+      <div class="event-icon" id="eventIcon">⭐</div>
+      <div class="event-title" id="eventTitle">Event!</div>
+      <div class="event-desc" id="eventDesc">Something special happened!</div>
+      <button class="btn btn-lg" style="background: linear-gradient(135deg, var(--gold), var(--warning)); color: #000; font-weight: 700;" onclick="closeEvent()">
+        Awesome!
+      </button>
+    </div>
+  </div>
+
+  <!-- Offline Earnings Modal -->
+  <div class="offline-earnings" id="offlineModal">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+    <h4>Welcome Back!</h4>
+    <p class="text-muted">You earned while away:</p>
+    <div style="font-size: 2rem; font-weight: 700; color: var(--success); margin-bottom: 1rem;" id="offlineAmount">
+      RWF 0
+    </div>
+    <button class="btn btn-primary" onclick="closeOfflineModal()">Claim</button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 mt-5" style="border-top: 1px solid rgba(255,255,255,0.1);">
+    <p class="text-muted small">
+      👑 <strong>Property Tycoon</strong> by <a href="index.html">HOME AFRICA</a> • Part of REJO Group
+    </p>
+    <p class="text-muted small">
+      Build your empire. All properties shown are real listings available for actual purchase!
+    </p>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Game Logic -->
+  <script>
+    // Game State
+    const game = {
+      money: 0,
+      totalEarned: 0,
+      perClick: 1,
+      perSecond: 0,
+      prestigeLevel: 0,
+      prestigeMultiplier: 1,
+      properties: {},
+      managers: {},
+      upgrades: {},
+      achievements: [],
+      lastSave: Date.now(),
+      clickCount: 0
+    };
+
+    // Property Definitions
+    const propertyTypes = [
+      { id: 'studio', name: 'Studio Apartment', location: 'Nyabugogo', basePrice: 1000, baseIncome: 10, image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400' },
+      { id: '1br', name: '1 Bedroom Flat', location: 'Kicukiro', basePrice: 5000, baseIncome: 40, image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400' },
+      { id: '2br', name: '2 Bedroom Apartment', location: 'Remera', basePrice: 25000, baseIncome: 150, image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400' },
+      { id: '3br', name: '3 Bedroom House', location: 'Kacyiru', basePrice: 100000, baseIncome: 500, image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400' },
+      { id: 'villa', name: 'Luxury Villa', location: 'Nyarutarama', basePrice: 500000, baseIncome: 2000, image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400' },
+      { id: 'mansion', name: 'Mega Mansion', location: 'Gisozi Heights', basePrice: 2000000, baseIncome: 7500, image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400' },
+      { id: 'penthouse', name: 'Sky Penthouse', location: 'City Center', basePrice: 10000000, baseIncome: 30000, image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400' },
+      { id: 'complex', name: 'Apartment Complex', location: 'Gacuriro', basePrice: 50000000, baseIncome: 120000, image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400' }
+    ];
+
+    // Managers
+    const managerTypes = [
+      { id: 'junior', name: 'Junior Agent', icon: '👔', desc: 'Auto-collects from all properties every 5 seconds', price: 10000, interval: 5000 },
+      { id: 'senior', name: 'Senior Manager', icon: '💼', desc: 'Auto-collects from all properties every 2 seconds', price: 100000, interval: 2000 },
+      { id: 'executive', name: 'Executive Director', icon: '🏆', desc: 'Auto-collects from all properties every second', price: 1000000, interval: 1000 },
+      { id: 'ceo', name: 'Real Estate CEO', icon: '👑', desc: 'Auto-collects 2x per second', price: 10000000, interval: 500 }
+    ];
+
+    // Upgrades
+    const upgradeTypes = [
+      { id: 'click1', name: 'Better Clicking', icon: '🖱️', desc: 'Double click income', maxLevel: 10, priceMultiplier: 5 },
+      { id: 'income1', name: 'Rent Optimization', icon: '📈', desc: '+50% property income', maxLevel: 10, priceMultiplier: 8 },
+      { id: 'marketing', name: 'Marketing Campaign', icon: '📢', desc: 'Properties cost 10% less', maxLevel: 5, priceMultiplier: 10 }
+    ];
+
+    // Achievements
+    const achievementTypes = [
+      { id: 'first', name: 'First Steps', icon: '🌱', desc: 'Own your first property' },
+      { id: 'slumlord', name: 'Slumlord', icon: '🏚️', desc: 'Own 50 studio apartments' },
+      { id: 'landlord', name: 'Landlord', icon: '🏘️', desc: 'Own 10 properties total' },
+      { id: 'millionaire', name: 'Millionaire', icon: '💰', desc: 'Earn 1M RWF total' },
+      { id: 'billionaire', name: 'Billionaire', icon: '💎', desc: 'Reach 1B RWF net worth' },
+      { id: 'tycoon', name: 'Property Tycoon', icon: '👑', desc: 'Own 100 properties' },
+      { id: 'empire', name: 'Empire Builder', icon: '🏰', desc: 'Own one of each property type' },
+      { id: 'clicker', name: 'Click Master', icon: '👆', desc: 'Click 1000 times' }
+    ];
+
+    // Initialize
+    function init() {
+      loadGame();
+      renderProperties();
+      renderManagers();
+      renderUpgrades();
+      renderAchievements();
+      updateDisplay();
+      checkOfflineEarnings();
+      
+      // Start game loops
+      setInterval(gameLoop, 100);
+      setInterval(saveGame, 5000);
+      setInterval(triggerRandomEvent, 60000); // Check for event every minute
+      
+      // Setup auto-collect from managers
+      setupAutoCollect();
+    }
+
+    // Handle clicking
+    function handleClick(event) {
+      const amount = game.perClick * game.prestigeMultiplier;
+      game.money += amount;
+      game.totalEarned += amount;
+      game.clickCount++;
+      
+      // Create floating money effect
+      const floating = document.createElement('div');
+      floating.className = 'floating-money';
+      floating.textContent = '+RWF ' + formatMoney(amount);
+      floating.style.left = event.offsetX + 'px';
+      floating.style.top = event.offsetY + 'px';
+      document.getElementById('clickTarget').appendChild(floating);
+      
+      setTimeout(() => floating.remove(), 1000);
+      
+      updateDisplay();
+      checkAchievements();
+    }
+
+    // Game loop (10fps)
+    function gameLoop() {
+      // Passive income from properties with managers
+      if (game.perSecond > 0) {
+        const passiveIncome = (game.perSecond * game.prestigeMultiplier) / 10; // Divide by 10 for 100ms intervals
+        game.money += passiveIncome;
+        game.totalEarned += passiveIncome;
+      }
+      
+      updateDisplay();
+      updatePrestigeProgress();
+    }
+
+    // Buy property
+    function buyProperty(propertyId) {
+      const propertyDef = propertyTypes.find(p => p.id === propertyId);
+      if (!propertyDef) return;
+      
+      const count = game.properties[propertyId] || 0;
+      const price = Math.floor(propertyDef.basePrice * Math.pow(1.15, count));
+      
+      if (game.money < price) {
+        showEvent('❌', 'Not Enough Money!', 'Keep clicking or wait for passive income.');
+        return;
+      }
+      
+      game.money -= price;
+      game.properties[propertyId] = (game.properties[propertyId] || 0) + 1;
+      
+      // Recalculate income
+      recalculateIncome();
+      
+      // Update image if first purchase
+      if (count === 0) {
+        document.getElementById('clickPropertyImage').src = propertyDef.image;
+      }
+      
+      renderProperties();
+      updateDisplay();
+      checkAchievements();
+      
+      // Track purchase for analytics
+      if (window.socialProof) {
+        window.socialProof.trackActivity(propertyId, 'view', {
+          game: 'property-tycoon',
+          action: 'purchase',
+          property: propertyDef.name
+        });
+      }
+    }
+
+    // Buy manager
+    function buyManager(managerId) {
+      const managerDef = managerTypes.find(m => m.id === managerId);
+      if (!managerDef || game.managers[managerId]) return;
+      
+      if (game.money < managerDef.price) {
+        showEvent('❌', 'Not Enough Money!', 'You need more cash to hire this manager.');
+        return;
+      }
+      
+      game.money -= managerDef.price;
+      game.managers[managerId] = true;
+      
+      setupAutoCollect();
+      renderManagers();
+      updateDisplay();
+      
+      showEvent(managerDef.icon, 'Manager Hired!', `${managerDef.name} will auto-collect income for you!`);
+    }
+
+    // Buy upgrade
+    function buyUpgrade(upgradeId) {
+      const upgradeDef = upgradeTypes.find(u => u.id === upgradeId);
+      if (!upgradeDef) return;
+      
+      const level = game.upgrades[upgradeId] || 0;
+      if (level >= upgradeDef.maxLevel) return;
+      
+      const price = Math.floor(10000 * Math.pow(upgradeDef.priceMultiplier, level));
+      
+      if (game.money < price) {
+        showEvent('❌', 'Not Enough Money!', 'Save up more to buy this upgrade.');
+        return;
+      }
+      
+      game.money -= price;
+      game.upgrades[upgradeId] = level + 1;
+      
+      recalculateIncome();
+      renderUpgrades();
+      updateDisplay();
+      
+      showEvent('⬆️', 'Upgrade Purchased!', `${upgradeDef.name} is now level ${level + 1}!`);
+    }
+
+    // Recalculate income
+    function recalculateIncome() {
+      let perClick = 1;
+      let perSecond = 0;
+      
+      // Base from properties
+      for (const [propId, count] of Object.entries(game.properties)) {
+        const prop = propertyTypes.find(p => p.id === propId);
+        if (prop) {
+          perSecond += prop.baseIncome * count;
+        }
+      }
+      
+      // Apply click upgrade
+      const clickLevel = game.upgrades.click1 || 0;
+      perClick *= Math.pow(2, clickLevel);
+      
+      // Apply income upgrade
+      const incomeLevel = game.upgrades.income1 || 0;
+      perSecond *= (1 + (0.5 * incomeLevel));
+      
+      game.perClick = perClick;
+      game.perSecond = perSecond;
+    }
+
+    // Setup auto-collect
+    function setupAutoCollect() {
+      // Clear existing intervals and set new ones based on best manager
+      let bestInterval = null;
+      
+      for (const [managerId, owned] of Object.entries(game.managers)) {
+        if (owned) {
+          const manager = managerTypes.find(m => m.id === managerId);
+          if (manager && (!bestInterval || manager.interval < bestInterval)) {
+            bestInterval = manager.interval;
+          }
+        }
+      }
+      
+      // Auto-collect is now handled in gameLoop with perSecond
+    }
+
+    // Prestige
+    function doPrestige() {
+      if (game.money < 1000000000) {
+        showEvent('❌', 'Not Yet!', 'You need 1 Billion RWF to prestige.');
+        return;
+      }
+      
+      game.prestigeLevel++;
+      game.prestigeMultiplier += 0.1;
+      
+      // Reset
+      game.money = 0;
+      game.properties = {};
+      game.managers = {};
+      game.upgrades = {};
+      game.perClick = 1;
+      game.perSecond = 0;
+      
+      saveGame();
+      
+      showEvent('🌟', 'PRESTIGE ACHIEVED!', `You now have a ${(game.prestigeMultiplier - 1) * 100}% permanent bonus!`);
+      
+      renderProperties();
+      renderManagers();
+      renderUpgrades();
+      updateDisplay();
+    }
+
+    // Random Events
+    function triggerRandomEvent() {
+      const rand = Math.random();
+      
+      if (rand < 0.1) { // 10% chance per minute
+        // Golden Property Event
+        const bonus = Math.floor(game.money * 0.1) + 1000;
+        game.money += bonus;
+        
+        const clickTarget = document.getElementById('clickTarget');
+        clickTarget.classList.add('golden-mode');
+        
+        showEvent('✨', 'GOLDEN PROPERTY!', `A lucky investor just gave you RWF ${formatMoney(bonus)}!`);
+        
+        setTimeout(() => {
+          clickTarget.classList.remove('golden-mode');
+        }, 30000);
+        
+      } else if (rand < 0.15) { // 5% chance
+        // Market Crash - Everything 50% off for 30 seconds
+        showEvent('📉', 'MARKET CRASH!', 'All properties are 50% off for the next 30 seconds! Buy now!');
+        // Would need temp discount system
+      }
+    }
+
+    // Show event modal
+    function showEvent(icon, title, desc) {
+      document.getElementById('eventIcon').textContent = icon;
+      document.getElementById('eventTitle').textContent = title;
+      document.getElementById('eventDesc').textContent = desc;
+      document.getElementById('eventOverlay').classList.add('active');
+    }
+
+    // Close event
+    function closeEvent() {
+      document.getElementById('eventOverlay').classList.remove('active');
+    }
+
+    // Check offline earnings
+    function checkOfflineEarnings() {
+      const now = Date.now();
+      const offline = now - game.lastSave;
+      
+      if (offline > 60000 && game.perSecond > 0) { // Away more than 1 minute
+        const offlineSeconds = offline / 1000;
+        const maxOffline = 3600; // Cap at 1 hour
+        const effectiveSeconds = Math.min(offlineSeconds, maxOffline);
+        
+        const earnings = game.perSecond * effectiveSeconds * game.prestigeMultiplier;
+        game.money += earnings;
+        game.totalEarned += earnings;
+        
+        document.getElementById('offlineAmount').textContent = 'RWF ' + formatMoney(earnings);
+        document.getElementById('offlineModal').classList.add('show');
+      }
+    }
+
+    // Close offline modal
+    function closeOfflineModal() {
+      document.getElementById('offlineModal').classList.remove('show');
+    }
+
+    // Check achievements
+    function checkAchievements() {
+      const totalProperties = Object.values(game.properties).reduce((a, b) => a + b, 0);
+      
+      const checks = {
+        first: totalProperties >= 1,
+        slumlord: (game.properties.studio || 0) >= 50,
+        landlord: totalProperties >= 10,
+        millionaire: game.totalEarned >= 1000000,
+        billionaire: game.money >= 1000000000,
+        tycoon: totalProperties >= 100,
+        empire: propertyTypes.every(p => (game.properties[p.id] || 0) > 0),
+        clicker: game.clickCount >= 1000
+      };
+      
+      for (const [id, unlocked] of Object.entries(checks)) {
+        if (unlocked && !game.achievements.includes(id)) {
+          game.achievements.push(id);
+          const ach = achievementTypes.find(a => a.id === id);
+          if (ach) {
+            showEvent(ach.icon, 'Achievement Unlocked!', `${ach.name}: ${ach.desc}`);
+          }
+        }
+      }
+      
+      renderAchievements();
+    }
+
+    // Update prestige progress
+    function updatePrestigeProgress() {
+      const progress = Math.min((game.money / 1000000000) * 100, 100);
+      const bar = document.getElementById('prestigeProgress');
+      bar.style.width = progress + '%';
+      bar.textContent = progress.toFixed(1) + '%';
+      
+      const btn = document.getElementById('prestigeBtn');
+      btn.disabled = game.money < 1000000000;
+      
+      if (game.money >= 1000000000) {
+        btn.innerHTML = '🌟 PRESTIGE NOW! (+' + ((game.prestigeMultiplier + 0.1 - 1) * 100).toFixed(0) + '% Bonus)';
+      }
+      
+      document.getElementById('prestigeBonus').textContent = 
+        'Current Prestige Bonus: +' + ((game.prestigeMultiplier - 1) * 100).toFixed(0) + '%';
+    }
+
+    // Render functions
+    function renderProperties() {
+      const grid = document.getElementById('propertiesGrid');
+      grid.innerHTML = propertyTypes.map(prop => {
+        const count = game.properties[prop.id] || 0;
+        const price = Math.floor(prop.basePrice * Math.pow(1.15, count));
+        const canAfford = game.money >= price;
+        
+        return `
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="property-card ${!canAfford ? 'locked' : ''} ${count > 0 ? 'owned' : ''} position-relative">
+              ${count > 0 ? `<div class="property-card-count">${count}</div>` : ''}
+              <img src="${prop.image}" class="property-card-image" alt="${prop.name}">
+              <div class="property-card-body">
+                <div class="property-card-title">${prop.name}</div>
+                <div class="property-card-location">📍 ${prop.location}</div>
+                <div class="property-card-income">+RWF ${formatMoney(prop.baseIncome)}/sec</div>
+              </div>
+              <button class="buy-btn" onclick="buyProperty('${prop.id}')" ${!canAfford ? 'disabled' : ''}>
+                ${canAfford ? '💰 BUY' : '🔒'} RWF ${formatMoney(price)}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderManagers() {
+      const list = document.getElementById('managersList');
+      list.innerHTML = managerTypes.map(manager => {
+        const owned = game.managers[manager.id];
+        const canAfford = game.money >= manager.price;
+        
+        return `
+          <div class="manager-card ${owned ? 'purchased' : ''}">
+            <div class="manager-icon">${manager.icon}</div>
+            <div class="manager-info">
+              <div class="manager-name">${manager.name}</div>
+              <div class="manager-desc">${manager.desc}</div>
+            </div>
+            ${owned ? 
+              '<span style="color: var(--success);">✅ Hired</span>' :
+              `<button class="btn btn-sm ${canAfford ? 'btn-warning' : 'btn-outline-secondary'}" 
+                onclick="buyManager('${manager.id}')" ${!canAfford ? 'disabled' : ''}>
+                RWF ${formatMoney(manager.price)}
+              </button>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderUpgrades() {
+      const grid = document.getElementById('upgradesGrid');
+      grid.innerHTML = upgradeTypes.map(upgrade => {
+        const level = game.upgrades[upgrade.id] || 0;
+        const maxed = level >= upgrade.maxLevel;
+        const price = maxed ? 0 : Math.floor(10000 * Math.pow(upgrade.priceMultiplier, level));
+        const canAfford = game.money >= price;
+        
+        return `
+          <div class="col-6 col-md-3">
+            <div class="upgrade-card ${maxed ? 'maxed' : ''}" onclick="${maxed ? '' : `buyUpgrade('${upgrade.id}')`}">
+              <div class="upgrade-icon">${upgrade.icon}</div>
+              <div class="upgrade-name">${upgrade.name}</div>
+              <div class="upgrade-level">Level ${level}/${upgrade.maxLevel}</div>
+              ${!maxed ? `<div class="text-warning mt-2" style="font-weight: 700;">RWF ${formatMoney(price)}</div>` : '<div class="text-success mt-2">✅ MAXED</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAchievements() {
+      const grid = document.getElementById('achievementsGrid');
+      grid.innerHTML = achievementTypes.map(ach => {
+        const unlocked = game.achievements.includes(ach.id);
+        
+        return `
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="achievement-card ${unlocked ? 'unlocked' : ''}">
+              <div class="achievement-icon">${ach.icon}</div>
+              <div class="achievement-info">
+                <div class="achievement-name">${ach.name}</div>
+                <div class="achievement-desc">${ach.desc}</div>
+              </div>
+              ${unlocked ? '<i class="bi bi-check-circle-fill text-warning"></i>' : '<i class="bi bi-lock text-muted"></i>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Update display
+    function updateDisplay() {
+      document.getElementById('moneyDisplay').textContent = 'RWF ' + formatMoney(game.money);
+      document.getElementById('perClick').textContent = '+' + formatMoney(game.perClick * game.prestigeMultiplier);
+      document.getElementById('perSecond').textContent = '+' + formatMoney(game.perSecond * game.prestigeMultiplier);
+      document.getElementById('propertyCount').textContent = Object.values(game.properties).reduce((a, b) => a + b, 0);
+      document.getElementById('managerCount').textContent = Object.values(game.managers).filter(Boolean).length;
+      document.getElementById('multiplierDisplay').textContent = game.prestigeMultiplier.toFixed(1);
+      document.getElementById('prestigeLevel').textContent = game.prestigeLevel;
+    }
+
+    // Format money
+    function formatMoney(num) {
+      if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return Math.floor(num).toLocaleString();
+    }
+
+    // Save game
+    function saveGame() {
+      game.lastSave = Date.now();
+      localStorage.setItem('propertyTycoon', JSON.stringify(game));
+      updateLeaderboard();
+    }
+
+    // Load game
+    function loadGame() {
+      const saved = localStorage.getItem('propertyTycoon');
+      if (saved) {
+        const loaded = JSON.parse(saved);
+        Object.assign(game, loaded);
+      }
+      recalculateIncome();
+    }
+
+    // Update leaderboard
+    function updateLeaderboard() {
+      const leaderboard = JSON.parse(localStorage.getItem('tycoonLeaderboard') || '[]');
+      const totalValue = game.money + Object.entries(game.properties).reduce((sum, [id, count]) => {
+        const prop = propertyTypes.find(p => p.id === id);
+        return sum + (prop ? prop.basePrice * count * 0.5 : 0);
+      }, 0);
+      
+      const entry = {
+        name: 'You',
+        value: totalValue,
+        prestige: game.prestigeLevel,
+        date: Date.now()
+      };
+      
+      // Keep only recent entries and sort
+      leaderboard.push(entry);
+      leaderboard.sort((a, b) => b.value - a.value);
+      leaderboard.splice(10); // Keep top 10
+      
+      localStorage.setItem('tycoonLeaderboard', JSON.stringify(leaderboard));
+      
+      // Render
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = leaderboard.map((entry, index) => `
+        <div class="leaderboard-row">
+          <div class="leaderboard-rank" style="background: ${index < 3 ? 'linear-gradient(135deg, #ffd700, #ffaa00)' : 'rgba(255,255,255,0.1)'}; color: ${index < 3 ? '#000' : '#fff'};">
+            ${index + 1}
+          </div>
+          <div style="flex: 1;">
+            <div style="font-weight: 600;">${entry.name}</div>
+            <div style="font-size: 0.75rem; color: #888;">${entry.prestige > 0 ? '⭐ Prestige ' + entry.prestige : ''}</div>
+          </div>
+          <div style="font-weight: 700; color: var(--success);">RWF ${formatMoney(entry.value)}</div>
+        </div>
+      `).join('');
+    }
+
+    // Reset game
+    function resetGame() {
+      if (confirm('Are you sure? This will delete ALL progress!')) {
+        localStorage.removeItem('propertyTycoon');
+        location.reload();
+      }
+    }
+
+    // Start
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

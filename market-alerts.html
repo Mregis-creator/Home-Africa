@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Intelligence | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #8fff00;
+      --danger: #ff3366;
+      --warning: #ffaa00;
+      --info: #66aaff;
+      --success: #00ff88;
+      --bg-dark: #0a0f1c;
+      --card-bg: rgba(0,0,0,0.92);
+    }
+    
+    html, body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.15) 0%, rgba(0,136,255,0.15) 50%, rgba(255,0,136,0.1) 100%);
+      pointer-events: none;
+    }
+    
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid var(--primary);
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+      position: relative;
+      z-index: 1000;
+    }
+    
+    .navbar-brand {
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary) 10%, var(--secondary) 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .dashboard-container {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 0;
+    }
+    
+    .intelligence-card {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      margin-bottom: 1.5rem;
+    }
+    
+    .alert-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .alert-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+    
+    .alert-card.critical { border-color: var(--danger); }
+    .alert-card.critical::before { background: var(--danger); }
+    .alert-card.high { border-color: var(--warning); }
+    .alert-card.high::before { background: var(--warning); }
+    .alert-card.moderate { border-color: var(--info); }
+    .alert-card.moderate::before { background: var(--info); }
+    .alert-card.positive { border-color: var(--success); }
+    .alert-card.positive::before { background: var(--success); }
+    .alert-card.info { border-color: #888; }
+    .alert-card.info::before { background: #888; }
+    
+    .alert-card:hover {
+      transform: translateX(5px);
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .alert-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-right: 1rem;
+    }
+    
+    .alert-card.critical .alert-icon { background: rgba(255,51,102,0.2); color: var(--danger); }
+    .alert-card.high .alert-icon { background: rgba(255,170,0,0.2); color: var(--warning); }
+    .alert-card.moderate .alert-icon { background: rgba(102,170,255,0.2); color: var(--info); }
+    .alert-card.positive .alert-icon { background: rgba(0,255,136,0.2); color: var(--success); }
+    .alert-card.info .alert-icon { background: rgba(136,136,136,0.2); color: #888; }
+    
+    .opportunity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .opportunity-badge.critical { background: rgba(255,51,102,0.2); color: var(--danger); border: 1px solid var(--danger); }
+    .opportunity-badge.high { background: rgba(255,170,0,0.2); color: var(--warning); border: 1px solid var(--warning); }
+    .opportunity-badge.moderate { background: rgba(102,170,255,0.2); color: var(--info); border: 1px solid var(--info); }
+    
+    .ratio-display {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .ratio-label {
+      font-size: 0.85rem;
+      color: #888;
+    }
+    
+    .metric-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    
+    .metric-value {
+      font-size: 1.75rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .metric-label {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+    
+    .seasonal-indicator {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,136,255,0.1) 100%);
+      border-radius: 12px;
+      border: 1px solid var(--primary);
+    }
+    
+    .seasonal-icon {
+      font-size: 2.5rem;
+    }
+    
+    .nav-pills .nav-link {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid transparent;
+      margin-right: 0.5rem;
+      border-radius: 8px;
+    }
+    
+    .nav-pills .nav-link.active {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #000;
+      border-color: var(--primary);
+    }
+    
+    .gap-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .opportunity-score-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .opportunity-score-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .btn-intelligence {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border: none;
+      color: #000;
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .btn-intelligence:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,136,0.3);
+    }
+    
+    .filter-badge {
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-badge:hover {
+      transform: scale(1.05);
+    }
+    
+    .filter-badge.active {
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .animate-pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="homeafricabanneralternative_III.png" height="40" alt="HOME AFRICA" />
+        Market Intelligence
+      </a>
+      <span class="badge bg-warning text-dark">VIP</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="vip-analytics.html">
+              <i class="bi bi-graph-up"></i> Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html">
+              <i class="bi bi-grid"></i> Dashboard
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container dashboard-container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="bi bi-graph-up-arrow"></i> Market Intelligence</h2>
+        <p class="text-muted mb-0">Predictive alerts & supply/demand analysis</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light" onclick="refreshData()">
+          <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+        <button class="btn btn-intelligence" onclick="checkOpportunity()">
+          <i class="bi bi-calculator"></i> Check Listing Opportunity
+        </button>
+      </div>
+    </div>
+
+    <!-- Seasonal Indicator -->
+    <div class="intelligence-card mb-4">
+      <div class="seasonal-indicator" id="seasonalIndicator">
+        <div class="seasonal-icon">📊</div>
+        <div class="flex-grow-1">
+          <h5 class="mb-1">Market Season</h5>
+          <p class="mb-0 text-muted">Loading seasonal forecast...</p>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-info" id="seasonalFactor">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Opportunities -->
+    <div class="row mb-4">
+      <div class="col-lg-8">
+        <div class="intelligence-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Top Market Opportunities</h5>
+            <span class="badge bg-danger">Live</span>
+          </div>
+          <div id="opportunitiesList">
+            <div class="text-center py-4">
+              <i class="bi bi-arrow-repeat spin" style="font-size: 2rem;"></i>
+              <p class="mt-2 text-muted">Analyzing market data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="intelligence-card">
+          <h5 class="mb-3"><i class="bi bi-lightning"></i> Quick Stats</h5>
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="metric-card">
+                <div class="metric-value" id="totalGaps">--</div>
+                <div class="metric-label">Gaps Found</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="metric-card">
+                <div class="metric-value" id="avgRatio">--</div>
+                <div class="metric-label">Avg Ratio</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="metric-card">
+                <div class="metric-value" id="hotDistricts">--</div>
+                <div class="metric-label">Hot Districts</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="metric-card">
+                <div class="metric-value" id="criticalGaps">--</div>
+                <div class="metric-label">Critical</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Market Alerts -->
+    <div class="intelligence-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi bi-bell"></i> Market Alerts</h5>
+        <div class="d-flex gap-2">
+          <span class="badge filter-badge bg-danger active" onclick="filterAlerts('all')">All</span>
+          <span class="badge filter-badge bg-warning" onclick="filterAlerts('critical')">Critical</span>
+          <span class="badge filter-badge bg-info" onclick="filterAlerts('opportunity')">Opportunities</span>
+        </div>
+      </div>
+      
+      <div id="alertsContainer">
+        <div class="text-center py-4">
+          <i class="bi bi-arrow-repeat spin" style="font-size: 2rem;"></i>
+          <p class="mt-2 text-muted">Loading alerts...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opportunity Calculator Modal -->
+  <div class="modal fade" id="opportunityModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="background: var(--card-bg); border: 2px solid var(--primary); color: #fff;">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h5 class="modal-title"><i class="bi bi-calculator"></i> Listing Opportunity Calculator</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">District</label>
+                <select class="form-select" id="calcDistrict" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: #fff;">
+                  <option value="">Select district...</option>
+                  <option value="Nyarutarama">Nyarutarama</option>
+                  <option value="Kacyiru">Kacyiru</option>
+                  <option value="Remera">Remera</option>
+                  <option value="Kicukiro">Kicukiro</option>
+                  <option value="Gisozi">Gisozi</option>
+                  <option value="Kimihurura">Kimihurura</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Property Type</label>
+                <select class="form-select" id="calcType" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: #fff;">
+                  <option value="">Select type...</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="house">House</option>
+                  <option value="land">Land Plot</option>
+                  <option value="office">Office</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Your Price (RWF)</label>
+                <input type="number" class="form-control" id="calcPrice" placeholder="e.g. 45000000" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: #fff;">
+              </div>
+              <button class="btn btn-intelligence w-100" onclick="calculateOpportunity()">
+                <i class="bi bi-calculator"></i> Calculate Score
+              </button>
+            </div>
+            <div class="col-md-6">
+              <div id="opportunityResult" style="display: none;">
+                <div class="text-center mb-3">
+                  <div id="opportunityScore" style="font-size: 4rem; font-weight: bold;">--</div>
+                  <div id="opportunityRating" class="badge" style="font-size: 1rem; padding: 0.5rem 1rem;">--</div>
+                </div>
+                <div class="mb-3">
+                  <strong>Market Data:</strong>
+                  <ul class="list-unstyled mt-2 text-muted">
+                    <li>Demand: <span id="oppDemand" class="text-white">--</span> searches (30d)</li>
+                    <li>Supply: <span id="oppSupply" class="text-white">--</span> listings</li>
+                    <li>Market Avg: <span id="oppAvgPrice" class="text-white">--</span> RWF</li>
+                  </ul>
+                </div>
+                <div class="alert" id="opportunityRecommendation" style="background: rgba(0,255,136,0.1); border: 1px solid var(--success);">
+                  --
+                </div>
+              </div>
+              <div id="opportunityPlaceholder" class="text-center py-4 text-muted">
+                <i class="bi bi-calculator" style="font-size: 3rem;"></i>
+                <p class="mt-2">Fill in the details to see your opportunity score</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/market-intelligence.js"></script>
+  
+  <script>
+    let currentAlerts = [];
+    let currentGaps = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadData();
+    });
+
+    async function loadData() {
+      try {
+        if (!window.marketIntelligence) {
+          console.warn('Market Intelligence not initialized');
+          showMockData();
+          return;
+        }
+
+        await window.marketIntelligence.init();
+        
+        // Load seasonal data
+        const seasonal = await window.marketIntelligence.getSeasonalForecast();
+        renderSeasonal(seasonal);
+        
+        // Load gaps
+        currentGaps = await window.marketIntelligence.analyzeSupplyDemandGaps();
+        renderOpportunities(currentGaps);
+        updateStats(currentGaps);
+        
+        // Load alerts
+        currentAlerts = await window.marketIntelligence.generateMarketAlerts();
+        renderAlerts(currentAlerts);
+      } catch (err) {
+        console.error('Error loading market data:', err);
+        showMockData();
+      }
+    }
+
+    function showMockData() {
+      // Mock data for demo
+      const mockGaps = [
+        { district: 'Nyarutarama', type: 'apartment', demand: 145, supply: 12, ratio: 12.1, opportunity_score: 95, severity: 'critical', recommendation: '🚨 CRITICAL: Extreme undersupply. List immediately!' },
+        { district: 'Kacyiru', type: 'land', demand: 89, supply: 18, ratio: 4.9, opportunity_score: 75, severity: 'high', recommendation: '⚡ HIGH DEMAND: Fast sale expected. List now!' },
+        { district: 'Remera', type: 'house', demand: 67, supply: 15, ratio: 4.5, opportunity_score: 70, severity: 'moderate', recommendation: '📈 MODERATE: Good opportunity. Consider listing.' },
+        { district: 'Kimihurura', type: 'apartment', demand: 52, supply: 14, ratio: 3.7, opportunity_score: 55, severity: 'moderate', recommendation: '📈 MODERATE: Decent demand. Price competitively.' }
+      ];
+
+      const mockAlerts = [
+        { type: 'supply_demand_gap', severity: 'critical', title: 'Nyarutarama: Apartment Undersupply', message: '🚨 CRITICAL: Nyarutarama has extreme undersupply of apartments. 12 listings for 145 searches. Immediate opportunity to list.', actionable: true, action_text: 'View Details' },
+        { type: 'seasonal', severity: 'positive', title: 'Seasonal Market Update: HIGH ACTIVITY', message: '📈 PEAK SEASON: List now for maximum exposure and faster sales.', actionable: false },
+        { type: 'price_trend', severity: 'positive', title: 'Kacyiru land prices rising', message: 'Land plots in Kacyiru are appreciating by 8.5%. Good time to sell.', actionable: false }
+      ];
+
+      const mockSeasonal = {
+        current_month: { activity: 'very_high', factor: 1.4, reason: 'Holiday season + year-end bonuses' },
+        recommendation: '📈 PEAK SEASON: List now for maximum exposure and faster sales.'
+      };
+
+      renderSeasonal(mockSeasonal);
+      renderOpportunities(mockGaps);
+      updateStats(mockGaps);
+      renderAlerts(mockAlerts);
+    }
+
+    function renderSeasonal(seasonal) {
+      const container = document.getElementById('seasonalIndicator');
+      const icon = seasonal.current_month.factor > 1.2 ? '🔥' : 
+                   seasonal.current_month.factor > 1 ? '📈' : 
+                   seasonal.current_month.factor < 0.9 ? '❄️' : '📊';
+      
+      container.innerHTML = `
+        <div class="seasonal-icon">${icon}</div>
+        <div class="flex-grow-1">
+          <h5 class="mb-1">${seasonal.current_month.activity.replace('_', ' ').toUpperCase()} SEASON</h5>
+          <p class="mb-0 text-muted">${seasonal.current_month.reason}</p>
+        </div>
+        <div class="text-end">
+          <span class="badge ${seasonal.current_month.factor > 1 ? 'bg-success' : 'bg-info'}" style="font-size: 1rem; padding: 0.5rem 1rem;">
+            ${Math.round(seasonal.current_month.factor * 100)}% Activity
+          </span>
+        </div>
+      `;
+    }
+
+    function renderOpportunities(gaps) {
+      const container = document.getElementById('opportunitiesList');
+      
+      if (gaps.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+            <p class="mt-2">No significant supply/demand gaps found. Market is balanced.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = gaps.slice(0, 5).map(gap => `
+        <div class="gap-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h6 class="mb-1">${gap.district} - ${gap.type}s</h6>
+              <p class="mb-0 text-muted" style="font-size: 0.9rem;">${gap.recommendation}</p>
+            </div>
+            <span class="opportunity-badge ${gap.severity}">
+              Score: ${gap.opportunity_score}
+            </span>
+          </div>
+          <div class="row mt-2">
+            <div class="col-4 text-center">
+              <div class="ratio-display">${gap.demand}</div>
+              <div class="ratio-label">Searches (30d)</div>
+            </div>
+            <div class="col-4 text-center">
+              <div class="ratio-display" style="color: var(--secondary);">${gap.supply}</div>
+              <div class="ratio-label">Active Listings</div>
+            </div>
+            <div class="col-4 text-center">
+              <div class="ratio-display" style="color: ${gap.ratio >= 5 ? 'var(--danger)' : 'var(--warning)'};">${gap.ratio}:1</div>
+              <div class="ratio-label">Demand/Supply</div>
+            </div>
+          </div>
+          <div class="opportunity-score-bar">
+            <div class="opportunity-score-fill" style="width: ${gap.opportunity_score}%; background: ${gap.opportunity_score >= 80 ? 'var(--danger)' : gap.opportunity_score >= 60 ? 'var(--warning)' : 'var(--info)'}"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateStats(gaps) {
+      document.getElementById('totalGaps').textContent = gaps.length;
+      
+      const avgRatio = gaps.length > 0 
+        ? (gaps.reduce((sum, g) => sum + g.ratio, 0) / gaps.length).toFixed(1)
+        : '0';
+      document.getElementById('avgRatio').textContent = avgRatio + ':1';
+      
+      const districts = [...new Set(gaps.map(g => g.district))].length;
+      document.getElementById('hotDistricts').textContent = districts;
+      
+      const critical = gaps.filter(g => g.severity === 'critical').length;
+      document.getElementById('criticalGaps').textContent = critical;
+    }
+
+    function renderAlerts(alerts) {
+      const container = document.getElementById('alertsContainer');
+      
+      if (alerts.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <i class="bi bi-bell-slash text-muted" style="font-size: 3rem;"></i>
+            <p class="mt-2">No active market alerts</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = alerts.map(alert => `
+        <div class="alert-card ${alert.severity}">
+          <div class="d-flex">
+            <div class="alert-icon">
+              <i class="bi bi-${getAlertIcon(alert.type)}"></i>
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1">${alert.title}</h6>
+              <p class="mb-2 text-muted" style="font-size: 0.9rem;">${alert.message}</p>
+              ${alert.actionable ? `
+                <button class="btn btn-sm btn-primary">
+                  ${alert.action_text || 'Take Action'}
+                </button>
+              ` : ''}
+            </div>
+            <div class="text-end">
+              <small class="text-muted">${timeAgo(alert.created_at)}</small>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getAlertIcon(type) {
+      const icons = {
+        supply_demand_gap: 'exclamation-triangle',
+        price_trend: 'currency-exchange',
+        seasonal: 'calendar-event',
+        competition: 'people'
+      };
+      return icons[type] || 'bell';
+    }
+
+    function timeAgo(dateString) {
+      if (!dateString) return 'Just now';
+      const date = new Date(dateString);
+      const seconds = Math.floor((Date.now() - date) / 1000);
+      
+      if (seconds < 60) return 'Just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      return `${Math.floor(hours / 24)}d ago`;
+    }
+
+    function filterAlerts(filter) {
+      // Update badge states
+      document.querySelectorAll('.filter-badge').forEach(badge => {
+        badge.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // Filter alerts
+      let filtered = currentAlerts;
+      if (filter === 'critical') {
+        filtered = currentAlerts.filter(a => a.severity === 'critical' || a.severity === 'high');
+      } else if (filter === 'opportunity') {
+        filtered = currentAlerts.filter(a => a.type === 'supply_demand_gap');
+      }
+      
+      renderAlerts(filtered);
+    }
+
+    function refreshData() {
+      const btn = event.target;
+      btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Refreshing...';
+      btn.disabled = true;
+      
+      loadData().then(() => {
+        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+        btn.disabled = false;
+      });
+    }
+
+    function checkOpportunity() {
+      new bootstrap.Modal(document.getElementById('opportunityModal')).show();
+    }
+
+    async function calculateOpportunity() {
+      const district = document.getElementById('calcDistrict').value;
+      const type = document.getElementById('calcType').value;
+      const price = parseInt(document.getElementById('calcPrice').value);
+      
+      if (!district || !type || !price) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      try {
+        const result = await window.marketIntelligence.getListingOpportunityScore(district, type, price);
+        
+        document.getElementById('opportunityPlaceholder').style.display = 'none';
+        document.getElementById('opportunityResult').style.display = 'block';
+        
+        document.getElementById('opportunityScore').textContent = result.score;
+        document.getElementById('opportunityScore').style.color = 
+          result.score >= 80 ? 'var(--success)' : 
+          result.score >= 60 ? 'var(--warning)' : 
+          result.score >= 40 ? 'var(--info)' : 'var(--danger)';
+        
+        const ratingBadge = document.getElementById('opportunityRating');
+        ratingBadge.textContent = result.rating;
+        ratingBadge.className = 'badge ' + (
+          result.score >= 80 ? 'bg-success' : 
+          result.score >= 60 ? 'bg-warning' : 
+          result.score >= 40 ? 'bg-info' : 'bg-danger'
+        );
+        
+        document.getElementById('oppDemand').textContent = result.supporting_data.gap?.demand || '--';
+        document.getElementById('oppSupply').textContent = result.supporting_data.gap?.supply || '--';
+        document.getElementById('oppAvgPrice').textContent = result.supporting_data.trends?.current_avg?.toLocaleString() || '--';
+        document.getElementById('opportunityRecommendation').textContent = result.recommendation;
+      } catch (err) {
+        console.error('Error calculating opportunity:', err);
+        alert('Error calculating opportunity score. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>

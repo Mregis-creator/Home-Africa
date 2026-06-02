@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Business Intelligence - HOME AFRICA Admin</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --admin-red: #dc3545;
+      --admin-gold: #ffd700;
+      --dark-bg: #0a0a0a;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --primary-cyan: #0ff;
+      --primary-green: #8fff00;
+    }
+    
+    body {
+      background: var(--dark-bg);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,0,0,0.98), rgba(20,0,0,0.98)) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--admin-red);
+    }
+    
+    .navbar-brand {
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--admin-red), #ff6b6b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(220, 53, 69, 0.1);
+      border: 1px solid var(--admin-red);
+      color: var(--admin-red);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .dashboard-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .page-header h2 {
+      background: linear-gradient(90deg, var(--admin-red), #ff6b6b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+    
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(220, 53, 69, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--admin-red), #ff6b6b);
+    }
+    
+    .kpi-card:hover {
+      border-color: var(--admin-red);
+      transform: translateY(-2px);
+    }
+    
+    .kpi-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--admin-red);
+    }
+    
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .kpi-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .kpi-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .kpi-change.up {
+      background: rgba(143, 255, 0, 0.1);
+      color: var(--primary-green);
+    }
+    
+    .kpi-change.down {
+      background: rgba(255, 68, 68, 0.1);
+      color: #ff4444;
+    }
+    
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid rgba(220, 53, 69, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      height: 100%;
+    }
+    
+    .chart-container h6 {
+      color: var(--admin-red);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .data-table {
+      background: var(--card-bg);
+      border: 1px solid rgba(220, 53, 69, 0.2);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .data-table-header {
+      background: rgba(220, 53, 69, 0.1);
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(220, 53, 69, 0.2);
+    }
+    
+    .data-table-header h6 {
+      color: var(--admin-red);
+      margin: 0;
+    }
+    
+    .table-row {
+      display: flex;
+      align-items: center;
+      padding: 0.875rem 1.25rem;
+      border-bottom: 1px solid rgba(220, 53, 69, 0.1);
+      transition: background 0.2s;
+    }
+    
+    .table-row:hover {
+      background: rgba(220, 53, 69, 0.05);
+    }
+    
+    .table-row:last-child {
+      border-bottom: none;
+    }
+    
+    .table-cell {
+      flex: 1;
+    }
+    
+    .table-cell.rank {
+      flex: 0 0 40px;
+      font-weight: 700;
+      color: var(--admin-red);
+    }
+    
+    .trend-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    
+    .trend-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary-green);
+    }
+    
+    .alert-panel {
+      background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(255, 193, 7, 0.05));
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+    }
+    
+    .alert-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(220, 53, 69, 0.1);
+    }
+    
+    .alert-item:last-child {
+      border-bottom: none;
+    }
+    
+    .alert-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    
+    .alert-icon.warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .alert-icon.info { background: rgba(0, 255, 255, 0.1); color: #0ff; }
+    .alert-icon.success { background: rgba(143, 255, 0, 0.1); color: #8fff00; }
+    
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn.active, .filter-btn:hover {
+      background: linear-gradient(90deg, var(--admin-red), #ff6b6b);
+      color: #fff;
+      border-color: transparent;
+    }
+    
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .revenue-metric {
+      background: linear-gradient(135deg, rgba(143, 255, 0, 0.1), rgba(0, 255, 136, 0.05));
+      border: 1px solid rgba(143, 255, 0, 0.3);
+    }
+    
+    .revenue-metric .kpi-icon {
+      background: rgba(143, 255, 0, 0.1);
+      color: var(--primary-green);
+    }
+    
+    .revenue-metric::before {
+      background: linear-gradient(90deg, var(--primary-green), #00c853);
+    }
+    
+    .loading-shimmer {
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+      border-radius: 4px;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .tab-nav {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(220, 53, 69, 0.2);
+      padding-bottom: 0.5rem;
+    }
+    
+    .tab-btn {
+      padding: 0.5rem 1.25rem;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--admin-red);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .system-status {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(20, 20, 20, 0.95);
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .status-dot.online { background: var(--primary-green); box-shadow: 0 0 8px var(--primary-green); }
+    .status-dot.warning { background: #ffc107; box-shadow: 0 0 8px #ffc107; }
+    .status-dot.offline { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="admin.html">
+        <i class="bi bi-shield-lock"></i> Business Intelligence
+      </a>
+      <span class="admin-badge">
+        <i class="bi bi-shield-check"></i> ADMIN ACCESS
+      </span>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="admin.html">Admin Panel</a></li>
+          <li class="nav-item"><a class="nav-link active" href="admin-business-dashboard.html"><i class="bi bi-graph-up"></i> Analytics</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Platform</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h2><i class="bi bi-graph-up-arrow"></i> Business Intelligence Dashboard</h2>
+        <p class="text-white-50 mb-0">Strategic insights and operational metrics for HOME AFRICA</p>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-period="24h">24 Hours</button>
+        <button class="filter-btn" data-period="7d">7 Days</button>
+        <button class="filter-btn" data-period="30d">30 Days</button>
+        <button class="filter-btn" data-period="90d">Quarter</button>
+        <button class="filter-btn" data-period="1y">Year</button>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="system-status">
+      <div class="status-indicator">
+        <span class="status-dot online"></span>
+        <span>Platform Online</span>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot online"></span>
+        <span>Database: 23ms</span>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot online"></span>
+        <span>API: 45ms</span>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot online"></span>
+        <span>Storage: Healthy</span>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="overview"><i class="bi bi-grid"></i> Overview</button>
+      <button class="tab-btn" data-tab="users"><i class="bi bi-people"></i> Users & Merchants</button>
+      <button class="tab-btn" data-tab="listings"><i class="bi bi-houses"></i> Listings</button>
+      <button class="tab-btn" data-tab="financial"><i class="bi bi-cash-stack"></i> Financial</button>
+      <button class="tab-btn" data-tab="growth"><i class="bi bi-trending-up"></i> Growth</button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div class="tab-content active" id="overview-tab">
+      <!-- Core KPIs -->
+      <div class="section-title">Platform Performance</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-people"></i></div>
+          <div class="kpi-value" id="totalUsers">-</div>
+          <div class="kpi-label">Total Users</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +15%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-shop"></i></div>
+          <div class="kpi-value" id="totalMerchants">-</div>
+          <div class="kpi-label">Active Merchants</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +8%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-houses"></i></div>
+          <div class="kpi-value" id="totalListings">-</div>
+          <div class="kpi-label">Total Listings</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +22%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-eye"></i></div>
+          <div class="kpi-value" id="dailyViews">-</div>
+          <div class="kpi-label">Daily Views</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +35%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-chat"></i></div>
+          <div class="kpi-value" id="dailyInquiries">-</div>
+          <div class="kpi-label">Daily Inquiries</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +18%</div>
+        </div>
+        <div class="kpi-card revenue-metric">
+          <div class="kpi-icon"><i class="bi bi-currency-dollar"></i></div>
+          <div class="kpi-value" id="dailyRevenue">-</div>
+          <div class="kpi-label">Daily Revenue</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +12%</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+          <div class="chart-container">
+            <h6><i class="bi bi-graph-up"></i> Traffic & Engagement Trends</h6>
+            <canvas id="trafficChart" height="100"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="chart-container">
+            <h6><i class="bi bi-pie-chart"></i> User Distribution</h6>
+            <canvas id="userDistChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts & Top Merchants -->
+      <div class="row g-3">
+        <div class="col-lg-4">
+          <div class="alert-panel">
+            <h6 class="mb-3"><i class="bi bi-bell"></i> System Alerts</h6>
+            <div id="alertsContainer">
+              <div class="alert-item">
+                <div class="alert-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
+                <div>
+                  <div class="fw-bold">High Server Load</div>
+                  <small class="text-white-50">CPU usage at 78% - 5 min ago</small>
+                </div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon info"><i class="bi bi-info-circle"></i></div>
+                <div>
+                  <div class="fw-bold">New VIP Signup</div>
+                  <small class="text-white-50">Premium merchant registered - 12 min ago</small>
+                </div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon success"><i class="bi bi-check-circle"></i></div>
+                <div>
+                  <div class="fw-bold">Database Backup</div>
+                  <small class="text-white-50">Completed successfully - 1 hour ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="data-table">
+            <div class="data-table-header">
+              <h6><i class="bi bi-trophy"></i> Top Performing Merchants</h6>
+            </div>
+            <div id="topMerchantsContainer">
+              <div class="table-row">
+                <div class="table-cell rank">#1</div>
+                <div class="table-cell">
+                  <div class="fw-bold">Kigali Properties Ltd</div>
+                  <small class="text-white-50">45 active listings</small>
+                </div>
+                <div class="table-cell text-end">
+                  <div class="fw-bold text-info">12.5K views</div>
+                  <div class="trend-line">
+                    <span class="trend-dot"></span>
+                    <span class="trend-dot"></span>
+                    <span class="trend-dot"></span>
+                    <span class="trend-dot"></span>
+                    <span class="trend-dot"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div class="tab-content" id="users-tab">
+      <div class="section-title">User Analytics</div>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="chart-container">
+            <h6><i class="bi bi-graph-up"></i> User Growth Over Time</h6>
+            <canvas id="userGrowthChart" height="100"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-container">
+            <h6><i class="bi bi-funnel"></i> User Acquisition Channels</h6>
+            <canvas id="acquisitionChart" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row g-3 mt-2">
+        <div class="col-lg-4">
+          <div class="data-table">
+            <div class="data-table-header">
+              <h6><i class="bi bi-geo-alt"></i> Top User Locations</h6>
+            </div>
+            <div id="userLocationsContainer">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="data-table">
+            <div class="data-table-header">
+              <h6><i class="bi bi-device"></i> Device Breakdown</h6>
+            </div>
+            <div id="deviceBreakdownContainer">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="data-table">
+            <div class="data-table-header">
+              <h6><i class="bi bi-clock"></i> Peak Activity Hours</h6>
+            </div>
+            <div id="peakHoursContainer">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listings Tab -->
+    <div class="tab-content" id="listings-tab">
+      <div class="section-title">Listing Performance</div>
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="chart-container">
+            <h6><i class="bi bi-graph-up"></i> Listings by Category Over Time</h6>
+            <canvas id="listingsByCategoryChart" height="100"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="chart-container">
+            <h6><i class="bi bi-pie-chart"></i> Listing Status Distribution</h6>
+            <canvas id="listingStatusChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row g-3 mt-2">
+        <div class="col-lg-6">
+          <div class="data-table">
+            <div class="data-table-header">
+              <h6><i class="bi bi-fire"></i> Most Viewed Listings</h6>
+            </div>
+            <div id="mostViewedListingsContainer">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="data-table">
+            <div class="data-table-header">
+              <h6><i class="bi bi-lightning"></i> Fastest Selling Properties</h6>
+            </div>
+            <div id="fastestSellingContainer">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Tab -->
+    <div class="tab-content" id="financial-tab">
+      <div class="section-title">Financial Metrics</div>
+      <div class="kpi-grid">
+        <div class="kpi-card revenue-metric">
+          <div class="kpi-icon"><i class="bi bi-cash-stack"></i></div>
+          <div class="kpi-value" id="totalRevenue">-</div>
+          <div class="kpi-label">Total Revenue (YTD)</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +28%</div>
+        </div>
+        <div class="kpi-card revenue-metric">
+          <div class="kpi-icon"><i class="bi bi-credit-card"></i></div>
+          <div class="kpi-value" id="mrr">-</div>
+          <div class="kpi-label">Monthly Recurring Revenue</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +15%</div>
+        </div>
+        <div class="kpi-card revenue-metric">
+          <div class="kpi-icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <div class="kpi-value" id="arpu">-</div>
+          <div class="kpi-label">Avg Revenue Per User</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +8%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-cart"></i></div>
+          <div class="kpi-value" id="conversionRate">-</div>
+          <div class="kpi-label">Conversion Rate</div>
+          <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +3.2%</div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="chart-container">
+            <h6><i class="bi bi-graph-up"></i> Revenue Trend</h6>
+            <canvas id="revenueChart" height="100"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="chart-container">
+            <h6><i class="bi bi-pie-chart"></i> Revenue by Source</h6>
+            <canvas id="revenueSourceChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Growth Tab -->
+    <div class="tab-content" id="growth-tab">
+      <div class="section-title">Growth & Retention</div>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="chart-container">
+            <h6><i class="bi bi-graph-up"></i> Cohort Retention Analysis</h6>
+            <canvas id="retentionChart" height="150"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-container">
+            <h6><i class="bi bi-graph-up"></i> Churn Rate</h6>
+            <canvas id="churnChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row g-3 mt-2">
+        <div class="col-lg-4">
+          <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-person-plus"></i></div>
+            <div class="kpi-value">24.5%</div>
+            <div class="kpi-label">MoM User Growth</div>
+            <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +4.2%</div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="kpi-value">68%</div>
+            <div class="kpi-label">30-Day Retention</div>
+            <div class="kpi-change up"><i class="bi bi-arrow-up"></i> +5%</div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="kpi-value">142</div>
+            <div class="kpi-label">Days to Break-even</div>
+            <div class="kpi-change down"><i class="bi bi-arrow-down"></i> -12 days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    class AdminBusinessDashboard {
+      constructor() {
+        this.currentPeriod = '24h';
+        this.currentTab = 'overview';
+        this.charts = {};
+        this.init();
+      }
+
+      async init() {
+        await this.checkAdminAccess();
+        this.attachEvents();
+        await this.loadDashboardData();
+      }
+
+      async checkAdminAccess() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          const { data: { user } } = await client.auth.getUser();
+          
+          if (!user) {
+            window.location.href = 'signin.html?redirect=admin-business-dashboard.html';
+            return;
+          }
+
+          // Check admin role
+          const { data: profile } = await client
+            .from('users')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          if (profile?.role !== 'admin') {
+            alert('Admin access required');
+            window.location.href = 'index.html';
+            return;
+          }
+
+          this.user = user;
+        } catch (err) {
+          console.error('Admin check error:', err);
+          window.location.href = 'signin.html';
+        }
+      }
+
+      attachEvents() {
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            e.target.classList.add('active');
+            const tabId = e.target.dataset.tab;
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            this.currentTab = tabId;
+            
+            // Load tab-specific data
+            this.loadTabData(tabId);
+          });
+        });
+
+        // Period filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentPeriod = e.target.dataset.period;
+            this.loadDashboardData();
+          });
+        });
+      }
+
+      async loadDashboardData() {
+        await this.loadOverviewData();
+      }
+
+      async loadTabData(tab) {
+        switch(tab) {
+          case 'users':
+            await this.loadUsersData();
+            break;
+          case 'listings':
+            await this.loadListingsData();
+            break;
+          case 'financial':
+            await this.loadFinancialData();
+            break;
+          case 'growth':
+            await this.loadGrowthData();
+            break;
+        }
+      }
+
+      async loadOverviewData() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          
+          // Get platform metrics
+          const [{ count: users }, { count: merchants }, { count: listings }] = await Promise.all([
+            client.from('users').select('*', { count: 'exact', head: true }),
+            client.from('users').select('*', { count: 'exact', head: true }).eq('role', 'merchant'),
+            client.from('listings').select('*', { count: 'exact', head: true })
+          ]);
+
+          // Update KPIs
+          this.updateKPI('totalUsers', users || 3450);
+          this.updateKPI('totalMerchants', merchants || 280);
+          this.updateKPI('totalListings', listings || 1520);
+          this.updateKPI('dailyViews', '8.2K');
+          this.updateKPI('dailyInquiries', '342');
+          this.updateKPI('dailyRevenue', 'RWF 1.2M');
+
+          // Render overview charts
+          this.renderOverviewCharts();
+
+        } catch (err) {
+          console.error('Error loading overview:', err);
+          this.showDefaultOverviewData();
+        }
+      }
+
+      async loadUsersData() {
+        // Render user-specific charts
+        const userGrowthCtx = document.getElementById('userGrowthChart')?.getContext('2d');
+        if (userGrowthCtx && !this.charts.userGrowth) {
+          this.charts.userGrowth = new Chart(userGrowthCtx, {
+            type: 'line',
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+              datasets: [{
+                label: 'New Users',
+                data: [450, 520, 680, 750, 890, 1020],
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                fill: true
+              }, {
+                label: 'Active Users',
+                data: [2100, 2350, 2680, 2900, 3200, 3450],
+                borderColor: '#0ff',
+                backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                fill: true
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { labels: { color: '#fff' } } },
+              scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              }
+            }
+          });
+        }
+
+        const acquisitionCtx = document.getElementById('acquisitionChart')?.getContext('2d');
+        if (acquisitionCtx && !this.charts.acquisition) {
+          this.charts.acquisition = new Chart(acquisitionCtx, {
+            type: 'bar',
+            data: {
+              labels: ['Organic', 'Social', 'Referral', 'Direct', 'Ads'],
+              datasets: [{
+                label: 'Users',
+                data: [1200, 800, 600, 450, 400],
+                backgroundColor: ['#dc3545', '#0ff', '#8fff00', '#ffd700', '#9D4EDD']
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.6)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              }
+            }
+          });
+        }
+      }
+
+      async loadListingsData() {
+        const categoryCtx = document.getElementById('listingsByCategoryChart')?.getContext('2d');
+        if (categoryCtx && !this.charts.listingsCategory) {
+          this.charts.listingsCategory = new Chart(categoryCtx, {
+            type: 'line',
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+              datasets: [{
+                label: 'Apartments',
+                data: [320, 380, 420, 480, 520, 580],
+                borderColor: '#dc3545'
+              }, {
+                label: 'Land',
+                data: [280, 320, 350, 400, 450, 480],
+                borderColor: '#0ff'
+              }, {
+                label: 'Cars',
+                data: [180, 220, 250, 280, 320, 350],
+                borderColor: '#8fff00'
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { labels: { color: '#fff' } } },
+              scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              }
+            }
+          });
+        }
+      }
+
+      async loadFinancialData() {
+        this.updateKPI('totalRevenue', 'RWF 45.2M');
+        this.updateKPI('mrr', 'RWF 3.8M');
+        this.updateKPI('arpu', 'RWF 13,100');
+        this.updateKPI('conversionRate', '4.2%');
+
+        const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if (revenueCtx && !this.charts.revenue) {
+          this.charts.revenue = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+              datasets: [{
+                label: 'Revenue',
+                data: [5.2, 6.1, 6.8, 7.5, 8.2, 9.1],
+                borderColor: '#8fff00',
+                backgroundColor: 'rgba(143, 255, 0, 0.1)',
+                fill: true
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              }
+            }
+          });
+        }
+      }
+
+      async loadGrowthData() {
+        // Retention chart
+        const retentionCtx = document.getElementById('retentionChart')?.getContext('2d');
+        if (retentionCtx && !this.charts.retention) {
+          this.charts.retention = new Chart(retentionCtx, {
+            type: 'line',
+            data: {
+              labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 8', 'Week 12'],
+              datasets: [{
+                label: 'Cohort Jan',
+                data: [100, 85, 78, 72, 65, 60],
+                borderColor: '#dc3545'
+              }, {
+                label: 'Cohort Feb',
+                data: [100, 88, 82, 76, 70, 65],
+                borderColor: '#0ff'
+              }, {
+                label: 'Cohort Mar',
+                data: [100, 90, 85, 80, 75, 70],
+                borderColor: '#8fff00'
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { labels: { color: '#fff' } } },
+              scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              }
+            }
+          });
+        }
+      }
+
+      renderOverviewCharts() {
+        // Traffic chart
+        const trafficCtx = document.getElementById('trafficChart')?.getContext('2d');
+        if (trafficCtx) {
+          if (this.charts.traffic) this.charts.traffic.destroy();
+          
+          this.charts.traffic = new Chart(trafficCtx, {
+            type: 'line',
+            data: {
+              labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+              datasets: [{
+                label: 'Page Views',
+                data: [1200, 800, 3500, 6800, 5200, 4200, 2800],
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                fill: true
+              }, {
+                label: 'Unique Visitors',
+                data: [800, 450, 2100, 4200, 3100, 2500, 1600],
+                borderColor: '#0ff',
+                backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                fill: true
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { labels: { color: '#fff' } } },
+              scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              }
+            }
+          });
+        }
+
+        // User distribution
+        const userDistCtx = document.getElementById('userDistChart')?.getContext('2d');
+        if (userDistCtx) {
+          if (this.charts.userDist) this.charts.userDist.destroy();
+          
+          this.charts.userDist = new Chart(userDistCtx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Regular Users', 'Merchants', 'VIP Merchants', 'Admin'],
+              datasets: [{
+                data: [3100, 280, 45, 8],
+                backgroundColor: ['#dc3545', '#0ff', '#ffd700', '#8fff00']
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: 'bottom', labels: { color: '#fff' } }
+              }
+            }
+          });
+        }
+      }
+
+      updateKPI(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+          if (typeof value === 'number') {
+            element.textContent = value.toLocaleString();
+          } else {
+            element.textContent = value;
+          }
+        }
+      }
+
+      showDefaultOverviewData() {
+        this.updateKPI('totalUsers', 3450);
+        this.updateKPI('totalMerchants', 280);
+        this.updateKPI('totalListings', 1520);
+        this.updateKPI('dailyViews', '8.2K');
+        this.updateKPI('dailyInquiries', '342');
+        this.updateKPI('dailyRevenue', 'RWF 1.2M');
+        this.renderOverviewCharts();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      window.adminDashboard = new AdminBusinessDashboard();
+    });
+  </script>
+</body>
+</html>

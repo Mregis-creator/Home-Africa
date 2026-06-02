@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Messages - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA � Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
 
   <!-- Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -384,13 +387,24 @@
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="bg-dark text-light pt-4 pb-3 mt-5">
+  <!-- 🌍 Minimal Footer -->
+  <footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff;">
     <div class="container">
-      <div class="text-center">
-        <p>&copy; 2025 HOME AFRICA. All rights reserved.</p>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="small">
+          &copy; <span class="footer-year">2026</span> HOME AFRICA · 
+          <a href="privacy-policy.html" class="footer-link text-white">Privacy</a> · 
+          <a href="terms-of-service.html" class="footer-link text-white">Terms</a>
+        </div>
+        <div>
+          <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+          <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+          <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+          <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>
+        </div>
       </div>
     </div>
+    <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
   </footer>
 
   <!-- Bootstrap JS -->
@@ -407,13 +421,37 @@
   <script src="js/protected-pages.js"></script>
   
   <!-- Messages Script -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/email-notifications.js"></script>
   <script src="js/messages.js"></script>
   
   <!-- Footer Fix -->
   <script src="js/footer-fix.js"></script>
   
   <!-- AI Chatbot -->
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
+
+  <!-- Auth Guard - Redirect if not logged in -->
+  <script>
+    (async function() {
+      const supabaseClient = window.getSupabaseClient ? window.getSupabaseClient() : 
+                            (window.supabaseClient || (typeof supabase !== 'undefined' ? supabase.createClient(
+                              'https://your-project.supabase.co',
+                              'your-anon-key'
+                            ) : null));
+      
+      if (supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.user) {
+          // Store intended destination
+          sessionStorage.setItem('redirectAfterLogin', window.location.href);
+          // Redirect to login
+          window.location.href = 'signin.html?redirect=messages';
+        }
+      }
+    })();
+  </script>
 
   <script>
     // Initialize particles

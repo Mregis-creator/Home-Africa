@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Merchant Dashboard | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA � Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -217,6 +220,108 @@
         </div>
       </div>
 
+      <!-- CRM Lead Pipeline Widget -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="dashboard-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="text-white mb-0"><i class="bi bi-funnel"></i> Lead Pipeline</h4>
+              <a href="crm-dashboard.html" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-box-arrow-up-right"></i> Open CRM
+              </a>
+            </div>
+            <div class="row" id="crmLeadSummary">
+              <div class="col-md-3 mb-3">
+                <div class="text-center p-3 rounded" style="background: linear-gradient(135deg, rgba(255,51,102,0.2) 0%, rgba(255,51,102,0.1) 100%); border: 2px solid #ff3366;">
+                  <h3 class="mb-1" style="color: #ff3366;" id="crmHotCount">0</h3>
+                  <small class="text-white">🔥 Hot Leads</small>
+                  <p class="mb-0 mt-1" style="font-size: 0.75rem; color: #ff6688;">Contact within 2hrs</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="text-center p-3 rounded" style="background: linear-gradient(135deg, rgba(255,170,0,0.2) 0%, rgba(255,170,0,0.1) 100%); border: 2px solid #ffaa00;">
+                  <h3 class="mb-1" style="color: #ffaa00;" id="crmWarmCount">0</h3>
+                  <small class="text-white">⚡ Warm Leads</small>
+                  <p class="mb-0 mt-1" style="font-size: 0.75rem; color: #ffcc44;">Follow up today</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="text-center p-3 rounded" style="background: linear-gradient(135deg, rgba(102,170,255,0.2) 0%, rgba(102,170,255,0.1) 100%); border: 2px solid #66aaff;">
+                  <h3 class="mb-1" style="color: #66aaff;" id="crmColdCount">0</h3>
+                  <small class="text-white">❄️ Cold Leads</small>
+                  <p class="mb-0 mt-1" style="font-size: 0.75rem; color: #88bbff;">Nurture campaign</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="text-center p-3 rounded" style="background: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.1) 100%); border: 2px solid #00ff88;">
+                  <h3 class="mb-1" style="color: #00ff88;" id="crmConversionRate">0%</h3>
+                  <small class="text-white">✅ Conversion</small>
+                  <p class="mb-0 mt-1" style="font-size: 0.75rem; color: #44ffaa;">This month</p>
+                </div>
+              </div>
+            </div>
+            <div id="crmInsights" class="mt-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversion Funnel Widget -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="dashboard-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="text-white mb-0"><i class="bi bi-filter-circle"></i> Conversion Funnel</h4>
+              <a href="funnel-dashboard.html" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-box-arrow-up-right"></i> View Details
+              </a>
+            </div>
+            <div class="row align-items-center">
+              <div class="col-md-2 text-center">
+                <div class="p-2 rounded" style="background: rgba(0,255,136,0.1); border: 1px solid var(--primary);">
+                  <h4 class="mb-1 text-white" id="funnelViews">0</h4>
+                  <small class="text-white-50">Views</small>
+                </div>
+              </div>
+              <div class="col-md-1 text-center">
+                <i class="bi bi-arrow-right text-white-50"></i>
+                <div class="small text-success" id="funnelViewToFav">-%</div>
+              </div>
+              <div class="col-md-2 text-center">
+                <div class="p-2 rounded" style="background: rgba(255,170,0,0.1); border: 1px solid var(--warning);">
+                  <h4 class="mb-1 text-white" id="funnelFavorites">0</h4>
+                  <small class="text-white-50">Favorites</small>
+                </div>
+              </div>
+              <div class="col-md-1 text-center">
+                <i class="bi bi-arrow-right text-white-50"></i>
+                <div class="small text-success" id="funnelFavToContact">-%</div>
+              </div>
+              <div class="col-md-2 text-center">
+                <div class="p-2 rounded" style="background: rgba(0,136,255,0.1); border: 1px solid #0088ff;">
+                  <h4 class="mb-1 text-white" id="funnelContacts">0</h4>
+                  <small class="text-white-50">Contacts</small>
+                </div>
+              </div>
+              <div class="col-md-1 text-center">
+                <i class="bi bi-arrow-right text-white-50"></i>
+                <div class="small text-success" id="funnelContactToMsg">-%</div>
+              </div>
+              <div class="col-md-2 text-center">
+                <div class="p-2 rounded" style="background: rgba(0,255,136,0.2); border: 1px solid var(--success);">
+                  <h4 class="mb-1" style="color: var(--success);" id="funnelMessages">0</h4>
+                  <small class="text-white-50">Messages</small>
+                </div>
+              </div>
+              <div class="col-md-1 text-center">
+                <div class="small text-muted">Rate</div>
+                <div class="fw-bold text-success" id="funnelConversionRate">0%</div>
+              </div>
+            </div>
+            <div id="funnelInsights" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Analytics Charts -->
       <div class="row mb-4">
         <div class="col-md-6 mb-3">
@@ -287,7 +392,10 @@
   <!-- Footer -->
   <footer class="bg-dark text-light pt-4 pb-3 mt-5" style="position:relative;z-index:1;">
     <div class="container text-center">
-      <p class="mb-0">&copy; 2025 HOME AFRICA. All rights reserved.</p>
+      <p class="mb-0">&copy; 2025 HOME AFRICA. All rights reserved. | 
+        <a href="privacy-policy.html" class="footer-link">Privacy Policy</a> | 
+        <a href="terms-of-service.html" class="footer-link">Terms of Service</a>
+      </p>
     </div>
   </footer>
 
@@ -302,8 +410,28 @@
       interactivity: { events: { onhover: { enable: true, mode: 'repulse' } } }
     });
 
-    // Get merchant name from localStorage
-    const merchantName = localStorage.getItem('merchantName') || 'Merchant';
+    // Get current user ID from Supabase auth
+    let currentUserId = null;
+    async function getCurrentUser() {
+      const supabase = window.supabaseClient;
+      if (!supabase) return null;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          currentUserId = session.user.id;
+          const nameEl = document.getElementById('dashboardUserName');
+          if (nameEl) nameEl.textContent = session.user.email?.split('@')[0] || 'Seller';
+          return session.user.id;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    // Init on load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await getCurrentUser();
+      loadListings('apartments');
+    });
 
     // Switch tabs
     function switchTab(tab) {
@@ -338,7 +466,8 @@
         }
 
         const supabaseType = typeMap[type];
-        const listings = await window.supabaseListings.getListingsByMerchant(merchantName, supabaseType);
+        if (!currentUserId) await getCurrentUser();
+        const listings = await window.supabaseListings.getListingsByUser(currentUserId, supabaseType);
         
         container.innerHTML = '';
         
@@ -368,18 +497,34 @@
       const image = listing.images && listing.images[0] ? listing.images[0] : (type === 'apartments' ? 'images/house1.jpg' : type === 'cars' ? 'images/car1.jpg' : 'images/land1.jpg');
       const location = typeof listing.location === 'string' ? listing.location : (listing.location?.city || '');
       
+      // Check featured status
+      const isFeatured = listing.featured;
+      const featuredUntil = listing.featured_until ? new Date(listing.featured_until).toLocaleDateString() : null;
+      const featuredBadge = isFeatured 
+        ? `<span class="badge bg-warning text-dark ms-2" style="font-size:0.7rem;"><i class="bi bi-lightning-fill"></i> Featured ${featuredUntil ? 'until ' + featuredUntil : ''}</span>`
+        : '';
+      
+      // Feature button (only show if not featured or featured expired)
+      const showFeatureBtn = !isFeatured || (listing.featured_until && new Date(listing.featured_until) < new Date());
+      const featureBtn = showFeatureBtn
+        ? `<button class="btn btn-sm btn-action" style="background:linear-gradient(90deg,#ff0088,#ff8800);color:#fff;border:none;" onclick="featureListing('${id}', '${type}')">
+             <i class="bi bi-lightning-charge"></i> Feature
+           </button>`
+        : '';
+      
       div.innerHTML = `
         <div class="row align-items-center">
           <div class="col-md-2">
             <img src="${image}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;" alt="${title}">
           </div>
           <div class="col-md-6">
-            <h5 class="text-white mb-1">${title}</h5>
+            <h5 class="text-white mb-1">${title}${featuredBadge}</h5>
             <p class="text-white-50 mb-0">RWF ${price}</p>
             ${location ? `<small class="text-white-50"><i class="bi bi-geo-alt"></i> ${location}</small>` : ''}
           </div>
           <div class="col-md-4">
             <div class="listing-actions">
+              ${featureBtn}
               <button class="btn btn-sm btn-primary btn-action" onclick="editListing('${id}', '${type}')">
                 <i class="bi bi-pencil"></i> Edit
               </button>
@@ -396,6 +541,11 @@
       return div;
     }
 
+    // Feature listing - redirect to payment page
+    function featureListing(id, type) {
+      window.location.href = `feature-listing.html?listingId=${id}&type=${type}`;
+    }
+
     // Edit listing
     async function editListing(id, type) {
       try {
@@ -409,76 +559,76 @@
           return;
         }
 
-        document.getElementById('editId').value = id;
-        document.getElementById('editType').value = type;
+          document.getElementById('editId').value = id;
+          document.getElementById('editType').value = type;
         
         const location = typeof listing.location === 'string' ? listing.location : (listing.location?.city || '');
         const mileage = listing.metadata?.mileage || '';
         const size = listing.metadata?.size || '';
-        
-        let formFields = '';
-        if (type === 'apartments') {
-          formFields = `
-            <div class="mb-3">
-              <label class="text-white">Title *</label>
+          
+          let formFields = '';
+          if (type === 'apartments') {
+            formFields = `
+              <div class="mb-3">
+                <label class="text-white">Title *</label>
               <input type="text" class="form-control" id="editTitle" value="${listing.title || ''}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Location *</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Location *</label>
               <input type="text" class="form-control" id="editLocation" value="${location}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Price (RWF) *</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Price (RWF) *</label>
               <input type="number" class="form-control" id="editPrice" value="${listing.price || ''}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Description</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Description</label>
               <textarea class="form-control" id="editDescription" rows="3" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">${listing.description || ''}</textarea>
-            </div>
-          `;
-        } else if (type === 'cars') {
-          formFields = `
-            <div class="mb-3">
-              <label class="text-white">Title *</label>
+              </div>
+            `;
+          } else if (type === 'cars') {
+            formFields = `
+              <div class="mb-3">
+                <label class="text-white">Title *</label>
               <input type="text" class="form-control" id="editTitle" value="${listing.title || ''}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Price (RWF) *</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Price (RWF) *</label>
               <input type="number" class="form-control" id="editPrice" value="${listing.price || ''}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Mileage</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Mileage</label>
               <input type="text" class="form-control" id="editMileage" value="${mileage}" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-          `;
-        } else {
-          formFields = `
-            <div class="mb-3">
-              <label class="text-white">Title *</label>
+              </div>
+            `;
+          } else {
+            formFields = `
+              <div class="mb-3">
+                <label class="text-white">Title *</label>
               <input type="text" class="form-control" id="editTitle" value="${listing.title || ''}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Location *</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Location *</label>
               <input type="text" class="form-control" id="editLocation" value="${location}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Price (RWF) *</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Price (RWF) *</label>
               <input type="number" class="form-control" id="editPrice" value="${listing.price || ''}" required style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-            <div class="mb-3">
-              <label class="text-white">Size</label>
+              </div>
+              <div class="mb-3">
+                <label class="text-white">Size</label>
               <input type="text" class="form-control" id="editSize" value="${size}" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#fff;">
-            </div>
-          `;
-        }
-        
-        document.getElementById('editFormFields').innerHTML = formFields;
-        const modal = new bootstrap.Modal(document.getElementById('editModal'));
-        modal.show();
+              </div>
+            `;
+          }
+          
+          document.getElementById('editFormFields').innerHTML = formFields;
+          const modal = new bootstrap.Modal(document.getElementById('editModal'));
+          modal.show();
       } catch (error) {
         console.error('Error loading listing for edit:', error);
         alert('Error loading listing: ' + error.message);
-      }
+        }
     }
 
     // Save edit
@@ -706,11 +856,126 @@
   <!-- Auth System -->
   <script src="js/auth.js"></script>
   
+  <!-- Navbar User Indicator -->
+  <script src="js/navbar-user-indicator.js"></script>
+  
   <!-- Protected Pages Auth Check -->
   <script src="js/protected-pages.js"></script>
   
+  <!-- Lead CRM System -->
+  <script src="js/lead-crm.js"></script>
+  
+  <!-- Funnel Analytics System -->
+  <script src="js/funnel-analytics.js"></script>
+  
   <!-- AI Chatbot -->
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
+  
+  <!-- CRM Widget Data Loader -->
+  <script>
+    // Load CRM data for dashboard widget
+    async function loadCRMWidget() {
+      try {
+        if (!window.leadCRM) return;
+        
+        await window.leadCRM.init();
+        const leads = await window.leadCRM.loadLeads();
+        
+        // Update counts
+        const hot = leads.filter(l => l.temperature === 'hot').length;
+        const warm = leads.filter(l => l.temperature === 'warm').length;
+        const cold = leads.filter(l => l.temperature === 'cold').length;
+        
+        // Calculate conversion rate
+        const total = leads.length || 1;
+        const closed = leads.filter(l => l.pipeline_stage === 'closed_won').length;
+        const conversionRate = Math.round((closed / total) * 100);
+        
+        // Update DOM
+        document.getElementById('crmHotCount').textContent = hot;
+        document.getElementById('crmWarmCount').textContent = warm;
+        document.getElementById('crmColdCount').textContent = cold;
+        document.getElementById('crmConversionRate').textContent = conversionRate + '%';
+        
+        // Show insights if urgent
+        const insightsContainer = document.getElementById('crmInsights');
+        const urgentHot = leads.filter(l => {
+          if (l.temperature !== 'hot') return false;
+          const hoursSince = (Date.now() - new Date(l.last_activity_at)) / (1000 * 60 * 60);
+          return hoursSince > 24 && l.pipeline_stage === 'inquiry';
+        });
+        
+        if (urgentHot.length > 0) {
+          insightsContainer.innerHTML = `
+            <div class="alert" style="background: rgba(255,51,102,0.2); border: 1px solid #ff3366; color: #ff6688;">
+              <i class="bi bi-exclamation-circle"></i> 
+              <strong>${urgentHot.length} hot lead${urgentHot.length > 1 ? 's' : ''}</strong> need${urgentHot.length === 1 ? 's' : ''} follow-up! 
+              <a href="crm-dashboard.html" class="alert-link" style="color: #ffaa00;">Go to CRM →</a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading CRM widget:', err);
+      }
+    }
+    
+    // Load CRM data after page load
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(loadCRMWidget, 1000); // Delay to ensure leadCRM is initialized
+      setTimeout(loadFunnelWidget, 2000); // Delay for funnel analytics
+    });
+    
+    // Load Funnel data for dashboard widget
+    async function loadFunnelWidget() {
+      try {
+        if (!window.funnelAnalytics) return;
+        
+        await window.funnelAnalytics.init();
+        
+        // Get current user
+        const { data: { user } } = await window.funnelAnalytics.supabase.auth.getUser();
+        if (!user) return;
+        
+        const funnelData = await window.funnelAnalytics.getMerchantFunnel(user.id, '30days');
+        
+        // Update funnel widget
+        if (funnelData && funnelData.funnel) {
+          document.getElementById('funnelViews').textContent = funnelData.funnel.unique_users?.view_listing || 0;
+          document.getElementById('funnelFavorites').textContent = funnelData.funnel.unique_users?.favorite || 0;
+          document.getElementById('funnelContacts').textContent = funnelData.funnel.unique_users?.contact_click || 0;
+          document.getElementById('funnelMessages').textContent = funnelData.funnel.unique_users?.message_sent || 0;
+          document.getElementById('funnelConversionRate').textContent = (funnelData.funnel.conversion_rates?.overall || 0) + '%';
+          
+          // Calculate intermediate conversion rates
+          const views = funnelData.funnel.unique_users?.view_listing || 1;
+          const favs = funnelData.funnel.unique_users?.favorite || 0;
+          const contacts = funnelData.funnel.unique_users?.contact_click || 0;
+          const msgs = funnelData.funnel.unique_users?.message_sent || 0;
+          
+          document.getElementById('funnelViewToFav').textContent = Math.round((favs / views) * 100) + '%';
+          document.getElementById('funnelFavToContact').textContent = favs > 0 ? Math.round((contacts / favs) * 100) + '%' : '0%';
+          document.getElementById('funnelContactToMsg').textContent = contacts > 0 ? Math.round((msgs / contacts) * 100) + '%' : '0%';
+          
+          // Show abandonment insight if high
+          if (funnelData.abandonments && funnelData.abandonments.total > 0) {
+            const recoveryRate = funnelData.abandonments.recovery_rate || 0;
+            const insightsContainer = document.getElementById('funnelInsights');
+            insightsContainer.innerHTML = `
+              <div class="alert" style="background: rgba(255,170,0,0.1); border: 1px solid var(--warning); color: #ffcc44;">
+                <i class="bi bi-lightning"></i> 
+                <strong>${funnelData.abandonments.total} users</strong> showed interest but didn't contact you. 
+                <strong>${recoveryRate}%</strong> were recovered automatically. 
+                <a href="funnel-dashboard.html" class="alert-link" style="color: var(--primary);">View Recovery →</a>
+              </div>
+            `;
+          }
+        }
+      } catch (err) {
+        console.error('Error loading funnel widget:', err);
+      }
+    }
+  </script>
 </body>
 </html>
 

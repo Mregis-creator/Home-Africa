@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Dashboard - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary-cyan: #0ff;
+      --primary-green: #8fff00;
+      --user-purple: #9D4EDD;
+      --dark-bg: #0a0a0a;
+      --card-bg: rgba(20, 20, 20, 0.95);
+    }
+    
+    body {
+      background: var(--dark-bg);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    .navbar {
+      background: rgba(0, 0, 0, 0.95) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(157, 78, 221, 0.3);
+    }
+    
+    .navbar-brand {
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--user-purple), #E0AAFF);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(157, 78, 221, 0.1);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      color: var(--user-purple);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+    
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+    }
+    
+    .page-header h2 {
+      background: linear-gradient(90deg, var(--user-purple), #E0AAFF);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+    
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(224, 170, 255, 0.05));
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .welcome-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--user-purple), #E0AAFF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(157, 78, 221, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--user-purple);
+      transform: translateY(-2px);
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(157, 78, 221, 0.1);
+      color: var(--user-purple);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .stat-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+    
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid rgba(157, 78, 221, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .chart-container h5 {
+      color: var(--user-purple);
+      margin-bottom: 1rem;
+    }
+    
+    .activity-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(157, 78, 221, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    
+    .activity-card h5 {
+      color: var(--user-purple);
+      margin-bottom: 1rem;
+    }
+    
+    .activity-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(157, 78, 221, 0.1);
+      transition: all 0.2s;
+    }
+    
+    .activity-item:hover {
+      background: rgba(157, 78, 221, 0.05);
+      border-radius: 8px;
+    }
+    
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.25rem;
+    }
+    
+    .activity-icon.view { background: rgba(0, 255, 255, 0.1); color: #0ff; }
+    .activity-icon.favorite { background: rgba(255, 0, 136, 0.1); color: #ff0088; }
+    .activity-icon.search { background: rgba(143, 255, 0, 0.1); color: #8fff00; }
+    .activity-icon.message { background: rgba(157, 78, 221, 0.1); color: var(--user-purple); }
+    
+    .activity-content {
+      flex: 1;
+    }
+    
+    .activity-title {
+      font-weight: 500;
+      color: #fff;
+    }
+    
+    .activity-time {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .action-btn {
+      background: var(--card-bg);
+      border: 1px solid rgba(157, 78, 221, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .action-btn:hover {
+      border-color: var(--user-purple);
+      transform: translateY(-3px);
+      color: #fff;
+    }
+    
+    .action-btn i {
+      font-size: 1.75rem;
+      color: var(--user-purple);
+    }
+    
+    .saved-search-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: rgba(157, 78, 221, 0.05);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .saved-search-item:hover {
+      background: rgba(157, 78, 221, 0.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .upgrade-banner {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 170, 0, 0.05));
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    
+    .upgrade-banner h5 {
+      color: #ffd700;
+      margin: 0;
+    }
+    
+    .btn-upgrade {
+      background: linear-gradient(90deg, #ffd700, #ffaa00);
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .btn-upgrade:hover {
+      transform: scale(1.05);
+      color: #000;
+    }
+    
+    .time-filter {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .time-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .time-btn.active, .time-btn:hover {
+      background: linear-gradient(90deg, var(--user-purple), #E0AAFF);
+      color: #fff;
+      border-color: transparent;
+    }
+    
+    .loading-pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-person-workspace"></i> My Dashboard
+      </a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="explore.html">Explore</a></li>
+          <li class="nav-item"><a class="nav-link" href="favorites.html"><i class="bi bi-heart"></i> Favorites</a></li>
+          <li class="nav-item"><a class="nav-link" href="messages.html"><i class="bi bi-chat"></i> Messages</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile-personal.html"><i class="bi bi-person"></i> Profile</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <span class="user-badge mb-2">
+          <i class="bi bi-person"></i> Registered User
+        </span>
+        <h2><i class="bi bi-speedometer2"></i> Personal Dashboard</h2>
+        <p class="text-white-50 mb-0">Track your activity and manage your property journey</p>
+      </div>
+      <div class="time-filter">
+        <button class="time-btn active" data-period="7d">7 Days</button>
+        <button class="time-btn" data-period="30d">30 Days</button>
+        <button class="time-btn" data-period="90d">3 Months</button>
+      </div>
+    </div>
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <div class="welcome-avatar" id="userAvatar">U</div>
+      <div>
+        <h4 class="mb-1">Welcome back, <span id="userName">User</span>!</h4>
+        <p class="text-white-50 mb-0">Here's what's happening with your account</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <a href="explore.html" class="action-btn">
+        <i class="bi bi-search"></i>
+        <span>Search Properties</span>
+      </a>
+      <a href="favorites.html" class="action-btn">
+        <i class="bi bi-heart"></i>
+        <span>View Favorites</span>
+      </a>
+      <a href="messages.html" class="action-btn">
+        <i class="bi bi-chat-dots"></i>
+        <span>Messages</span>
+      </a>
+      <a href="saved-searches.html" class="action-btn">
+        <i class="bi bi-bookmark"></i>
+        <span>Saved Searches</span>
+      </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-eye"></i>
+          </div>
+          <div class="stat-value loading-pulse" id="totalViews">-</div>
+          <div class="stat-label">Properties Viewed</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-heart"></i>
+          </div>
+          <div class="stat-value loading-pulse" id="totalFavorites">-</div>
+          <div class="stat-label">Saved Favorites</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-search"></i>
+          </div>
+          <div class="stat-value loading-pulse" id="totalSearches">-</div>
+          <div class="stat-label">Searches Made</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-chat"></i>
+          </div>
+          <div class="stat-value loading-pulse" id="totalMessages">-</div>
+          <div class="stat-label">Messages Sent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts & Activity Row -->
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="chart-container">
+          <h5><i class="bi bi-graph-up"></i> Your Activity Over Time</h5>
+          <canvas id="activityChart" height="100"></canvas>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="activity-card">
+          <h5><i class="bi bi-clock-history"></i> Recent Activity</h5>
+          <div id="activityContainer">
+            <div class="empty-state">
+              <div class="spinner-border text-info"></div>
+              <p class="mt-2">Loading your activity...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <!-- Property Types Chart -->
+        <div class="chart-container">
+          <h5><i class="bi bi-pie-chart"></i> Properties You're Interested In</h5>
+          <canvas id="interestsChart" height="200"></canvas>
+        </div>
+        
+        <!-- Saved Searches -->
+        <div class="activity-card">
+          <h5><i class="bi bi-bookmark-star"></i> Saved Searches</h5>
+          <div id="savedSearchesContainer">
+            <div class="empty-state">
+              <i class="bi bi-bookmark" style="font-size: 2rem;"></i>
+              <p class="mt-2">No saved searches yet</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Upgrade Banner -->
+        <div class="upgrade-banner">
+          <div>
+            <h5><i class="bi bi-star-fill"></i> Upgrade to Merchant</h5>
+            <p class="text-white-50 mb-0 small">Post your properties and access detailed analytics</p>
+          </div>
+          <a href="signup.html" class="btn btn-upgrade">Upgrade Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    class UserDashboard {
+      constructor() {
+        this.currentPeriod = '7d';
+        this.charts = {};
+        this.init();
+      }
+
+      async init() {
+        await this.checkAuth();
+        this.attachEvents();
+        await this.loadUserData();
+      }
+
+      async checkAuth() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          const { data: { user } } = await client.auth.getUser();
+          
+          if (!user) {
+            window.location.href = 'signin.html?redirect=user-dashboard.html';
+            return;
+          }
+          
+          this.user = user;
+          this.updateUserDisplay(user);
+        } catch (err) {
+          console.error('Auth check error:', err);
+          window.location.href = 'signin.html?redirect=user-dashboard.html';
+        }
+      }
+
+      updateUserDisplay(user) {
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+        document.getElementById('userName').textContent = name;
+        document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+      }
+
+      attachEvents() {
+        document.querySelectorAll('.time-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentPeriod = e.target.dataset.period;
+            this.loadUserData();
+          });
+        });
+      }
+
+      async loadUserData() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          const days = this.getDaysFromPeriod(this.currentPeriod);
+          const startDate = new Date();
+          startDate.setDate(startDate.getDate() - days);
+
+          // Load user activity data
+          const [views, favorites, searches, messages] = await Promise.all([
+            this.fetchUserActivity(client, 'listing_views', startDate),
+            this.fetchUserActivity(client, 'favorites', startDate),
+            this.fetchUserActivity(client, 'searches', startDate),
+            this.fetchUserActivity(client, 'messages', startDate)
+          ]);
+
+          this.updateStats({
+            views: views.length,
+            favorites: favorites.length,
+            searches: searches.length,
+            messages: messages.length
+          });
+
+          this.renderCharts({ views, favorites, searches });
+          this.renderActivity([...views, ...favorites, ...searches].sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+          ).slice(0, 10));
+          this.renderSavedSearches(searches);
+
+        } catch (err) {
+          console.error('Error loading user data:', err);
+          this.showDefaultData();
+        }
+      }
+
+      async fetchUserActivity(client, table, startDate) {
+        try {
+          const { data } = await client
+            .from(table)
+            .select('*')
+            .eq('user_id', this.user.id)
+            .gte('created_at', startDate.toISOString())
+            .order('created_at', { ascending: false });
+          
+          return data || [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      getDaysFromPeriod(period) {
+        const map = { '7d': 7, '30d': 30, '90d': 90 };
+        return map[period] || 7;
+      }
+
+      updateStats(data) {
+        this.animateValue('totalViews', data.views);
+        this.animateValue('totalFavorites', data.favorites);
+        this.animateValue('totalSearches', data.searches);
+        this.animateValue('totalMessages', data.messages);
+      }
+
+      animateValue(id, value) {
+        const element = document.getElementById(id);
+        element.classList.remove('loading-pulse');
+        element.textContent = value.toLocaleString();
+      }
+
+      renderCharts(data) {
+        // Activity chart
+        const activityCtx = document.getElementById('activityChart').getContext('2d');
+        
+        if (this.charts.activity) this.charts.activity.destroy();
+        
+        // Group by date
+        const dates = {};
+        const days = this.getDaysFromPeriod(this.currentPeriod);
+        for (let i = 0; i < days; i++) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          dates[date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })] = { views: 0, favorites: 0 };
+        }
+        
+        data.views.forEach(v => {
+          const date = new Date(v.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          if (dates[date]) dates[date].views++;
+        });
+        
+        data.favorites.forEach(f => {
+          const date = new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          if (dates[date]) dates[date].favorites++;
+        });
+        
+        const labels = Object.keys(dates).reverse();
+        const viewData = labels.map(d => dates[d].views);
+        const favData = labels.map(d => dates[d].favorites);
+        
+        this.charts.activity = new Chart(activityCtx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Views',
+              data: viewData,
+              borderColor: '#0ff',
+              backgroundColor: 'rgba(0, 255, 255, 0.1)',
+              fill: true,
+              tension: 0.4
+            }, {
+              label: 'Favorites',
+              data: favData,
+              borderColor: '#9D4EDD',
+              backgroundColor: 'rgba(157, 78, 221, 0.1)',
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#fff' } } },
+            scales: {
+              x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+          }
+        });
+
+        // Interests pie chart
+        const interestsCtx = document.getElementById('interestsChart').getContext('2d');
+        
+        if (this.charts.interests) this.charts.interests.destroy();
+        
+        // Count by type from views/favorites
+        const types = { apartments: 0, land: 0, cars: 0, other: 0 };
+        [...data.views, ...data.favorites].forEach(item => {
+          const type = item.listing_type || item.type || 'other';
+          if (types[type] !== undefined) types[type]++;
+          else types.other++;
+        });
+        
+        this.charts.interests = new Chart(interestsCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Apartments', 'Land', 'Cars', 'Other'],
+            datasets: [{
+              data: [types.apartments, types.land, types.cars, types.other],
+              backgroundColor: ['#9D4EDD', '#0ff', '#8fff00', '#ff8800']
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#fff' } }
+            }
+          }
+        });
+      }
+
+      renderActivity(activities) {
+        const container = document.getElementById('activityContainer');
+        
+        if (activities.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="bi bi-clock" style="font-size: 2rem;"></i>
+              <p class="mt-2">No recent activity</p>
+            </div>
+          `;
+          return;
+        }
+
+        const getIcon = (type) => {
+          if (type.includes('view')) return { icon: 'eye', class: 'view' };
+          if (type.includes('favorite')) return { icon: 'heart', class: 'favorite' };
+          if (type.includes('search')) return { icon: 'search', class: 'search' };
+          return { icon: 'chat', class: 'message' };
+        };
+
+        container.innerHTML = activities.map(activity => {
+          const { icon, class: iconClass } = getIcon(activity.type || '');
+          const time = new Date(activity.created_at).toLocaleString();
+          const title = activity.listing_title || activity.query || 'Activity';
+          
+          return `
+            <div class="activity-item">
+              <div class="activity-icon ${iconClass}">
+                <i class="bi bi-${icon}"></i>
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">${title}</div>
+                <div class="activity-time">${time}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderSavedSearches(searches) {
+        const container = document.getElementById('savedSearchesContainer');
+        
+        if (searches.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="bi bi-bookmark" style="font-size: 2rem;"></i>
+              <p class="mt-2">No saved searches yet</p>
+              <a href="explore.html" class="btn btn-sm btn-outline-info mt-2">Start Searching</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = searches.slice(0, 5).map(search => `
+          <div class="saved-search-item">
+            <div>
+              <i class="bi bi-search text-info"></i>
+              <span class="ms-2">${search.query || 'Search'}</span>
+            </div>
+            <a href="search.html?q=${encodeURIComponent(search.query || '')}" class="btn btn-sm btn-outline-light">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        `).join('');
+      }
+
+      showDefaultData() {
+        this.updateStats({ views: 0, favorites: 0, searches: 0, messages: 0 });
+        document.getElementById('activityContainer').innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ff4444;"></i>
+            <p class="mt-2">Error loading data. Please refresh.</p>
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      window.userDashboard = new UserDashboard();
+    });
+  </script>
+</body>
+</html>

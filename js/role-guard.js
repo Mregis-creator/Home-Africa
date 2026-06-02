@@ -22,14 +22,19 @@ class RoleGuard {
   protectPages() {
     const currentPage = window.location.pathname.split('/').pop();
     
-    // Admin-only pages
+    // Skip admin.html - it handles its own authentication
     if (currentPage === 'admin.html') {
-      if (!this.rbac.hasRole('admin')) {
-        alert('Access denied. Admin privileges required.');
-        window.location.href = 'index.html';
-        return;
-      }
+      return;
     }
+    
+    // Check if RBAC is available
+    if (!this.rbac || typeof this.rbac.hasRole !== 'function') {
+      console.warn('RBAC not initialized, skipping role guard');
+      return;
+    }
+    
+    // Admin-only pages (excluding admin.html which handles its own auth)
+    // This is for other admin pages if any
 
     // Merchant-only pages (post.html removed - now public)
     const merchantPages = ['dashboard.html']; // post.html removed - public posting enabled

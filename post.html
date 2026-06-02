@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Post Your Property | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA � Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
 
   <!-- Offline Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -130,14 +133,7 @@
       color: #FFD600 !important;
       text-decoration: underline;
     }
-    footer.bg-dark {
-      background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
-      border-top: 2px solid #0ff;
-      box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
-      position: static !important;
-      bottom: unset !important;
-      width: 100%;
-    }
+    /* Removed duplicate footer style - using unified style below */
     .footer-link {
       color: #fff !important;
       transition: color 0.2s;
@@ -226,23 +222,34 @@
       background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
       border-top: 2px solid #0ff;
       box-shadow: 0 -2px 12px rgba(0,255,136,0.08);
-      position: fixed;
-      bottom: 0;
-      left: 0;
+      position: relative;
+      bottom: auto;
+      left: auto;
       width: 100%;
-      z-index: 1000;
+      z-index: 100;
+      margin-top: auto;
     }
-    /* Add padding to body to prevent content from being hidden behind fixed footer */
-    body {
-      padding-bottom: 250px;
+    /* Ensure body uses flexbox for sticky footer */
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    #main-content-post {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 100vh;
+    }
+    /* Content wrapper should grow to push footer down */
+    #main-content-post > .container {
+      flex: 1;
+    }
+    /* Footer stays at bottom when content is short, pushed down when content is long */
+    footer.bg-dark {
+      margin-top: auto;
     }
     @media (max-width: 768px) {
-      footer.bg-dark {
-        position: relative;
-      }
-      body {
-        padding-bottom: 0;
-      }
       footer.bg-dark .row > div {
         margin-bottom: 1.5rem;
       }
@@ -502,14 +509,39 @@
     }
     /* Enhanced Form Styling */
     .posting-form-container {
-      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,255,136,0.2) 100%);
-      border: 2px solid #0ff;
+      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,255,136,0.2) 100%) !important;
+      border: 2px solid #0ff !important;
       border-radius: 20px;
       padding: 3rem;
       margin: 2rem 0;
       box-shadow: 0 0 30px rgba(0,255,255,0.2);
       position: relative;
       z-index: 1;
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+    /* Ensure form container content is visible */
+    #formContainer {
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+    #formContainer .posting-form-container {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    /* Ensure form elements are visible */
+    #formContainer form {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    #formContainer .form-control,
+    #formContainer .form-select,
+    #formContainer .form-label {
+      opacity: 1 !important;
+      visibility: visible !important;
+      color: #fff !important;
     }
     .posting-form-container h4 {
       color: #0ff;
@@ -589,14 +621,14 @@
   <div id="particles-js"></div>
   
   <!-- Splash Screen Overlay -->
-  <div id="splash-screen-post" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
+  <div id="splash-screen-post" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10001;display:none;visibility:hidden;opacity:0;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s;">
     <div style="text-align:center;">
       <img id="splash-logo-post" src="images/hero-bg.jpeg" alt="HOME AFRICA" style="max-width:40vw;max-height:40vh;border-radius:50%;box-shadow:0 0 60px #0ff,0 0 120px #8fff00;">
       <h1 style="margin-top:2rem;font-size:3.5rem;font-weight:bold;background:linear-gradient(90deg,#0ff 10%,#8fff00 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.2em;">HOME AFRICA</h1>
       <h2 style="color:#fff;margin-top:1.5rem;">Beyond Horizons</h2>
     </div>
   </div>
-  <div id="main-content-post" style="display:none;">
+  <div id="main-content-post" style="display:flex;flex-direction:column;flex:1;min-height:100vh;visibility:visible;opacity:1;position:relative;z-index:1;">
   <!-- 🚀 Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
@@ -688,49 +720,24 @@
     </div>
   </div>
 
-  <!-- 🌍 Footer -->
-  <footer class="bg-dark text-light pt-4 pb-3 mt-5">
+  <!-- 🌍 Minimal Footer -->
+  <footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff;">
     <div class="container">
-      <div class="row">
-        <!-- Brand Info -->
-        <div class="col-md-3 mb-3">
-          <h5>🏠 HOME AFRICA</h5>
-          <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="small">
+          &copy; <span class="footer-year">2026</span> HOME AFRICA ·
+          <a href="privacy-policy.html" class="footer-link text-white">Privacy</a> ·
+          <a href="terms-of-service.html" class="footer-link text-white">Terms</a>
         </div>
-        <!-- Quick Links -->
-        <div class="col-md-3 mb-3">
-          <h6>Quick Links</h6>
-          <ul class="list-unstyled">
-            <li><a href="index.html" class="footer-link">Home</a></li>
-            <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
-            <li><a href="apartment.html" class="footer-link">Apartments</a></li>
-            <li><a href="land.html" class="footer-link">Land</a></li>
-            <li><a href="cars.html" class="footer-link">Cars</a></li>
-          </ul>
+        <div>
+          <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+          <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+          <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+          <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>
         </div>
-        <!-- Contact Info -->
-        <div class="col-md-3 mb-3">
-          <h6>Contact Us</h6>
-          <ul class="list-unstyled">
-            <li>Phone: +250 788 123 456</li>
-            <li>Email: info@home.africa</li>
-            <li>Address: Kigali, Rwanda</li>
-          </ul>
-        </div>
-        <!-- Social Links -->
-        <div class="col-md-3 mb-3">
-          <h6>Follow Us</h6>
-          <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
-          <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
-          <a href="https://instagram.com/homeafrica" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
-          <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-        </div>
-      </div>
-      <hr style="border-color: rgba(255,255,255,0.1)" />
-      <div class="text-center small">
-        &copy; 2025 HOME AFRICA. All rights reserved.
       </div>
     </div>
+    <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
   </footer>
   </div>
 
@@ -782,17 +789,40 @@
       retina_detect: true
     });
 
-    // Hide splash screen immediately (splash only on index page)
-    window.addEventListener('DOMContentLoaded', function() {
+    // Hide splash screen and show content immediately
+    function hideSplashAndShowContent() {
       const splashScreen = document.getElementById('splash-screen-post');
+      const mainContent = document.getElementById('main-content-post');
+      
+      console.log('Splash screen element:', !!splashScreen);
+      console.log('Main content element:', !!mainContent);
+      
       if (splashScreen) {
         splashScreen.style.display = 'none';
+        splashScreen.style.visibility = 'hidden';
+        splashScreen.style.opacity = '0';
+        splashScreen.style.zIndex = '-1';
+        console.log('✅ Splash screen hidden');
       }
-      const mainContent = document.getElementById('main-content-post');
       if (mainContent) {
-          mainContent.style.display = '';
+        mainContent.style.display = 'block';
+        mainContent.style.visibility = 'visible';
+        mainContent.style.opacity = '1';
+        mainContent.style.position = 'relative';
+        mainContent.style.zIndex = '1';
+        console.log('✅ Main content shown');
+      } else {
+        console.error('❌ Main content element not found!');
       }
-    });
+    }
+    
+    // Run immediately and also on DOM ready
+    hideSplashAndShowContent();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hideSplashAndShowContent);
+    } else {
+      setTimeout(hideSplashAndShowContent, 100);
+    }
 
 
     const forms = {
@@ -1242,6 +1272,11 @@
       
       formContainer.innerHTML = forms[selected] || '';
       
+      // Ensure form container is visible
+      formContainer.style.opacity = '1';
+      formContainer.style.visibility = 'visible';
+      formContainer.style.display = 'block';
+      
       // Show merchant info card when a product is selected
       if (selected) {
         merchantInfoCard.style.display = 'block';
@@ -1250,6 +1285,14 @@
       }
 
       const form = formContainer.querySelector('form');
+      
+      // Force visibility of the form container and its contents
+      const postingForm = formContainer.querySelector('.posting-form-container');
+      if (postingForm) {
+        postingForm.style.opacity = '1';
+        postingForm.style.visibility = 'visible';
+        postingForm.style.display = 'block';
+      }
       if (form) {
         // Reset validation state on new form load
         form.classList.remove('was-validated');
@@ -1756,9 +1799,13 @@
   <!-- Auth System -->
   <script src="js/auth.js"></script>
   
+  <!-- Navbar User Indicator -->
+  <script src="js/navbar-user-indicator.js"></script>
+  
   <!-- Protected Pages Auth Check - REMOVED: post.html is now public (anyone can post) -->
   
   <!-- AI Chatbot -->
+  <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
   
   <!-- Footer Fix - Dynamic padding to prevent content overlap -->

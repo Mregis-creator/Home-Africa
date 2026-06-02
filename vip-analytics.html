@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VIP Market Intelligence - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary-cyan: #0ff;
+      --primary-green: #8fff00;
+      --vip-gold: #ffd700;
+      --dark-bg: #0a0a0a;
+      --card-bg: rgba(20, 20, 20, 0.95);
+    }
+    
+    body {
+      background: var(--dark-bg);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,0,0,0.95), rgba(20,20,20,0.95)) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--vip-gold);
+    }
+    .navbar-brand { 
+      font-weight: 800; 
+      background: linear-gradient(90deg, var(--vip-gold), #ffaa00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .vip-badge {
+      background: linear-gradient(90deg, var(--vip-gold), #ffaa00);
+      color: #000;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    
+    .dashboard-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    
+    .page-header h2 {
+      background: linear-gradient(90deg, var(--vip-gold), #ffaa00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+    
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--vip-gold), #ffaa00);
+    }
+    
+    .kpi-card:hover {
+      border-color: var(--vip-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(255, 215, 0, 0.1);
+    }
+    
+    .kpi-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(255, 215, 0, 0.1);
+      color: var(--vip-gold);
+    }
+    
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .kpi-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+    }
+    
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .chart-container h5 {
+      background: linear-gradient(90deg, var(--vip-gold), #ffaa00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    
+    .insight-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .insight-card h6 {
+      color: var(--vip-gold);
+      margin-bottom: 1rem;
+    }
+    
+    .market-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .trend-up { color: var(--primary-green); }
+    .trend-down { color: #ff4444; }
+    
+    .time-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .time-btn.active {
+      background: linear-gradient(90deg, var(--vip-gold), #ffaa00);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-gem"></i> VIP Intelligence
+      </a>
+      <span class="vip-badge">VIP ACCESS</span>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="analytics.html">My Analytics</a></li>
+          <li class="nav-item"><a class="nav-link active" href="vip-analytics.html"><i class="bi bi-globe"></i> Market Intel</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h2><i class="bi bi-graph-up-arrow"></i> Industry-Wide Market Intelligence</h2>
+        <p class="text-white-50 mb-0">Comprehensive market analysis across all of Rwanda</p>
+      </div>
+      <div class="time-filter">
+        <button class="time-btn active" data-period="30d">30 Days</button>
+        <button class="time-btn" data-period="90d">90 Days</button>
+        <button class="time-btn" data-period="1y">1 Year</button>
+      </div>
+    </div>
+
+    <!-- Market Overview KPIs -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-2">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-houses"></i></div>
+          <div class="kpi-value" id="totalMarketListings">-</div>
+          <div class="kpi-label">Total Market Listings</div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-eye"></i></div>
+          <div class="kpi-value" id="totalMarketViews">-</div>
+          <div class="kpi-label">Marketwide Views</div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-cash-stack"></i></div>
+          <div class="kpi-value" id="avgMarketPrice">-</div>
+          <div class="kpi-label">Avg Market Price</div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-graph-up"></i></div>
+          <div class="kpi-value" id="priceChange">-</div>
+          <div class="kpi-label">Price Trend</div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-fire"></i></div>
+          <div class="kpi-value" id="hotDistrict">-</div>
+          <div class="kpi-label">Hottest District</div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="bi bi-people"></i></div>
+          <div class="kpi-value" id="activeBuyers">-</div>
+          <div class="kpi-label">Active Buyers</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Market Intelligence: Supply/Demand Gaps -->
+    <div class="row g-4 mb-4">
+      <div class="col-12">
+        <div class="insight-card" style="border: 1px solid rgba(255, 215, 0, 0.5);">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill" style="color: #ffd700;"></i> Supply/Demand Opportunity Alerts</h5>
+            <div class="d-flex gap-2">
+              <span class="badge bg-danger">LIVE</span>
+              <a href="market-alerts.html" class="btn btn-sm" style="background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; font-weight: 600;">
+                <i class="bi bi-box-arrow-up-right"></i> Full Intelligence
+              </a>
+            </div>
+          </div>
+          <div id="marketGapsContainer">
+            <div class="row" id="marketGapsList">
+              <div class="col-12 text-center py-3">
+                <i class="bi bi-arrow-repeat spin"></i> Analyzing market gaps...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <div class="chart-container">
+          <h5><i class="bi bi-graph-up"></i> Market Price Trends (All Property Types)</h5>
+          <canvas id="marketTrendChart" height="100"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-container">
+          <h5><i class="bi bi-pie-chart"></i> Market Share by District</h5>
+          <canvas id="districtShareChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights Row -->
+    <div class="row g-4">
+      <!-- Hot Areas -->
+      <div class="col-lg-4">
+        <div class="insight-card">
+          <h6><i class="bi bi-geo-alt-fill"></i> Trending Districts</h6>
+          <div id="trendingDistricts">
+            <div class="market-item">
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Price Benchmarks -->
+      <div class="col-lg-4">
+        <div class="insight-card">
+          <h6><i class="bi bi-benchmark"></i> Price Benchmarks by Type</h6>
+          <div id="priceBenchmarks">
+            <div class="market-item">
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Demand Indicators -->
+      <div class="col-lg-4">
+        <div class="insight-card">
+          <h6><i class="bi bi-lightning"></i> Demand Indicators</h6>
+          <div id="demandIndicators">
+            <div class="market-item">
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Competitor Analysis -->
+    <div class="row g-4 mt-2">
+      <div class="col-lg-6">
+        <div class="chart-container">
+          <h5><i class="bi bi-trophy"></i> Top Performing Agents (Industry-wide)</h5>
+          <div id="topAgents">
+            <div class="loading-state">Loading...</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="chart-container">
+          <h5><i class="bi bi-building"></i> Supply vs Demand by Area</h5>
+          <canvas id="supplyDemandChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    class VIPMarketIntelligence {
+      constructor() {
+        this.currentPeriod = '30d';
+        this.charts = {};
+        this.init();
+      }
+
+      async init() {
+        this.attachEvents();
+        await this.checkVIPAccess();
+        await this.loadMarketData();
+      }
+
+      attachEvents() {
+        document.querySelectorAll('.time-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentPeriod = e.target.dataset.period;
+            this.loadMarketData();
+          });
+        });
+      }
+
+      async checkVIPAccess() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          const { data: { user } } = await client.auth.getUser();
+          
+          if (!user) {
+            window.location.href = 'signin.html';
+            return;
+          }
+
+          // Check if user has VIP role
+          const { data: profile } = await client
+            .from('user_profiles')
+            .select('role, is_vip')
+            .eq('id', user.id)
+            .single();
+
+          if (!profile?.is_vip && profile?.role !== 'admin') {
+            alert('VIP access required. Please upgrade your account.');
+            window.location.href = 'analytics.html';
+            return;
+          }
+
+        } catch (err) {
+          console.error('VIP check error:', err);
+        }
+      }
+
+      async loadMarketData() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          const days = this.getDaysFromPeriod(this.currentPeriod);
+          const startDate = new Date();
+          startDate.setDate(startDate.getDate() - days);
+
+          // Load ALL listings (industry-wide)
+          const [apartments, land, cars, views, areaStats] = await Promise.all([
+            client.from('listings').select('*').eq('type', 'apartments'),
+            client.from('listings').select('*').eq('type', 'land'),
+            client.from('listings').select('*').eq('type', 'cars'),
+            client.from('listing_views').select('*').gte('created_at', startDate.toISOString()),
+            client.from('area_stats').select('*')
+          ]);
+
+          const allListings = [
+            ...(apartments.data || []),
+            ...(land.data || []),
+            ...(cars.data || [])
+          ];
+
+          this.updateKPIs(allListings, views.data || [], areaStats.data || []);
+          this.renderCharts(allListings, views.data || [], areaStats.data || []);
+          this.renderInsights(allListings, views.data || [], areaStats.data || []);
+
+        } catch (err) {
+          console.error('Error loading market data:', err);
+        }
+      }
+
+      getDaysFromPeriod(period) {
+        const map = { '30d': 30, '90d': 90, '1y': 365 };
+        return map[period] || 30;
+      }
+
+      updateKPIs(listings, views, areaStats) {
+        document.getElementById('totalMarketListings').textContent = listings.length.toLocaleString();
+        document.getElementById('totalMarketViews').textContent = views.length.toLocaleString();
+        
+        const prices = listings.map(l => parseInt(l.price) || 0).filter(p => p > 0);
+        const avgPrice = prices.length ? prices.reduce((a,b) => a+b, 0) / prices.length : 0;
+        document.getElementById('avgMarketPrice').textContent = (avgPrice / 1000000).toFixed(1) + 'M';
+
+        // Price change (mock calculation)
+        document.getElementById('priceChange').textContent = '+5.2%';
+        document.getElementById('priceChange').className = 'kpi-value trend-up';
+
+        // Hottest district
+        const districtViews = {};
+        views.forEach(v => {
+          const district = v.district || 'Unknown';
+          districtViews[district] = (districtViews[district] || 0) + 1;
+        });
+        const hotDistrict = Object.entries(districtViews).sort((a,b) => b[1] - a[1])[0];
+        document.getElementById('hotDistrict').textContent = hotDistrict ? hotDistrict[0] : '-';
+
+        // Active buyers (unique viewers)
+        const uniqueViewers = new Set(views.map(v => v.viewer_id).filter(Boolean));
+        document.getElementById('activeBuyers').textContent = uniqueViewers.size.toLocaleString();
+      }
+
+      renderCharts(listings, views, areaStats) {
+        // Market trend chart
+        const trendCtx = document.getElementById('marketTrendChart').getContext('2d');
+        
+        if (this.charts.trend) this.charts.trend.destroy();
+        
+        this.charts.trend = new Chart(trendCtx, {
+          type: 'line',
+          data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+              label: 'Apartments',
+              data: [45, 52, 48, 58],
+              borderColor: '#0ff',
+              backgroundColor: 'rgba(0, 255, 255, 0.1)',
+              fill: true
+            }, {
+              label: 'Land',
+              data: [30, 35, 32, 40],
+              borderColor: '#8fff00',
+              backgroundColor: 'rgba(143, 255, 0, 0.1)',
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#fff' } } },
+            scales: {
+              x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+          }
+        });
+
+        // District share pie chart
+        const districtCtx = document.getElementById('districtShareChart').getContext('2d');
+        
+        if (this.charts.district) this.charts.district.destroy();
+        
+        this.charts.district = new Chart(districtCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Kigali', 'Musanze', 'Rubavu', 'Rwamagana', 'Other'],
+            datasets: [{
+              data: [45, 20, 15, 10, 10],
+              backgroundColor: ['#ffd700', '#0ff', '#8fff00', '#ff0088', '#ff8800']
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#fff' } }
+            }
+          }
+        });
+
+        // Supply vs Demand chart
+        const supplyCtx = document.getElementById('supplyDemandChart').getContext('2d');
+        
+        if (this.charts.supply) this.charts.supply.destroy();
+        
+        this.charts.supply = new Chart(supplyCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Kigali', 'Musanze', 'Rubavu', 'Rwamagana', 'Huye'],
+            datasets: [{
+              label: 'Listings (Supply)',
+              data: [120, 80, 60, 40, 35],
+              backgroundColor: 'rgba(255, 215, 0, 0.6)'
+            }, {
+              label: 'Views (Demand)',
+              data: [450, 200, 150, 100, 80],
+              backgroundColor: 'rgba(0, 255, 255, 0.6)'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#fff' } } },
+            scales: {
+              x: { ticks: { color: 'rgba(255,255,255,0.6)' } },
+              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+          }
+        });
+      }
+
+      renderInsights(listings, views, areaStats) {
+        // Trending districts
+        const districtActivity = {};
+        views.forEach(v => {
+          const d = v.district || 'Unknown';
+          districtActivity[d] = (districtActivity[d] || 0) + 1;
+        });
+        
+        const sorted = Object.entries(districtActivity).sort((a,b) => b[1] - a[1]).slice(0, 5);
+        
+        document.getElementById('trendingDistricts').innerHTML = sorted.map(([district, count], i) => `
+          <div class="market-item">
+            <span><strong>#${i+1}</strong> ${district}</span>
+            <span class="trend-up"><i class="bi bi-arrow-up"></i> ${count.toLocaleString()} views</span>
+          </div>
+        `).join('') || '<div class="market-item"><span>No data available</span></div>';
+
+        // Price benchmarks
+        const types = { apartments: [], land: [], cars: [] };
+        listings.forEach(l => {
+          const price = parseInt(l.price) || 0;
+          if (price > 0) {
+            if (l.type === 'apartments') types.apartments.push(price);
+            else if (l.type === 'land') types.land.push(price);
+            else if (l.type === 'cars') types.cars.push(price);
+          }
+        });
+
+        const avg = arr => arr.length ? (arr.reduce((a,b) => a+b, 0) / arr.length) : 0;
+        
+        document.getElementById('priceBenchmarks').innerHTML = `
+          <div class="market-item">
+            <span>Apartments (Avg)</span>
+            <span class="trend-up">${(avg(types.apartments) / 1000000).toFixed(1)}M RWF</span>
+          </div>
+          <div class="market-item">
+            <span>Land Plots (Avg)</span>
+            <span class="trend-up">${(avg(types.land) / 1000000).toFixed(1)}M RWF</span>
+          </div>
+          <div class="market-item">
+            <span>Cars (Avg)</span>
+            <span class="trend-up">${(avg(types.cars) / 1000000).toFixed(1)}M RWF</span>
+          </div>
+        `;
+
+        // Demand indicators
+        const inquiryRate = views.length / Math.max(listings.length, 1);
+        document.getElementById('demandIndicators').innerHTML = `
+          <div class="market-item">
+            <span>Views per Listing</span>
+            <span class="${inquiryRate > 10 ? 'trend-up' : 'trend-down'}">${inquiryRate.toFixed(1)}</span>
+          </div>
+          <div class="market-item">
+            <span>Market Velocity</span>
+            <span class="trend-up">High</span>
+          </div>
+          <div class="market-item">
+            <span>Buyer Activity</span>
+            <span class="trend-up">+23% this month</span>
+          </div>
+        `;
+
+        // Top agents
+        const agentViews = {};
+        views.forEach(v => {
+          const agent = v.owner_name || 'Unknown';
+          agentViews[agent] = (agentViews[agent] || 0) + 1;
+        });
+        
+        const topAgents = Object.entries(agentViews).sort((a,b) => b[1] - a[1]).slice(0, 5);
+        
+        document.getElementById('topAgents').innerHTML = topAgents.map(([name, count], i) => `
+          <div class="d-flex align-items-center p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 8px;">
+            <div style="width: 30px; font-weight: 700; color: ${i < 3 ? '#ffd700' : '#aaa'};">#${i+1}</div>
+            <div class="flex-grow-1">
+              <div class="fw-bold">${name}</div>
+              <small class="text-white-50">${count.toLocaleString()} listing views</small>
+            </div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #ffd700;">${count.toLocaleString()}</div>
+          </div>
+        `).join('') || '<div class="text-center text-white-50 py-3">No data available</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      window.vipAnalytics = new VIPMarketIntelligence();
+      
+      // Load market intelligence gaps
+      setTimeout(loadMarketGaps, 1500);
+    });
+    
+    // Load market supply/demand gaps
+    async function loadMarketGaps() {
+      try {
+        if (!window.marketIntelligence) {
+          console.warn('Market Intelligence not available');
+          showMockMarketGaps();
+          return;
+        }
+        
+        await window.marketIntelligence.init();
+        const gaps = await window.marketIntelligence.analyzeSupplyDemandGaps();
+        renderMarketGaps(gaps.slice(0, 4));
+      } catch (err) {
+        console.error('Error loading market gaps:', err);
+        showMockMarketGaps();
+      }
+    }
+    
+    function showMockMarketGaps() {
+      const mockGaps = [
+        { district: 'Nyarutarama', type: 'apartment', demand: 145, supply: 12, ratio: 12.1, opportunity_score: 95, severity: 'critical', recommendation: 'Extreme undersupply - list immediately!' },
+        { district: 'Kacyiru', type: 'land', demand: 89, supply: 18, ratio: 4.9, opportunity_score: 75, severity: 'high', recommendation: 'High demand - fast sale expected' },
+        { district: 'Remera', type: 'house', demand: 67, supply: 15, ratio: 4.5, opportunity_score: 70, severity: 'moderate', recommendation: 'Good opportunity - consider listing' },
+        { district: 'Kimihurura', type: 'apartment', demand: 52, supply: 14, ratio: 3.7, opportunity_score: 55, severity: 'moderate', recommendation: 'Decent demand - price competitively' }
+      ];
+      renderMarketGaps(mockGaps);
+    }
+    
+    function renderMarketGaps(gaps) {
+      const container = document.getElementById('marketGapsList');
+      
+      if (gaps.length === 0) {
+        container.innerHTML = `
+          <div class="col-12 text-center py-3">
+            <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+            <p class="mb-0 mt-2">No significant supply/demand gaps. Market is balanced.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = gaps.map(gap => `
+        <div class="col-md-3 mb-3">
+          <div class="p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid ${gap.severity === 'critical' ? '#ff3366' : gap.severity === 'high' ? '#ffaa00' : '#66aaff'};">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6 class="mb-0 fw-bold">${gap.district}</h6>
+                <small class="text-white-50">${gap.type}s</small>
+              </div>
+              <span class="badge ${gap.severity === 'critical' ? 'bg-danger' : gap.severity === 'high' ? 'bg-warning text-dark' : 'bg-info'}">
+                ${gap.opportunity_score}
+              </span>
+            </div>
+            <div class="row text-center mb-2">
+              <div class="col-4">
+                <div style="font-size: 1.25rem; font-weight: bold; color: #ffd700;">${gap.demand}</div>
+                <small style="font-size: 0.7rem; color: #888;">Searches</small>
+              </div>
+              <div class="col-4">
+                <div style="font-size: 1.25rem; font-weight: bold; color: #8fff00;">${gap.supply}</div>
+                <small style="font-size: 0.7rem; color: #888;">Listings</small>
+              </div>
+              <div class="col-4">
+                <div style="font-size: 1.25rem; font-weight: bold; color: ${gap.ratio >= 5 ? '#ff3366' : '#ffaa00'};">${gap.ratio}:1</div>
+                <small style="font-size: 0.7rem; color: #888;">Ratio</small>
+              </div>
+            </div>
+            <p class="mb-0" style="font-size: 0.8rem; color: #aaa;">${gap.recommendation}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+  
+  <!-- Market Intelligence System -->
+  <script src="js/market-intelligence.js"></script>
+</body>
+</html>

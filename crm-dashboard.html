@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lead CRM | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #8fff00;
+      --danger: #ff3366;
+      --warning: #ffaa00;
+      --success: #00ff88;
+      --bg-dark: #0a0f1c;
+      --card-bg: rgba(0,0,0,0.92);
+    }
+    
+    html, body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: linear-gradient(120deg, rgba(0,255,136,0.15) 0%, rgba(0,136,255,0.15) 50%, rgba(255,0,136,0.1) 100%);
+      pointer-events: none;
+    }
+    
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,255,136,0.25) 0%, rgba(0,136,255,0.25) 100%) !important;
+      border-bottom: 2px solid var(--primary);
+      box-shadow: 0 2px 12px rgba(0,255,136,0.08);
+      position: relative;
+      z-index: 1000;
+    }
+    
+    .navbar-brand {
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary) 10%, var(--secondary) 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .dashboard-container {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 0;
+    }
+    
+    .crm-card {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 0 24px 0 rgba(0,255,136,0.15);
+      margin-bottom: 1.5rem;
+    }
+    
+    .temp-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .temp-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    
+    .temp-card.hot {
+      border: 2px solid var(--danger);
+      background: linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%);
+    }
+    
+    .temp-card.warm {
+      border: 2px solid var(--warning);
+      background: linear-gradient(135deg, rgba(255,170,0,0.1) 0%, rgba(255,170,0,0.05) 100%);
+    }
+    
+    .temp-card.cold {
+      border: 2px solid #66aaff;
+      background: linear-gradient(135deg, rgba(102,170,255,0.1) 0%, rgba(102,170,255,0.05) 100%);
+    }
+    
+    .temp-card.ice {
+      border: 2px solid #888;
+      background: linear-gradient(135deg, rgba(136,136,136,0.1) 0%, rgba(136,136,136,0.05) 100%);
+    }
+    
+    .temp-count {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    
+    .temp-card.hot .temp-count { color: var(--danger); }
+    .temp-card.warm .temp-count { color: var(--warning); }
+    .temp-card.cold .temp-count { color: #66aaff; }
+    .temp-card.ice .temp-count { color: #888; }
+    
+    .temp-label {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .temp-card small {
+      color: #aaa;
+      font-size: 0.8rem;
+    }
+    
+    .insight-alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .insight-alert.urgent {
+      background: rgba(255,51,102,0.2);
+      border: 1px solid var(--danger);
+      color: #ff6688;
+    }
+    
+    .insight-alert.warning {
+      background: rgba(255,170,0,0.2);
+      border: 1px solid var(--warning);
+      color: #ffcc44;
+    }
+    
+    .insight-alert.success {
+      background: rgba(0,255,136,0.2);
+      border: 1px solid var(--success);
+      color: #44ffaa;
+    }
+    
+    .lead-score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    
+    .lead-score.high {
+      background: var(--danger);
+      color: #fff;
+    }
+    
+    .lead-score.medium {
+      background: var(--warning);
+      color: #000;
+    }
+    
+    .lead-score.low {
+      background: #66aaff;
+      color: #fff;
+    }
+    
+    .table-dark {
+      background: rgba(0,0,0,0.5);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .table-dark th {
+      background: rgba(0,255,136,0.1);
+      color: var(--primary);
+      font-weight: 600;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .table-dark td {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      vertical-align: middle;
+    }
+    
+    .pipeline-stage {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+    
+    .pipeline-stage.inquiry { background: rgba(102,170,255,0.3); color: #66aaff; }
+    .pipeline-stage.contacted { background: rgba(255,170,0,0.3); color: #ffcc44; }
+    .pipeline-stage.viewing_scheduled { background: rgba(0,255,136,0.3); color: #44ffaa; }
+    .pipeline-stage.negotiating { background: rgba(255,51,102,0.3); color: #ff6688; }
+    .pipeline-stage.closed_won { background: var(--success); color: #000; }
+    .pipeline-stage.closed_lost { background: #666; color: #fff; }
+    
+    .btn-crm {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border: none;
+      color: #000;
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .btn-crm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,136,0.3);
+    }
+    
+    .nav-pills .nav-link {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid transparent;
+      margin-right: 0.5rem;
+      border-radius: 8px;
+    }
+    
+    .nav-pills .nav-link.active {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #000;
+      border-color: var(--primary);
+    }
+    
+    .nav-pills .nav-link:hover {
+      border-color: var(--primary);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #888;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    
+    .funnel-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .funnel-stage {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #000;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .modal-content {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      color: #fff;
+    }
+    
+    .modal-header {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .modal-footer {
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .form-control, .form-select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 0 0.2rem rgba(0,255,136,0.25);
+    }
+    
+    .engagement-metric {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .engagement-metric i {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="homeafricabanneralternative_III.png" height="40" alt="HOME AFRICA" />
+        Lead CRM
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html">
+              <i class="bi bi-grid"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="analytics.html">
+              <i class="bi bi-graph-up"></i> Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="messages.html">
+              <i class="bi bi-chat"></i> Messages
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container dashboard-container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="bi bi-funnel"></i> Lead Management</h2>
+        <p class="text-muted mb-0">Track, score, and convert your prospects</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light" onclick="refreshData()">
+          <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+        <button class="btn btn-crm" data-bs-toggle="modal" data-bs-target="#addLeadModal">
+          <i class="bi bi-plus-lg"></i> Add Lead
+        </button>
+      </div>
+    </div>
+
+    <!-- Insights Alerts -->
+    <div id="insightsContainer" class="mb-4"></div>
+
+    <!-- Temperature Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="temp-card hot" onclick="filterByTemperature('hot')">
+          <div class="temp-count" id="hotCount">0</div>
+          <div class="temp-label">🔥 Hot Leads</div>
+          <small>Contact within 2 hours</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="temp-card warm" onclick="filterByTemperature('warm')">
+          <div class="temp-count" id="warmCount">0</div>
+          <div class="temp-label">⚡ Warm Leads</div>
+          <small>Follow up today</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="temp-card cold" onclick="filterByTemperature('cold')">
+          <div class="temp-count" id="coldCount">0</div>
+          <div class="temp-label">❄️ Cold Leads</div>
+          <small>Nurture campaign</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="temp-card ice" onclick="filterByTemperature('ice')">
+          <div class="temp-count" id="iceCount">0</div>
+          <div class="temp-label">🧊 Ice Cold</div>
+          <small>Long-term nurture</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+      <!-- Left Column - Leads Table -->
+      <div class="col-lg-8">
+        <div class="crm-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="bi bi-people"></i> Your Leads</h5>
+            <ul class="nav nav-pills" id="leadFilterTabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#" onclick="filterLeads('all')">All</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="filterLeads('hot')">Hot</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="filterLeads('warm')">Warm</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="filterLeads('followup')">Follow-ups</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-dark table-hover" id="leadsTable">
+              <thead>
+                <tr>
+                  <th>Lead</th>
+                  <th>Score</th>
+                  <th>Temp</th>
+                  <th>Stage</th>
+                  <th>Last Activity</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leadsTableBody">
+                <tr>
+                  <td colspan="6" class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>No leads yet. Start engaging with buyers!</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Stats & Funnel -->
+      <div class="col-lg-4">
+        <!-- Conversion Funnel -->
+        <div class="crm-card">
+          <h5 class="mb-3"><i class="bi bi-bar-chart-line"></i> Conversion Funnel</h5>
+          <div class="funnel-bar" id="funnelContainer">
+            <div class="funnel-stage" style="width: 100%">Inquiry: 0</div>
+            <div class="funnel-stage" style="width: 0%">Contacted: 0</div>
+            <div class="funnel-stage" style="width: 0%">Viewing: 0</div>
+            <div class="funnel-stage" style="width: 0%">Negotiating: 0</div>
+            <div class="funnel-stage" style="width: 0%">Closed: 0</div>
+          </div>
+          <div class="mt-3 text-center">
+            <small class="text-muted">Conversion Rate: <span id="conversionRate">0%</span></small>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="crm-card">
+          <h5 class="mb-3"><i class="bi bi-lightning"></i> Quick Actions</h5>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-light" onclick="viewHotLeads()">
+              <i class="bi bi-fire"></i> View Hot Leads First
+            </button>
+            <button class="btn btn-outline-light" onclick="viewFollowUps()">
+              <i class="bi bi-alarm"></i> Today's Follow-ups
+            </button>
+            <button class="btn btn-outline-light" onclick="exportLeads()">
+              <i class="bi bi-download"></i> Export Leads
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="crm-card">
+          <h5 class="mb-3"><i class="bi bi-clock-history"></i> Recent Activity</h5>
+          <div id="recentActivityList">
+            <p class="text-muted">No recent activity</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Lead Modal -->
+  <div class="modal fade" id="addLeadModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Lead</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addLeadForm">
+            <div class="mb-3">
+              <label class="form-label">Lead Name</label>
+              <input type="text" class="form-control" name="leadName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="leadEmail">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-control" name="leadPhone">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Source</label>
+              <select class="form-select" name="leadSource">
+                <option value="organic">Organic</option>
+                <option value="referral">Referral</option>
+                <option value="social">Social Media</option>
+                <option value="advertisement">Advertisement</option>
+                <option value="direct">Direct</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" name="leadNotes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-crm" onclick="addLead()">Add Lead</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lead Detail Modal -->
+  <div class="modal fade" id="leadDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="leadDetailTitle">Lead Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="leadDetailBody">
+          <!-- Dynamic content -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-crm" onclick="contactLead()">
+            <i class="bi bi-chat"></i> Message
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/lead-crm.js"></script>
+  <script src="js/auth-guard.js"></script>
+  
+  <script>
+    let currentLeads = [];
+    let currentFilter = 'all';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadLeads();
+      setupEventListeners();
+    });
+
+    async function loadLeads() {
+      try {
+        if (!window.leadCRM) {
+          console.warn('Lead CRM not initialized');
+          showMockData();
+          return;
+        }
+
+        await window.leadCRM.init();
+        currentLeads = await window.leadCRM.loadLeads();
+        
+        updateDashboard();
+      } catch (err) {
+        console.error('Error loading leads:', err);
+        showMockData();
+      }
+    }
+
+    function showMockData() {
+      // Demo data for preview
+      currentLeads = [
+        {
+          id: '1',
+          user_name: 'Jean-Pierre Uwimana',
+          lead_score: 78,
+          temperature: 'hot',
+          pipeline_stage: 'negotiating',
+          source: 'organic',
+          last_activity_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          profile_views: 12,
+          favorites: 3,
+          messages: 2
+        },
+        {
+          id: '2',
+          user_name: 'Marie-Claire Mukamana',
+          lead_score: 45,
+          temperature: 'warm',
+          pipeline_stage: 'contacted',
+          source: 'referral',
+          last_activity_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          profile_views: 8,
+          favorites: 1,
+          messages: 1
+        },
+        {
+          id: '3',
+          user_name: 'Patrick Ndayisaba',
+          lead_score: 23,
+          temperature: 'cold',
+          pipeline_stage: 'inquiry',
+          source: 'social',
+          last_activity_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          profile_views: 3,
+          favorites: 0,
+          messages: 0
+        }
+      ];
+      
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      updateTemperatureCounts();
+      updateInsights();
+      updateFunnel();
+      renderLeadsTable();
+    }
+
+    function updateTemperatureCounts() {
+      const hot = currentLeads.filter(l => l.temperature === 'hot').length;
+      const warm = currentLeads.filter(l => l.temperature === 'warm').length;
+      const cold = currentLeads.filter(l => l.temperature === 'cold').length;
+      const ice = currentLeads.filter(l => l.temperature === 'ice').length;
+
+      document.getElementById('hotCount').textContent = hot;
+      document.getElementById('warmCount').textContent = warm;
+      document.getElementById('coldCount').textContent = cold;
+      document.getElementById('iceCount').textContent = ice;
+    }
+
+    function updateInsights() {
+      const container = document.getElementById('insightsContainer');
+      const hotLeads = currentLeads.filter(l => l.temperature === 'hot');
+      const urgent = hotLeads.filter(l => {
+        const hoursSince = (Date.now() - new Date(l.last_activity_at)) / (1000 * 60 * 60);
+        return hoursSince > 24 && l.pipeline_stage === 'inquiry';
+      });
+
+      let html = '';
+      
+      if (urgent.length > 0) {
+        html += `
+          <div class="insight-alert urgent">
+            <i class="bi bi-exclamation-circle"></i>
+            <div>
+              <strong>${urgent.length} hot lead${urgent.length > 1 ? 's' : ''} need${urgent.length === 1 ? 's' : ''} follow-up!</strong>
+              <p class="mb-0">Contact within 2 hours to maintain engagement</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (hotLeads.length > 0) {
+        html += `
+          <div class="insight-alert success">
+            <i class="bi bi-check-circle"></i>
+            <div>
+              <strong>You have ${hotLeads.length} hot lead${hotLeads.length > 1 ? 's' : ''}!</strong>
+              <p class="mb-0">High conversion potential - prioritize these</p>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html || '<!-- No urgent insights -->';
+    }
+
+    function updateFunnel() {
+      const stages = ['inquiry', 'contacted', 'viewing_scheduled', 'negotiating', 'closed_won'];
+      const stageLabels = {
+        inquiry: 'Inquiry',
+        contacted: 'Contacted',
+        viewing_scheduled: 'Viewing',
+        negotiating: 'Negotiating',
+        closed_won: 'Closed'
+      };
+
+      const total = currentLeads.length || 1;
+      const counts = {};
+      stages.forEach(stage => {
+        counts[stage] = currentLeads.filter(l => l.pipeline_stage === stage).length;
+      });
+
+      const maxCount = Math.max(...Object.values(counts), 1);
+      const html = stages.map(stage => {
+        const count = counts[stage];
+        const width = total > 0 ? (count / maxCount) * 100 : 0;
+        return `<div class="funnel-stage" style="width: ${Math.max(width, 20)}%">${stageLabels[stage]}: ${count}</div>`;
+      }).join('');
+
+      document.getElementById('funnelContainer').innerHTML = html;
+
+      const conversionRate = total > 0 ? Math.round((counts.closed_won / total) * 100) : 0;
+      document.getElementById('conversionRate').textContent = conversionRate + '%';
+    }
+
+    function renderLeadsTable() {
+      const tbody = document.getElementById('leadsTableBody');
+      let filtered = currentLeads;
+
+      if (currentFilter === 'hot') {
+        filtered = currentLeads.filter(l => l.temperature === 'hot');
+      } else if (currentFilter === 'warm') {
+        filtered = currentLeads.filter(l => l.temperature === 'warm');
+      } else if (currentFilter === 'followup') {
+        filtered = currentLeads.filter(l => l.next_follow_up_at && new Date(l.next_follow_up_at) <= new Date());
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="bi bi-inbox"></i>
+              <p>No ${currentFilter === 'all' ? '' : currentFilter + ' '}leads found</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(lead => {
+        const scoreClass = lead.lead_score >= 50 ? 'high' : lead.lead_score >= 30 ? 'medium' : 'low';
+        const tempBadge = {
+          hot: '<span class="badge bg-danger">HOT</span>',
+          warm: '<span class="badge bg-warning text-dark">WARM</span>',
+          cold: '<span class="badge bg-info">COLD</span>',
+          ice: '<span class="badge bg-secondary">ICE</span>'
+        }[lead.temperature] || '';
+
+        return `
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="lead-score ${scoreClass}">${lead.lead_score}</div>
+                <div>
+                  <strong>${lead.user_name || 'Anonymous'}</strong>
+                  <small class="d-block text-muted">${lead.source || 'Organic'}</small>
+                </div>
+              </div>
+            </td>
+            <td>${lead.lead_score}</td>
+            <td>${tempBadge}</td>
+            <td><span class="pipeline-stage ${lead.pipeline_stage}">${lead.pipeline_stage.replace('_', ' ')}</span></td>
+            <td>${timeAgo(lead.last_activity_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-light" onclick="viewLeadDetail('${lead.id}')">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="contactLead('${lead.id}')">
+                <i class="bi bi-chat"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function timeAgo(dateString) {
+      const date = new Date(dateString);
+      const seconds = Math.floor((Date.now() - date) / 1000);
+      
+      if (seconds < 60) return 'Just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      if (days < 30) return `${days}d ago`;
+      return `${Math.floor(days / 30)}mo ago`;
+    }
+
+    function filterByTemperature(temp) {
+      currentFilter = temp;
+      updateTabUI();
+      renderLeadsTable();
+    }
+
+    function filterLeads(filter) {
+      currentFilter = filter;
+      updateTabUI();
+      renderLeadsTable();
+    }
+
+    function updateTabUI() {
+      document.querySelectorAll('#leadFilterTabs .nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      // Simple tab highlighting based on current filter
+    }
+
+    function viewLeadDetail(leadId) {
+      const lead = currentLeads.find(l => l.id === leadId);
+      if (!lead) return;
+
+      document.getElementById('leadDetailTitle').textContent = lead.user_name || 'Lead Details';
+      document.getElementById('leadDetailBody').innerHTML = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Lead Score: <span class="lead-score ${lead.lead_score >= 50 ? 'high' : lead.lead_score >= 30 ? 'medium' : 'low'}">${lead.lead_score}</span></h6>
+            <p><strong>Temperature:</strong> ${lead.temperature.toUpperCase()}</p>
+            <p><strong>Source:</strong> ${lead.source || 'Organic'}</p>
+            <p><strong>Pipeline Stage:</strong> ${lead.pipeline_stage.replace('_', ' ')}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Engagement Metrics</h6>
+            <div class="engagement-metric">
+              <i class="bi bi-eye"></i>
+              <span>${lead.profile_views || 0} Profile Views</span>
+            </div>
+            <div class="engagement-metric">
+              <i class="bi bi-heart"></i>
+              <span>${lead.favorites || 0} Favorites</span>
+            </div>
+            <div class="engagement-metric">
+              <i class="bi bi-chat"></i>
+              <span>${lead.messages || 0} Messages</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <h6>Notes</h6>
+          <p class="text-muted">${lead.notes || 'No notes added yet.'}</p>
+        </div>
+      `;
+
+      new bootstrap.Modal(document.getElementById('leadDetailModal')).show();
+    }
+
+    function contactLead(leadId) {
+      window.location.href = `messages.html?lead=${leadId}`;
+    }
+
+    function addLead() {
+      // Implementation for adding manual lead
+      alert('Lead added successfully!');
+      bootstrap.Modal.getInstance(document.getElementById('addLeadModal')).hide();
+    }
+
+    function viewHotLeads() {
+      filterByTemperature('hot');
+    }
+
+    function viewFollowUps() {
+      filterLeads('followup');
+    }
+
+    function exportLeads() {
+      // Export to CSV
+      const csv = convertToCSV(currentLeads);
+      downloadCSV(csv, 'leads-export.csv');
+    }
+
+    function convertToCSV(leads) {
+      const headers = ['Name', 'Score', 'Temperature', 'Stage', 'Source', 'Last Activity'];
+      const rows = leads.map(l => [
+        l.user_name || 'Anonymous',
+        l.lead_score,
+        l.temperature,
+        l.pipeline_stage,
+        l.source || 'Organic',
+        l.last_activity_at
+      ]);
+      return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    }
+
+    function downloadCSV(csv, filename) {
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    function refreshData() {
+      loadLeads();
+    }
+
+    function setupEventListeners() {
+      // Set up any additional event listeners
+    }
+  </script>
+</body>
+</html>

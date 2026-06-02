@@ -27,7 +27,14 @@ function waitForSupabase() {
 let currentUser = null;
 let currentMerchant = null;
 let isSuperAdmin = false;
-let supabase = null;
+
+// Get Supabase client instance (avoids declaration conflicts)
+function getSupabase() {
+  if (window.supabaseClient) {
+    return window.supabaseClient;
+  }
+  throw new Error('Supabase client not initialized');
+}
 
 // =====================================================
 // DEVELOPMENT MODE - DEFAULT SUPER ADMIN
@@ -40,11 +47,11 @@ const DEV_SUPER_ADMIN_NAME = 'Super Admin (Dev)';
 // Initialize Supabase
 (async function init() {
   try {
-    supabase = await waitForSupabase();
+    // Supabase will be accessed via getSupabase() function
     console.log('✅ Supabase initialized for admin panel');
     
     // Check auth state
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await getSupabase().auth.getSession();
     if (session) {
       currentUser = {
         id: session.user.id,
@@ -55,7 +62,7 @@ const DEV_SUPER_ADMIN_NAME = 'Super Admin (Dev)';
     }
     
     // Listen for auth changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    getSupabase().auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         currentUser = {
           id: session.user.id,
@@ -67,7 +74,7 @@ const DEV_SUPER_ADMIN_NAME = 'Super Admin (Dev)';
           showAdminPanel();
           loadDashboard();
         } else {
-          await supabase.auth.signOut();
+          await getSupabase().auth.signOut();
           showLoginScreen();
           showError('Access denied. Only registered merchants can access the admin panel.');
         }
@@ -105,15 +112,40 @@ const DEV_SUPER_ADMIN_NAME = 'Super Admin (Dev)';
     
     // Show login screen if not authenticated
     if (!currentUser) {
-      showLoginScreen();
-      showDevModeInfo();
+      // Ensure login screen is visible
+      setTimeout(() => {
+        showLoginScreen();
+        showDevModeInfo();
+      }, 100);
+    } else {
+      // User is authenticated, show admin panel
+      setTimeout(() => {
+        showAdminPanel();
+        loadDashboard();
+      }, 100);
     }
   } catch (error) {
     console.error('Error initializing admin panel:', error);
-    showLoginScreen();
-    showError('Failed to initialize admin panel. Please refresh the page.');
+    // Always show login screen on error
+    setTimeout(() => {
+      showLoginScreen();
+      showDevModeInfo();
+    }, 100);
   }
 })();
+
+// Ensure login screen is visible on page load (fallback)
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => {
+    const loginScreen = document.getElementById('loginScreen');
+    const adminPanel = document.getElementById('adminPanel');
+    
+    // If admin panel is not shown, show login screen
+    if (adminPanel && adminPanel.style.display === 'none' && loginScreen) {
+      loginScreen.style.display = 'flex';
+    }
+  }, 500);
+});
 
 // Initialize particles
 particlesJS('particles-js', {
@@ -239,11 +271,26 @@ document.getElementById('loginMethodEmailLink')?.addEventListener('change', func
 });
 
 // Login form handler with Supabase Authentication
-const loginForm = document.getElementById('adminLoginForm');
-if (loginForm) {
-  loginForm.addEventListener('submit', async function(e) {
+function setupLoginForm() {
+  const loginForm = document.getElementById('adminLoginForm');
+  if (!loginForm) {
+    console.warn('Login form not found, retrying...');
+    setTimeout(setupLoginForm, 500);
+    return;
+  }
+  
+  console.log('✅ Login form found, setting up handler');
+  
+  // Remove existing listeners (if any)
+  const newForm = loginForm.cloneNode(true);
+  loginForm.parentNode.replaceChild(newForm, loginForm);
+  
+  newForm.addEventListener('submit', async function(e) {
+    console.log('🚀 FORM SUBMIT EVENT TRIGGERED!');
     e.preventDefault();
     e.stopPropagation();
+    
+    console.log('🔐 Login form submitted - preventDefault called');
     
     const email = document.getElementById('adminEmail')?.value.trim() || '';
     const password = document.getElementById('adminPassword')?.value || '';
@@ -252,7 +299,12 @@ if (loginForm) {
     const successDiv = document.getElementById('loginSuccess');
     const submitBtn = document.getElementById('loginSubmitBtn');
     
+    console.log('Email:', email ? '***' : 'empty');
+    console.log('Password:', password ? '***' : 'empty');
+    console.log('Use email link:', useEmailLink);
+    
     if (!email) {
+      console.warn('No email provided');
       if (errorDiv) {
         errorDiv.textContent = 'Please enter your email.';
         errorDiv.style.display = 'block';
@@ -261,6 +313,7 @@ if (loginForm) {
     }
     
     if (!useEmailLink && !password) {
+      console.warn('No password provided');
       if (errorDiv) {
         errorDiv.textContent = 'Please enter your password.';
         errorDiv.style.display = 'block';
@@ -283,8 +336,16 @@ if (loginForm) {
       const normalizedEmail = email.toLowerCase().trim();
       const normalizedPassword = password.trim();
       
+      console.log('🔍 Dev mode check:');
+      console.log('  Expected email:', DEV_SUPER_ADMIN_EMAIL.toLowerCase());
+      console.log('  Provided email:', normalizedEmail);
+      console.log('  Email match:', normalizedEmail === DEV_SUPER_ADMIN_EMAIL.toLowerCase());
+      console.log('  Expected password:', DEV_SUPER_ADMIN_PASSWORD);
+      console.log('  Password provided:', !!normalizedPassword);
+      console.log('  Password match:', normalizedPassword === DEV_SUPER_ADMIN_PASSWORD);
+      
       if (normalizedEmail === DEV_SUPER_ADMIN_EMAIL.toLowerCase() && normalizedPassword === DEV_SUPER_ADMIN_PASSWORD) {
-        console.log('🔧 Dev mode: Bypassing Supabase Auth with super admin credentials');
+        console.log('✅ Dev mode: Credentials match! Bypassing Supabase Auth');
         
         if (submitBtn) {
           submitBtn.disabled = true;
@@ -306,9 +367,12 @@ if (loginForm) {
         };
         
         localStorage.setItem('devAutoLogin', 'true');
+        
+        console.log('🔄 Calling showAdminPanel()...');
         showAdminPanel();
         
         setTimeout(() => {
+          console.log('🔄 Loading dashboard...');
           loadDashboard();
           if (errorDiv) errorDiv.style.display = 'none';
           if (submitBtn) {
@@ -316,23 +380,38 @@ if (loginForm) {
             submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Login';
           }
           console.log('✅ Dev mode login successful!');
+          
+          // Double-check admin panel is visible
+          const adminPanel = document.getElementById('adminPanel');
+          const loginScreen = document.getElementById('loginScreen');
+          console.log('Admin panel display:', adminPanel?.style.display);
+          console.log('Login screen display:', loginScreen?.style.display);
+          
+          if (adminPanel && adminPanel.style.display === 'none') {
+            console.warn('⚠️ Admin panel still hidden, forcing display...');
+            adminPanel.style.display = 'block';
+            adminPanel.style.visibility = 'visible';
+          }
         }, 300);
         
         return;
       }
     }
     
-    // Wait for Supabase if not ready
-    if (!supabase) {
-      try {
-        supabase = await waitForSupabase();
-      } catch (error) {
-        if (errorDiv) {
-          errorDiv.textContent = 'Supabase not loaded. Please refresh the page.';
-          errorDiv.style.display = 'block';
-        }
-        return;
+    // Get Supabase client
+    let supabase;
+    try {
+      supabase = getSupabase();
+    } catch (error) {
+      if (errorDiv) {
+        errorDiv.textContent = 'Supabase not loaded. Please refresh the page.';
+        errorDiv.style.display = 'block';
       }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Login';
+      }
+      return;
     }
     
     // Disable button and show loading
@@ -388,7 +467,7 @@ if (loginForm) {
             loadDashboard();
             if (errorDiv) errorDiv.style.display = 'none';
           } else {
-            await supabase.auth.signOut();
+            await getSupabase().auth.signOut();
             if (errorDiv) {
               errorDiv.textContent = 'Access denied. Only registered merchants can access the admin panel.';
               errorDiv.style.display = 'block';
@@ -425,6 +504,30 @@ if (loginForm) {
   });
 }
 
+// Setup login form when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupLoginForm);
+} else {
+  // DOM already loaded, setup immediately
+  setTimeout(setupLoginForm, 100);
+}
+
+// Also add direct button click handler as fallback
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => {
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function(e) {
+        const form = document.getElementById('adminLoginForm');
+        if (form) {
+          console.log('Button clicked, triggering form submit');
+          form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        }
+      });
+    }
+  }, 500);
+});
+
 // Logout
 function logout() {
   if (DEV_MODE) {
@@ -432,7 +535,7 @@ function logout() {
   }
   
   if (supabase) {
-    supabase.auth.signOut().then(() => {
+    getSupabase().auth.signOut().then(() => {
       currentUser = null;
       currentMerchant = null;
       isSuperAdmin = false;
@@ -463,45 +566,84 @@ function showError(message) {
 }
 
 function showLoginScreen() {
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('adminPanel').style.display = 'none';
-  showDevModeInfo();
-}
-
-function showAdminPanel() {
   const loginScreen = document.getElementById('loginScreen');
   const adminPanel = document.getElementById('adminPanel');
   
   if (loginScreen) {
-    loginScreen.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    loginScreen.style.visibility = 'visible';
+    loginScreen.style.position = 'relative';
+    loginScreen.style.zIndex = '100';
   }
   
   if (adminPanel) {
-    adminPanel.style.display = 'block';
-    adminPanel.style.visibility = 'visible';
+    adminPanel.style.display = 'none';
+    adminPanel.style.visibility = 'hidden';
+  }
+  
+  showDevModeInfo();
+  console.log('Login screen shown');
+}
+
+function showAdminPanel() {
+  console.log('📋 showAdminPanel() called');
+  const loginScreen = document.getElementById('loginScreen');
+  const adminPanel = document.getElementById('adminPanel');
+  
+  console.log('Login screen element:', !!loginScreen);
+  console.log('Admin panel element:', !!adminPanel);
+  
+  if (loginScreen) {
+    loginScreen.classList.add('hide');
+    loginScreen.style.setProperty('display', 'none', 'important');
+    loginScreen.style.setProperty('visibility', 'hidden', 'important');
+    loginScreen.style.setProperty('position', 'absolute', 'important');
+    loginScreen.style.setProperty('z-index', '-1', 'important');
+    loginScreen.style.setProperty('opacity', '0', 'important');
+    console.log('✅ Login screen hidden');
+  } else {
+    console.warn('⚠️ Login screen element not found!');
+  }
+  
+  if (adminPanel) {
+    // Add show class and force display with important styles
+    adminPanel.classList.add('show');
+    adminPanel.style.setProperty('display', 'block', 'important');
+    adminPanel.style.setProperty('visibility', 'visible', 'important');
+    adminPanel.style.setProperty('position', 'relative', 'important');
+    adminPanel.style.setProperty('z-index', '100', 'important');
+    adminPanel.style.setProperty('opacity', '1', 'important');
+    
+    console.log('✅ Admin panel display set to block');
     
     const adminContainer = adminPanel.querySelector('.admin-container');
     if (adminContainer) {
-      adminContainer.style.display = 'block';
-      adminContainer.style.visibility = 'visible';
+      adminContainer.style.setProperty('display', 'block', 'important');
+      adminContainer.style.setProperty('visibility', 'visible', 'important');
+      console.log('✅ Admin container shown');
+    } else {
+      console.warn('⚠️ Admin container not found!');
     }
     
     const statsRow = adminPanel.querySelector('.row.mb-4');
     if (statsRow) {
-      statsRow.style.display = 'flex';
-      statsRow.style.visibility = 'visible';
+      statsRow.style.setProperty('display', 'flex', 'important');
+      statsRow.style.setProperty('visibility', 'visible', 'important');
+      console.log('✅ Stats row shown');
     }
     
     const tabsNav = adminPanel.querySelector('.nav-tabs');
     if (tabsNav) {
-      tabsNav.style.display = 'flex';
-      tabsNav.style.visibility = 'visible';
+      tabsNav.style.setProperty('display', 'flex', 'important');
+      tabsNav.style.setProperty('visibility', 'visible', 'important');
+      console.log('✅ Tabs nav shown');
     }
     
     const listingsTab = document.getElementById('listingsTab');
     if (listingsTab) {
-      listingsTab.style.display = 'block';
-      listingsTab.style.visibility = 'visible';
+      listingsTab.style.setProperty('display', 'block', 'important');
+      listingsTab.style.setProperty('visibility', 'visible', 'important');
+      console.log('✅ Listings tab shown');
     }
     
     document.querySelectorAll('.tab-content').forEach(tab => {
@@ -514,7 +656,12 @@ function showAdminPanel() {
     if (firstTab) {
       document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
       firstTab.classList.add('active');
+      console.log('✅ First tab activated');
     }
+    
+    console.log('✅ Admin panel fully shown');
+  } else {
+    console.error('❌ Admin panel element not found!');
   }
   
   // Display merchant/super admin info
@@ -568,7 +715,7 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
 async function loadDashboard() {
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     if (isSuperAdmin) {
@@ -657,7 +804,7 @@ async function loadListings() {
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     const allListings = [];
@@ -754,7 +901,7 @@ function renderListingsTable(allListings) {
 async function editListing(collection, id) {
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     // Extract type from collection name (e.g., "apartmentListings" -> "apartment")
@@ -816,7 +963,7 @@ document.getElementById('editForm')?.addEventListener('submit', async function(e
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     const { error } = await supabase
@@ -844,9 +991,7 @@ async function deleteListing(collection, id) {
   if (!confirm('Are you sure you want to delete this listing?')) return;
 
   try {
-    if (!supabase) {
-      supabase = await waitForSupabase();
-    }
+    const supabase = getSupabase();
     
     // Check permissions
     if (!isSuperAdmin) {
@@ -865,6 +1010,7 @@ async function deleteListing(collection, id) {
     }
 
     // Get listing data to delete images
+    const supabase = getSupabase();
     const { data: listing } = await supabase
       .from('listings')
       .select('images')
@@ -880,7 +1026,7 @@ async function deleteListing(collection, id) {
           const fileName = urlParts[urlParts.length - 1].split('?')[0];
           const filePath = `listings/${fileName}`;
           
-          const { error: deleteError } = await supabase.storage
+          const { error: deleteError } = await getSupabase().storage
             .from('listings')
             .remove([filePath]);
           
@@ -914,7 +1060,7 @@ async function toggleListingStatus(collection, id, currentStatus) {
   const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     const { error } = await supabase
@@ -943,17 +1089,18 @@ async function loadUsers() {
   const tbody = document.getElementById('usersTableBody');
   if (!tbody) return;
   
-  tbody.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" class="text-center">Loading...</td></tr>';
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
+    // Load all users (not just merchants) for admin view
     let query = supabase
       .from('users')
       .select('*, merchants(*)')
-      .eq('role', 'merchant');
+      .order('created_at', { ascending: false });
     
     if (!isSuperAdmin && currentMerchant?.id) {
       query = query.eq('id', currentMerchant.id);
@@ -964,31 +1111,118 @@ async function loadUsers() {
     if (error) throw error;
     
     if (!users || users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">No users found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center">No users found</td></tr>';
       return;
     }
 
     tbody.innerHTML = '';
     users.forEach(user => {
       const merchantData = user.merchants?.[0] || {};
+      
+      // Check for temporary password
+      let tempPasswordDisplay = '<span class="text-muted">-</span>';
+      if (user.temp_password && user.temp_password_expires) {
+        const expiresAt = new Date(user.temp_password_expires);
+        if (expiresAt > new Date()) {
+          // Decrypt and show temp password
+          try {
+            const decrypted = atob(user.temp_password);
+            tempPasswordDisplay = `
+              <div>
+                <code style="color: #0ff; font-size: 0.85rem;">${decrypted}</code>
+                <br>
+                <small class="text-muted">Expires: ${expiresAt.toLocaleString()}</small>
+              </div>
+            `;
+          } catch (e) {
+            tempPasswordDisplay = '<span class="text-warning">Encrypted</span>';
+          }
+        } else {
+          tempPasswordDisplay = '<span class="text-muted">Expired</span>';
+        }
+      }
+      
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${user.email || 'N/A'}</td>
         <td>${merchantData.business_name || user.full_name || 'N/A'}</td>
-        <td><span class="badge badge-admin">merchant</span></td>
+        <td><span class="badge badge-admin">${user.role || 'user'}</span></td>
         <td><span class="badge ${merchantData.verified ? 'bg-success' : 'bg-warning'}">${merchantData.verified ? 'Yes' : 'No'}</span></td>
+        <td>${tempPasswordDisplay}</td>
         <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
         <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')">
-            <i class="bi bi-trash"></i>
+          <button class="btn btn-sm btn-primary me-1" onclick="resetUserPassword('${user.id}', '${user.email}')" title="Reset Password">
+            <i class="bi bi-key"></i> Reset
           </button>
+          ${isSuperAdmin ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')" title="Delete User">
+            <i class="bi bi-trash"></i>
+          </button>` : ''}
         </td>
       `;
       tbody.appendChild(row);
     });
   } catch (error) {
     console.error('Error loading users:', error);
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading users</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading users</td></tr>';
+  }
+}
+
+// Reset user password (admin function)
+async function resetUserPassword(userId, userEmail) {
+  if (!isSuperAdmin && currentUser?.id !== userId) {
+    alert('Only super admins can reset passwords for other users.');
+    return;
+  }
+
+  if (!confirm(`Reset password for ${userEmail}?\n\nA temporary password will be generated and shown to you. The user will receive a password reset email.`)) {
+    return;
+  }
+
+  try {
+    const supabase = getSupabase();
+
+    // Generate random password
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let tempPassword = '';
+    for (let i = 0; i < 12; i++) {
+      tempPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+
+    // Send password reset email via Supabase Auth
+    const { error: resetError } = await getSupabase().auth.resetPasswordForEmail(
+      userEmail,
+      {
+        redirectTo: `${window.location.origin}/signin.html?reset=true`
+      }
+    );
+
+    if (resetError) {
+      console.warn('Password reset email error (non-critical):', resetError);
+    }
+
+    // Store temporary password (encrypted) in users table
+    const encryptedPassword = btoa(tempPassword); // Base64 encoding (simple encryption)
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        temp_password: encryptedPassword,
+        temp_password_expires: expiresAt.toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Show temporary password to admin
+    alert(`✅ Password reset initiated!\n\nTemporary Password: ${tempPassword}\n\nThis password expires in 24 hours.\n\nShare this with the user for immediate access, or they can use the reset link sent to their email.`);
+    
+    // Reload users table
+    loadUsers();
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    alert('Error resetting password: ' + error.message);
   }
 }
 
@@ -1002,7 +1236,7 @@ async function deleteUser(userId) {
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     // Delete user's listings first
@@ -1044,7 +1278,7 @@ async function loadMerchants() {
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     let query = supabase
@@ -1101,7 +1335,7 @@ async function verifyMerchant(merchantId, verify) {
   
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     const { error } = await supabase
@@ -1139,7 +1373,7 @@ async function loadFiles() {
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     let query = supabase
@@ -1204,7 +1438,7 @@ async function deleteFile(fileUrl, type, listingId) {
 
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     // Extract file path from URL
@@ -1213,7 +1447,7 @@ async function deleteFile(fileUrl, type, listingId) {
     const filePath = `listings/${fileName}`;
     
     // Delete from storage
-    const { error: storageError } = await supabase.storage
+    const { error: storageError } = await getSupabase().storage
       .from('listings')
       .remove([filePath]);
 
@@ -1253,7 +1487,7 @@ async function deleteFile(fileUrl, type, listingId) {
 async function loadAnalytics() {
   try {
     if (!supabase) {
-      supabase = await waitForSupabase();
+      // Supabase will be accessed via getSupabase() function
     }
     
     // Listings chart

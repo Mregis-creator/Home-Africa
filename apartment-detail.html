@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -572,6 +572,7 @@
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="js/notifications.js"></script>
+  <script src="js/email-service-emailjs.js"></script>
   
   <script>
 
@@ -664,6 +665,7 @@
       document.getElementById('aptRooms').textContent = apt.rooms ? apt.rooms + ' rooms' : 'N/A';
       document.getElementById('aptDescription').textContent = apt.description || 'No description available.';
       document.getElementById('merchantName').textContent = apt.merchantName || 'Seller';
+      window.currentListing = apt;
       document.getElementById('merchantContact').textContent = apt.merchantContact || 'Contact not available';
 
       // Set images

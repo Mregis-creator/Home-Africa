@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Map Explorer - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    :root {
+      --primary-cyan: #0ff;
+      --primary-green: #8fff00;
+      --dark-bg: #0a0a0a;
+      --card-bg: rgba(20, 20, 20, 0.95);
+    }
+    
+    body {
+      background: var(--dark-bg);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: rgba(0, 0, 0, 0.95) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    .navbar-brand { font-weight: 800; color: var(--primary-cyan) !important; }
+    .nav-link { color: rgba(255, 255, 255, 0.8) !important; }
+    .nav-link:hover { color: var(--primary-cyan) !important; }
+    
+    .map-explorer {
+      display: flex;
+      height: calc(100vh - 70px);
+      margin-top: 70px;
+    }
+    
+    .map-sidebar {
+      width: 380px;
+      background: var(--card-bg);
+      border-right: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 136, 0.05));
+    }
+    
+    .sidebar-header h4 {
+      color: var(--primary-cyan);
+      margin: 0;
+      font-weight: 700;
+    }
+    
+    .sidebar-filters {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    
+    .filter-group {
+      margin-bottom: 1rem;
+    }
+    
+    .filter-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 0.5rem;
+    }
+    
+    .filter-group select,
+    .filter-group input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: #fff;
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
+    
+    .filter-group select option {
+      background: #1a1a1a;
+      color: #fff;
+    }
+    
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: linear-gradient(90deg, var(--primary-cyan), var(--primary-green));
+      color: #000;
+      border-color: transparent;
+    }
+    
+    .stats-bar {
+      display: flex;
+      padding: 1rem;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .stat-item {
+      text-align: center;
+      flex: 1;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-cyan);
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .listings-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    
+    .listing-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .listing-card:hover {
+      border-color: var(--primary-cyan);
+      transform: translateY(-2px);
+    }
+    
+    .listing-card.active {
+      border-color: var(--primary-green);
+      background: rgba(0, 255, 136, 0.1);
+    }
+    
+    .listing-image {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    
+    .listing-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-green);
+    }
+    
+    .listing-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    
+    .listing-location {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .listing-type {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      background: rgba(0, 255, 255, 0.2);
+      color: var(--primary-cyan);
+      font-size: 0.7rem;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+    
+    .map-container {
+      flex: 1;
+      position: relative;
+    }
+    
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .area-info {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 1rem;
+      min-width: 250px;
+      z-index: 1000;
+    }
+    
+    .area-info h5 {
+      color: var(--primary-cyan);
+      margin-bottom: 0.75rem;
+    }
+    
+    .area-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    
+    .area-stat:last-child {
+      border-bottom: none;
+    }
+    
+    .leaflet-popup-content-wrapper {
+      background: rgba(0, 0, 0, 0.95) !important;
+      border: 1px solid rgba(0, 255, 255, 0.3) !important;
+      border-radius: 12px !important;
+      color: #fff !important;
+    }
+    
+    .leaflet-popup-tip {
+      background: rgba(0, 0, 0, 0.95) !important;
+    }
+    
+    .custom-marker {
+      background: linear-gradient(135deg, var(--primary-cyan), var(--primary-green));
+      border: 3px solid #fff;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
+    }
+    
+    .custom-marker.apartment { background: linear-gradient(135deg, #0ff, #00b4d8); }
+    .custom-marker.land { background: linear-gradient(135deg, #8fff00, #00b894); }
+    .custom-marker.car { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+    
+    @media (max-width: 768px) {
+      .map-sidebar {
+        width: 100%;
+        position: absolute;
+        z-index: 1001;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      
+      .map-sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .mobile-toggle {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-map-fill"></i> Map Explorer
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="apartment.html">Apartments</a></li>
+          <li class="nav-item"><a class="nav-link" href="land.html">Land</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="explore.html">Explore</a></li>
+          <li class="nav-item"><a class="nav-link active" href="map-explore.html"><i class="bi bi-map"></i> Map</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Map Explorer -->
+  <div class="map-explorer">
+    <!-- Sidebar -->
+    <div class="map-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h4><i class="bi bi-funnel-fill"></i> Filter Properties</h4>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-value" id="totalListings">0</div>
+          <div class="stat-label">Listings</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="avgPrice">-</div>
+          <div class="stat-label">Avg Price</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="areaCount">0</div>
+          <div class="stat-label">Areas</div>
+        </div>
+      </div>
+      
+      <!-- Filters -->
+      <div class="sidebar-filters">
+        <div class="filter-group">
+          <label>Property Type</label>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-type="all">All</button>
+            <button class="filter-btn" data-type="apartments">Apartments</button>
+            <button class="filter-btn" data-type="land">Land</button>
+            <button class="filter-btn" data-type="cars">Cars</button>
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>District / Area</label>
+          <select id="districtFilter">
+            <option value="">All Districts</option>
+            <option value="Kigali">Kigali City</option>
+            <option value="Gasabo">Gasabo</option>
+            <option value="Kicukiro">Kicukiro</option>
+            <option value="Nyarugenge">Nyarugenge</option>
+            <option value="Bugesera">Bugesera</option>
+            <option value="Gatsibo">Gatsibo</option>
+            <option value="Kayonza">Kayonza</option>
+            <option value="Kirehe">Kirehe</option>
+            <option value="Ngoma">Ngoma</option>
+            <option value="Nyagatare">Nyagatare</option>
+            <option value="Rwamagana">Rwamagana</option>
+            <option value="Gicumbi">Gicumbi</option>
+            <option value="Musanze">Musanze</option>
+            <option value="Burera">Burera</option>
+            <option value="Gakenke">Gakenke</option>
+            <option value="Gisagara">Gisagara</option>
+            <option value="Huye">Huye</option>
+            <option value="Kamonyi">Kamonyi</option>
+            <option value="Muhanga">Muhanga</option>
+            <option value="Nyamagabe">Nyamagabe</option>
+            <option value="Nyanza">Nyanza</option>
+            <option value="Nyaruguru">Nyaruguru</option>
+            <option value="Ruhango">Ruhango</option>
+            <option value="Karongi">Karongi</option>
+            <option value="Ngororero">Ngororero</option>
+            <option value="Nyabihu">Nyabihu</option>
+            <option value="Nyamasheke">Nyamasheke</option>
+            <option value="Rubavu">Rubavu</option>
+            <option value="Rutsiro">Rutsiro</option>
+            <option value="Rusizi">Rusizi</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Price Range (RWF)</label>
+          <div class="d-flex gap-2">
+            <input type="number" id="minPrice" placeholder="Min" style="width: 50%;">
+            <input type="number" id="maxPrice" placeholder="Max" style="width: 50%;">
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>Status</label>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-status="all">All</button>
+            <button class="filter-btn" data-status="sale">For Sale</button>
+            <button class="filter-btn" data-status="rent">For Rent</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Listings -->
+      <div class="listings-container" id="listingsContainer">
+        <div class="text-center text-white-50 py-5">
+          <div class="spinner-border text-info" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3">Loading properties...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Map -->
+    <div class="map-container">
+      <div id="map"></div>
+      
+      <!-- Area Info Panel -->
+      <div class="area-info" id="areaInfo" style="display: none;">
+        <h5 id="areaName">Area Name</h5>
+        <div class="area-stat">
+          <span>Total Listings</span>
+          <strong id="areaListings">0</strong>
+        </div>
+        <div class="area-stat">
+          <span>Average Price</span>
+          <strong id="areaAvgPrice">-</strong>
+        </div>
+        <div class="area-stat">
+          <span>Price Range</span>
+          <strong id="areaPriceRange">-</strong>
+        </div>
+        <div class="area-stat">
+          <span>Most Common Type</span>
+          <strong id="areaTopType">-</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/analytics.js"></script>
+  
+  <script>
+    class MapExplorer {
+      constructor() {
+        this.map = null;
+        this.markers = [];
+        this.allListings = [];
+        this.filteredListings = [];
+        this.currentFilters = {
+          type: 'all',
+          district: '',
+          status: 'all',
+          minPrice: null,
+          maxPrice: null
+        };
+        this.init();
+      }
+      
+      async init() {
+        this.initMap();
+        this.attachEvents();
+        await this.loadListings();
+      }
+      
+      initMap() {
+        // Center on Rwanda
+        this.map = L.map('map').setView([-1.94, 30.06], 9);
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(this.map);
+        
+        // Track map movements for analytics
+        this.map.on('moveend', () => {
+          this.updateAreaStats();
+        });
+      }
+      
+      attachEvents() {
+        // Type filters
+        document.querySelectorAll('[data-type]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentFilters.type = e.target.dataset.type;
+            this.applyFilters();
+          });
+        });
+        
+        // Status filters
+        document.querySelectorAll('[data-status]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentFilters.status = e.target.dataset.status;
+            this.applyFilters();
+          });
+        });
+        
+        // District filter
+        document.getElementById('districtFilter').addEventListener('change', (e) => {
+          this.currentFilters.district = e.target.value;
+          this.applyFilters();
+          
+          // Pan to district if selected
+          if (e.target.value) {
+            this.panToDistrict(e.target.value);
+          }
+        });
+        
+        // Price filters
+        document.getElementById('minPrice').addEventListener('input', (e) => {
+          this.currentFilters.minPrice = e.target.value ? parseInt(e.target.value) : null;
+          this.applyFilters();
+        });
+        
+        document.getElementById('maxPrice').addEventListener('input', (e) => {
+          this.currentFilters.maxPrice = e.target.value ? parseInt(e.target.value) : null;
+          this.applyFilters();
+        });
+      }
+      
+      async loadListings() {
+        try {
+          const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          if (!client) throw new Error('Supabase not initialized');
+          
+          // Load all listings from all tables
+          const [apartments, land, cars] = await Promise.all([
+            client.from('listings').select('*').eq('type', 'apartments').limit(500),
+            client.from('listings').select('*').eq('type', 'land').limit(500),
+            client.from('listings').select('*').eq('type', 'cars').limit(500)
+          ]);
+          
+          this.allListings = [
+            ...(apartments.data || []).map(l => ({...l, listingType: 'apartments'})),
+            ...(land.data || []).map(l => ({...l, listingType: 'land'})),
+            ...(cars.data || []).map(l => ({...l, listingType: 'cars'}))
+          ];
+          
+          // Filter only listings with coordinates
+          this.allListings = this.allListings.filter(l => 
+            l.latitude && l.longitude && 
+            !isNaN(parseFloat(l.latitude)) && 
+            !isNaN(parseFloat(l.longitude))
+          );
+          
+          this.filteredListings = [...this.allListings];
+          this.renderMarkers();
+          this.renderListings();
+          this.updateStats();
+          
+          // Track view in analytics
+          if (window.AnalyticsService) {
+            window.AnalyticsService.trackEvent('map_explore_viewed', {
+              total_listings: this.allListings.length
+            });
+          }
+          
+        } catch (err) {
+          console.error('Error loading listings:', err);
+          document.getElementById('listingsContainer').innerHTML = `
+            <div class="text-center text-white-50 py-5">
+              <i class="bi bi-exclamation-circle" style="font-size: 3rem;"></i>
+              <p class="mt-3">Failed to load properties. Please try again.</p>
+            </div>
+          `;
+        }
+      }
+      
+      applyFilters() {
+        this.filteredListings = this.allListings.filter(l => {
+          // Type filter
+          if (this.currentFilters.type !== 'all' && l.listingType !== this.currentFilters.type) {
+            return false;
+          }
+          
+          // District filter
+          if (this.currentFilters.district) {
+            const location = (l.location || l.district || '').toLowerCase();
+            if (!location.includes(this.currentFilters.district.toLowerCase())) {
+              return false;
+            }
+          }
+          
+          // Status filter
+          if (this.currentFilters.status !== 'all') {
+            const status = (l.status || '').toLowerCase();
+            if (!status.includes(this.currentFilters.status)) {
+              return false;
+            }
+          }
+          
+          // Price filters
+          const price = parseInt(l.price) || 0;
+          if (this.currentFilters.minPrice && price < this.currentFilters.minPrice) {
+            return false;
+          }
+          if (this.currentFilters.maxPrice && price > this.currentFilters.maxPrice) {
+            return false;
+          }
+          
+          return true;
+        });
+        
+        this.renderMarkers();
+        this.renderListings();
+        this.updateStats();
+      }
+      
+      renderMarkers() {
+        // Clear existing markers
+        this.markers.forEach(m => this.map.removeLayer(m));
+        this.markers = [];
+        
+        // Add markers for filtered listings
+        this.filteredListings.forEach(listing => {
+          const lat = parseFloat(listing.latitude);
+          const lng = parseFloat(listing.longitude);
+          
+          // Create custom icon
+          const icon = L.divIcon({
+            className: `custom-marker ${listing.listingType}`,
+            html: `<i class="bi bi-${this.getIconForType(listing.listingType)}"></i>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+          });
+          
+          const marker = L.marker([lat, lng], { icon })
+            .addTo(this.map)
+            .bindPopup(this.createPopupContent(listing));
+          
+          marker.on('click', () => {
+            this.highlightListing(listing.id);
+          });
+          
+          this.markers.push(marker);
+        });
+        
+        // Fit bounds if we have markers
+        if (this.markers.length > 0) {
+          const group = new L.featureGroup(this.markers);
+          this.map.fitBounds(group.getBounds().pad(0.1));
+        }
+      }
+      
+      getIconForType(type) {
+        switch(type) {
+          case 'apartments': return 'house-door-fill';
+          case 'land': return 'geo-alt-fill';
+          case 'cars': return 'car-front-fill';
+          default: return 'pin-fill';
+        }
+      }
+      
+      createPopupContent(listing) {
+        const price = parseInt(listing.price || 0).toLocaleString();
+        const image = listing.images?.[0] || listing.image || 'images/placeholder.jpg';
+        
+        return `
+          <div style="min-width: 200px;">
+            <img src="${image}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+            <h6 style="margin: 0; color: #0ff;">${listing.title || 'Untitled'}</h6>
+            <p style="margin: 4px 0; color: #8fff00; font-weight: bold;">RWF ${price}</p>
+            <p style="margin: 0; font-size: 0.8rem; color: #aaa;">
+              <i class="bi bi-geo-alt"></i> ${listing.location || listing.district || 'Unknown'}
+            </p>
+            <a href="${listing.listingType}-detail.html?id=${listing.id}" 
+               style="display: inline-block; margin-top: 8px; padding: 6px 12px; 
+                      background: linear-gradient(90deg, #0ff, #8fff00); 
+                      color: #000; text-decoration: none; border-radius: 6px; font-size: 0.85rem;">
+              View Details
+            </a>
+          </div>
+        `;
+      }
+      
+      renderListings() {
+        const container = document.getElementById('listingsContainer');
+        
+        if (this.filteredListings.length === 0) {
+          container.innerHTML = `
+            <div class="text-center text-white-50 py-5">
+              <i class="bi bi-search" style="font-size: 3rem;"></i>
+              <p class="mt-3">No properties match your filters.</p>
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = this.filteredListings.map(l => this.createListingCard(l)).join('');
+        
+        // Add click handlers
+        container.querySelectorAll('.listing-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const id = card.dataset.id;
+            const listing = this.filteredListings.find(l => l.id === id);
+            if (listing) {
+              this.map.setView([parseFloat(listing.latitude), parseFloat(listing.longitude)], 16);
+              this.highlightListing(id);
+            }
+          });
+        });
+      }
+      
+      createListingCard(listing) {
+        const price = parseInt(listing.price || 0).toLocaleString();
+        const image = listing.images?.[0] || listing.image || 'images/placeholder.jpg';
+        
+        return `
+          <div class="listing-card" data-id="${listing.id}">
+            <img src="${image}" class="listing-image" alt="${listing.title}">
+            <div class="listing-price">RWF ${price}</div>
+            <div class="listing-title">${listing.title || 'Untitled'}</div>
+            <div class="listing-location">
+              <i class="bi bi-geo-alt"></i> ${listing.location || listing.district || 'Unknown'}
+            </div>
+            <span class="listing-type">${listing.listingType}</span>
+          </div>
+        `;
+      }
+      
+      highlightListing(id) {
+        // Remove active class from all
+        document.querySelectorAll('.listing-card').forEach(c => c.classList.remove('active'));
+        
+        // Add to current
+        const card = document.querySelector(`.listing-card[data-id="${id}"]`);
+        if (card) {
+          card.classList.add('active');
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      
+      updateStats() {
+        document.getElementById('totalListings').textContent = this.filteredListings.length;
+        
+        // Calculate average price
+        const prices = this.filteredListings
+          .map(l => parseInt(l.price) || 0)
+          .filter(p => p > 0);
+        
+        if (prices.length > 0) {
+          const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+          document.getElementById('avgPrice').textContent = (avg / 1000000).toFixed(1) + 'M';
+        } else {
+          document.getElementById('avgPrice').textContent = '-';
+        }
+        
+        // Count unique areas
+        const areas = new Set(this.filteredListings.map(l => l.location || l.district));
+        document.getElementById('areaCount').textContent = areas.size;
+      }
+      
+      updateAreaStats() {
+        const center = this.map.getCenter();
+        const bounds = this.map.getBounds();
+        
+        // Find listings in visible area
+        const visible = this.filteredListings.filter(l => {
+          const lat = parseFloat(l.latitude);
+          const lng = parseFloat(l.longitude);
+          return bounds.contains([lat, lng]);
+        });
+        
+        if (visible.length === 0) {
+          document.getElementById('areaInfo').style.display = 'none';
+          return;
+        }
+        
+        // Update area info panel
+        document.getElementById('areaInfo').style.display = 'block';
+        document.getElementById('areaName').textContent = 'Visible Area';
+        document.getElementById('areaListings').textContent = visible.length;
+        
+        const prices = visible.map(l => parseInt(l.price) || 0).filter(p => p > 0);
+        if (prices.length > 0) {
+          const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+          const min = Math.min(...prices);
+          const max = Math.max(...prices);
+          document.getElementById('areaAvgPrice').textContent = (avg / 1000000).toFixed(1) + 'M RWF';
+          document.getElementById('areaPriceRange').textContent = 
+            (min / 1000000).toFixed(1) + 'M - ' + (max / 1000000).toFixed(1) + 'M';
+        }
+        
+        // Most common type
+        const types = {};
+        visible.forEach(l => {
+          types[l.listingType] = (types[l.listingType] || 0) + 1;
+        });
+        const topType = Object.entries(types).sort((a, b) => b[1] - a[1])[0];
+        document.getElementById('areaTopType').textContent = topType ? topType[0] : '-';
+      }
+      
+      panToDistrict(district) {
+        // District coordinates (approximate centers)
+        const districts = {
+          'Kigali': [-1.94, 30.06],
+          'Gasabo': [-1.92, 30.08],
+          'Kicukiro': [-1.97, 30.10],
+          'Nyarugenge': [-1.95, 30.03],
+          'Musanze': [-1.50, 29.60],
+          'Rubavu': [-1.67, 29.35],
+          'Huye': [-2.60, 29.75],
+          'Rwamagana': [-1.95, 30.45],
+          'Nyagatare': [-1.30, 30.35],
+          'Bugesera': [-2.20, 30.20]
+        };
+        
+        const coords = districts[district];
+        if (coords) {
+          this.map.setView(coords, 12);
+        }
+      }
+    }
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      window.mapExplorer = new MapExplorer();
+    });
+  </script>
+</body>
+</html>

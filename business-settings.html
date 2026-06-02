@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Business Settings - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,136,255,0.1) 100%);
+      border-bottom: 2px solid #0ff;
+      padding: 2rem 0;
+    }
+
+    .settings-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .settings-card h5 {
+      color: #0ff;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.3);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #0ff;
+    }
+    .form-label {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .save-btn {
+      background: linear-gradient(90deg, #0ff, #8fff00);
+      color: #222;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .save-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 5px 20px rgba(0,255,255,0.3);
+    }
+    .save-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .status-live { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid #00ff88; }
+    .status-test { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid #ffc107; }
+    .status-none { background: rgba(255,68,68,0.15); color: #ff4444; border: 1px solid #ff4444; }
+
+    .transaction-row {
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .tx-amount { color: #0ff; font-weight: bold; font-size: 1.1rem; }
+    .tx-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .tx-completed { background: rgba(0,255,136,0.2); color: #00ff88; }
+    .tx-pending { background: rgba(255,193,7,0.2); color: #ffc107; }
+    .tx-failed { background: rgba(255,68,68,0.2); color: #ff4444; }
+
+    .earnings-card {
+      background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,255,255,0.1));
+      border: 1px solid #0ff;
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .earnings-amount {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #0ff, #8fff00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid rgba(0,255,255,0.3);
+      color: rgba(255,255,255,0.6);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .tab-btn.active {
+      background: linear-gradient(90deg, #0ff, #8fff00);
+      color: #222;
+      border-color: transparent;
+      font-weight: bold;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background:rgba(0,0,0,0.9);border-bottom:1px solid rgba(0,255,255,0.3);">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html" style="color:#0ff;">
+        <i class="bi bi-house-heart"></i> HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link active" href="business-settings.html"><i class="bi bi-briefcase"></i> Business</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h2 class="fw-bold mb-2"><i class="bi bi-briefcase-fill" style="color:#0ff;"></i> Business Settings</h2>
+          <p class="text-white-50 mb-0">Manage your payouts, payment configuration, and transaction history</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <span id="paymentStatusBadge" class="status-badge status-none">
+            <i class="bi bi-exclamation-circle"></i> No API Key Set
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container py-4">
+
+    <!-- Earnings Summary -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="earnings-card">
+          <p class="text-white-50 mb-1">Total Earnings</p>
+          <div class="earnings-amount" id="totalEarnings">0 RWF</div>
+          <small class="text-white-50">From featured listings</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="earnings-card" style="border-color:#8fff00;">
+          <p class="text-white-50 mb-1">Available Balance</p>
+          <div class="earnings-amount" style="background:linear-gradient(90deg,#8fff00,#0ff);-webkit-background-clip:text;">0 RWF</div>
+          <small class="text-white-50">Ready for withdrawal</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="earnings-card" style="border-color:#ff0088;">
+          <p class="text-white-50 mb-1">Pending</p>
+          <div class="earnings-amount" style="background:linear-gradient(90deg,#ff0088,#ff8800);-webkit-background-clip:text;">0 RWF</div>
+          <small class="text-white-50">Awaiting settlement</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-3">
+      <button class="tab-btn active" onclick="switchTab('payout', this)">
+        <i class="bi bi-bank"></i> Payout Settings
+      </button>
+      <button class="tab-btn" onclick="switchTab('payments', this)">
+        <i class="bi bi-credit-card"></i> Payment Config
+      </button>
+      <button class="tab-btn" onclick="switchTab('transactions', this)">
+        <i class="bi bi-receipt"></i> Transactions
+      </button>
+    </div>
+
+    <!-- Payout Settings Tab -->
+    <div id="payoutTab" class="tab-content">
+      <div class="settings-card">
+        <h5><i class="bi bi-bank"></i> Payout Bank Account</h5>
+        <p class="text-white-50" style="font-size:0.85rem;">Enter your bank details where you want to receive payouts. Withdrawals typically take 1-3 business days.</p>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Bank Name</label>
+            <input type="text" id="bankName" class="form-input" placeholder="e.g., Bank of Kigali, Equity Bank">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Account Number</label>
+            <input type="text" id="accountNumber" class="form-input" placeholder="Your bank account number">
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Account Holder Name</label>
+            <input type="text" id="accountName" class="form-input" placeholder="Full name as on bank account">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mobile Money Number (Optional)</label>
+            <input type="tel" id="momoNumber" class="form-input" placeholder="2507XXXXXXXX">
+          </div>
+        </div>
+
+        <button class="save-btn" onclick="savePayoutSettings()">
+          <i class="bi bi-save"></i> Save Payout Settings
+        </button>
+        <span id="payoutSaveStatus" class="ms-3" style="color:#0ff;display:none;">
+          <i class="bi bi-check-circle"></i> Saved!
+        </span>
+      </div>
+
+      <div class="settings-card">
+        <h5><i class="bi bi-cash-stack"></i> Withdrawal Request</h5>
+        <p class="text-white-50" style="font-size:0.85rem;">Request a withdrawal to your configured bank account or Mobile Money.</p>
+        
+        <div class="row align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">Amount (RWF)</label>
+            <input type="number" id="withdrawAmount" class="form-input" placeholder="10000" min="5000">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Withdraw To</label>
+            <select id="withdrawMethod" class="form-input" style="padding:0.65rem 1rem;">
+              <option value="bank">Bank Account</option>
+              <option value="momo">Mobile Money</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button class="save-btn" onclick="requestWithdrawal()" style="width:100%;">
+              <i class="bi bi-send"></i> Request Withdrawal
+            </button>
+          </div>
+        </div>
+        <small class="text-white-50"><i class="bi bi-info-circle"></i> Minimum withdrawal: 5,000 RWF. Processing time: 1-3 business days.</small>
+      </div>
+    </div>
+
+    <!-- Payment Config Tab -->
+    <div id="paymentsTab" class="tab-content" style="display:none;">
+      <div class="settings-card">
+        <h5><i class="bi bi-credit-card"></i> Flutterwave API Configuration</h5>
+        <p class="text-white-50" style="font-size:0.85rem;">Enter your Flutterwave API keys to start accepting payments. Keep your secret key secure.</p>
+        
+        <div class="alert" style="background:rgba(255,193,7,0.1);border:1px solid #ffc107;color:#ffc107;border-radius:10px;padding:1rem;margin-bottom:1rem;">
+          <i class="bi bi-exclamation-triangle-fill"></i> 
+          <strong>Important:</strong> Use <strong>Test Keys</strong> for development. Switch to <strong>Live Keys</strong> only when ready to accept real payments.
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Public Key</label>
+            <input type="text" id="fwPublicKey" class="form-input" placeholder="FLWPUBK_TEST-xxxxxxxxxxxxxxxx-X">
+            <small class="text-white-50">Starts with FLWPUBK_TEST_ or FLWPUBK-</small>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Secret Key</label>
+            <input type="password" id="fwSecretKey" class="form-input" placeholder="FLWSECK_TEST-xxxxxxxxxxxxxxxx-X">
+            <small class="text-white-50">Never share this key. Starts with FLWSECK_TEST_ or FLWSECK-</small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <label class="form-label">Encryption Key</label>
+            <input type="password" id="fwEncryptionKey" class="form-input" placeholder="Your Flutterwave encryption key">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Webhook Secret (Optional)</label>
+            <input type="password" id="fwWebhookSecret" class="form-input" placeholder="For verifying webhooks">
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <button class="save-btn" onclick="savePaymentConfig()">
+            <i class="bi bi-save"></i> Save API Keys
+          </button>
+          <button class="btn btn-outline-info ms-2" onclick="testConnection()">
+            <i class="bi bi-plug"></i> Test Connection
+          </button>
+          <span id="apiSaveStatus" class="ms-3" style="color:#0ff;display:none;">
+            <i class="bi bi-check-circle"></i> Keys saved!
+          </span>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h5><i class="bi bi-gear"></i> Payment Settings</h5>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Currency</label>
+            <select id="currency" class="form-input" style="padding:0.65rem 1rem;">
+              <option value="RWF" selected>RWF (Rwandan Franc)</option>
+              <option value="KES">KES (Kenyan Shilling)</option>
+              <option value="UGX">UGX (Ugandan Shilling)</option>
+              <option value="TZS">TZS (Tanzanian Shilling)</option>
+              <option value="USD">USD (US Dollar)</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Auto-Withdrawal Threshold (RWF)</label>
+            <input type="number" id="autoWithdrawThreshold" class="form-input" placeholder="50000" value="50000">
+            <small class="text-white-50">Automatically request withdrawal when balance reaches this amount</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Tab -->
+    <div id="transactionsTab" class="tab-content" style="display:none;">
+      <div class="settings-card">
+        <h5><i class="bi bi-receipt"></i> Transaction History</h5>
+        <div class="d-flex gap-2 mb-3">
+          <button class="btn btn-sm btn-outline-light" onclick="filterTx('all')">All</button>
+          <button class="btn btn-sm btn-outline-light" onclick="filterTx('completed')">Completed</button>
+          <button class="btn btn-sm btn-outline-light" onclick="filterTx('pending')">Pending</button>
+          <button class="btn btn-sm btn-outline-light" onclick="filterTx('withdrawal')">Withdrawals</button>
+        </div>
+        
+        <div id="transactionsList">
+          <div class="empty-state">
+            <i class="bi bi-receipt"></i>
+            <p>No transactions yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3 mt-5" style="border-top:1px solid rgba(0,255,255,0.3);">
+    <div class="container text-center">
+      <p class="mb-0 text-white-50" style="font-size:0.85rem;">&copy; <span class="footer-year"></span> HOME AFRICA. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    let currentUser = null;
+    let allTransactions = [];
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.supabaseClient) {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session?.user) {
+          window.location.href = 'signin.html?redirect=' + encodeURIComponent(window.location.href);
+          return;
+        }
+        currentUser = session.user;
+      }
+
+      await loadSettings();
+      await loadTransactions();
+      updateEarnings();
+
+      document.querySelectorAll('.footer-year').forEach(e => e.textContent = new Date().getFullYear());
+    });
+
+    // ── Tab Switching ──
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      document.getElementById(tab + 'Tab').style.display = 'block';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // ── Load Settings ──
+    async function loadSettings() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('merchant_settings')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') throw error;
+        if (!data) return;
+
+        // Fill payout form
+        document.getElementById('bankName').value = data.bank_name || '';
+        document.getElementById('accountNumber').value = data.account_number || '';
+        document.getElementById('accountName').value = data.account_name || '';
+        document.getElementById('momoNumber').value = data.momo_number || '';
+
+        // Fill payment config
+        document.getElementById('fwPublicKey').value = data.fw_public_key || '';
+        document.getElementById('currency').value = data.currency || 'RWF';
+        document.getElementById('autoWithdrawThreshold').value = data.auto_withdraw_threshold || 50000;
+
+        updateStatusBadge(data.fw_public_key);
+      } catch (e) {
+        console.log('No settings found or error:', e.message);
+      }
+    }
+
+    // ── Save Payout Settings ──
+    async function savePayoutSettings() {
+      const btn = document.querySelector('#payoutTab .save-btn');
+      btn.disabled = true;
+
+      const settings = {
+        user_id: currentUser.id,
+        bank_name: document.getElementById('bankName').value.trim(),
+        account_number: document.getElementById('accountNumber').value.trim(),
+        account_name: document.getElementById('accountName').value.trim(),
+        momo_number: document.getElementById('momoNumber').value.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('merchant_settings')
+          .upsert(settings, { onConflict: 'user_id' });
+
+        if (error) throw error;
+
+        const status = document.getElementById('payoutSaveStatus');
+        status.style.display = 'inline';
+        setTimeout(() => status.style.display = 'none', 3000);
+      } catch (e) {
+        alert('Error saving: ' + e.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ── Save Payment Config ──
+    async function savePaymentConfig() {
+      const btn = document.querySelector('#paymentsTab .save-btn');
+      btn.disabled = true;
+
+      const publicKey = document.getElementById('fwPublicKey').value.trim();
+      const isLive = publicKey && !publicKey.includes('TEST');
+
+      const settings = {
+        user_id: currentUser.id,
+        fw_public_key: publicKey,
+        fw_secret_key: document.getElementById('fwSecretKey').value.trim(),
+        fw_encryption_key: document.getElementById('fwEncryptionKey').value.trim(),
+        fw_webhook_secret: document.getElementById('fwWebhookSecret').value.trim(),
+        currency: document.getElementById('currency').value,
+        auto_withdraw_threshold: parseInt(document.getElementById('autoWithdrawThreshold').value) || 50000,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('merchant_settings')
+          .upsert(settings, { onConflict: 'user_id' });
+
+        if (error) throw error;
+
+        updateStatusBadge(publicKey);
+        const status = document.getElementById('apiSaveStatus');
+        status.style.display = 'inline';
+        setTimeout(() => status.style.display = 'none', 3000);
+      } catch (e) {
+        alert('Error saving: ' + e.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ── Update Status Badge ──
+    function updateStatusBadge(publicKey) {
+      const badge = document.getElementById('paymentStatusBadge');
+      if (!publicKey) {
+        badge.className = 'status-badge status-none';
+        badge.innerHTML = '<i class="bi bi-exclamation-circle"></i> No API Key Set';
+      } else if (publicKey.includes('TEST')) {
+        badge.className = 'status-badge status-test';
+        badge.innerHTML = '<i class="bi bi-flask"></i> Test Mode Active';
+      } else {
+        badge.className = 'status-badge status-live';
+        badge.innerHTML = '<i class="bi bi-check-circle"></i> Live Mode Active';
+      }
+    }
+
+    // ── Test Connection ──
+    async function testConnection() {
+      const publicKey = document.getElementById('fwPublicKey').value.trim();
+      if (!publicKey) {
+        alert('Please enter your Public Key first');
+        return;
+      }
+      alert('To test: Try making a test payment on the Feature Listing page with a small amount (e.g., 100 RWF). Use test phone number: 250788000000');
+    }
+
+    // ── Request Withdrawal ──
+    async function requestWithdrawal() {
+      const amount = parseInt(document.getElementById('withdrawAmount').value);
+      const method = document.getElementById('withdrawMethod').value;
+
+      if (!amount || amount < 5000) {
+        alert('Minimum withdrawal is 5,000 RWF');
+        return;
+      }
+
+      try {
+        const { error } = await window.supabaseClient.from('withdrawals').insert({
+          user_id: currentUser.id,
+          amount: amount,
+          method: method,
+          status: 'pending',
+          requested_at: new Date().toISOString()
+        });
+
+        if (error) throw error;
+        alert('Withdrawal request submitted! You will receive confirmation within 1-3 business days.');
+        document.getElementById('withdrawAmount').value = '';
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    // ── Load Transactions ──
+    async function loadTransactions() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('transactions')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+        allTransactions = data || [];
+        renderTransactions('all');
+      } catch (e) {
+        console.error('Error loading transactions:', e);
+      }
+    }
+
+    // ── Render Transactions ──
+    function renderTransactions(filter) {
+      const list = document.getElementById('transactionsList');
+      let txs = allTransactions;
+
+      if (filter === 'completed') txs = txs.filter(t => t.status === 'completed');
+      else if (filter === 'pending') txs = txs.filter(t => t.status === 'pending');
+      else if (filter === 'withdrawal') txs = txs.filter(t => t.type === 'withdrawal');
+
+      if (txs.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-receipt"></i>
+            <p>No ${filter !== 'all' ? filter + ' ' : ''}transactions found</p>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = txs.map(tx => {
+        const statusClass = tx.status === 'completed' ? 'tx-completed' : 
+                           tx.status === 'pending' ? 'tx-pending' : 'tx-failed';
+        const statusIcon = tx.status === 'completed' ? 'bi-check-circle' : 
+                          tx.status === 'pending' ? 'bi-clock' : 'bi-x-circle';
+        const date = new Date(tx.created_at).toLocaleDateString();
+        const time = new Date(tx.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+        const typeLabel = tx.type === 'feature_listing' ? 'Listing Featured' : 
+                         tx.type === 'withdrawal' ? 'Withdrawal' : tx.type;
+
+        return `
+          <div class="transaction-row">
+            <div>
+              <div style="font-weight:bold;color:#fff;">${typeLabel}</div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);">
+                <i class="bi bi-calendar"></i> ${date} ${time}
+                ${tx.metadata?.plan ? `| <i class="bi bi-clock"></i> ${tx.metadata.plan}` : ''}
+              </div>
+            </div>
+            <div class="text-end">
+              <div class="tx-amount">${tx.amount.toLocaleString()} ${tx.currency || 'RWF'}</div>
+              <span class="tx-status ${statusClass}">
+                <i class="bi ${statusIcon}"></i> ${tx.status}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterTx(type) {
+      renderTransactions(type);
+    }
+
+    // ── Update Earnings Display ──
+    async function updateEarnings() {
+      try {
+        const completed = allTransactions.filter(t => t.status === 'completed' && t.type === 'feature_listing');
+        const total = completed.reduce((sum, t) => sum + t.amount, 0);
+        const pending = allTransactions.filter(t => t.status === 'pending' && t.type === 'feature_listing')
+                                       .reduce((sum, t) => sum + t.amount, 0);
+
+        document.getElementById('totalEarnings').textContent = total.toLocaleString() + ' RWF';
+        document.querySelectorAll('.earnings-amount')[1].textContent = total.toLocaleString() + ' RWF';
+        document.querySelectorAll('.earnings-amount')[2].textContent = pending.toLocaleString() + ' RWF';
+      } catch (e) {}
+    }
+  </script>
+
+</body>
+</html>

@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Panel | HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
+  <meta name="description" content="HOME AFRICA � Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -48,10 +51,27 @@
       background-clip: text;
     }
     #adminPanel {
-      position: relative;
-      z-index: 10;
+      position: relative !important;
+      z-index: 100 !important;
       min-height: 100vh;
       background: transparent;
+      width: 100%;
+    }
+    #adminPanel.show {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    #loginScreen.hide {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+    /* Ensure login screen is visible by default */
+    #loginScreen:not(.hide) {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
     .admin-container {
       position: relative;
@@ -123,10 +143,14 @@
       font-weight: bold;
     }
     .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 100vh !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative !important;
+      z-index: 100 !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
     .login-card {
       background: linear-gradient(120deg, rgba(0,0,0,0.95) 60%, rgba(255,0,136,0.15) 100%);
@@ -136,6 +160,9 @@
       box-shadow: 0 0 30px rgba(255,0,136,0.3);
       max-width: 400px;
       width: 100%;
+      position: relative;
+      z-index: 101;
+      color: #fff;
     }
   </style>
 </head>
@@ -143,7 +170,7 @@
   <div id="particles-js"></div>
 
   <!-- Login Screen (shown if not authenticated) -->
-  <div id="loginScreen" class="login-container" style="display: none;">
+  <div id="loginScreen" class="login-container" style="display: flex;">
     <div class="login-card">
       <h2 class="text-center mb-4" style="color: #ff0088;">
         <i class="bi bi-shield-lock"></i> Merchant Admin Login
@@ -283,6 +310,12 @@
             <button class="nav-link admin-tab" data-tab="analytics">
               <i class="bi bi-graph-up"></i> Analytics
             </button>
+          <button class="nav-link admin-tab" data-tab="subscriptions" id="subscriptionsTabBtn">
+            <i class="bi bi-star-fill" style="color:#ff0088"></i> Subscriptions
+          </button>
+          <button class="nav-link admin-tab" data-tab="verified" id="verifiedTabBtn">
+            <i class="bi bi-patch-check-fill" style="color:#00b4d8"></i> Verified Sellers
+          </button>
           </li>
         </ul>
 
@@ -325,12 +358,13 @@
                   <th>Name</th>
                   <th>Role</th>
                   <th>Verified</th>
+                  <th>Temp Password</th>
                   <th>Created</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
-                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                <tr><td colspan="7" class="text-center">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -404,7 +438,55 @@
     </div>
   </div>
 
-  <!-- Edit Modal -->
+  
+        <!-- Subscriptions Tab -->
+        <div id="subscriptionsTab" class="tab-content admin-card" style="display: none;">
+          <h3 class="mb-4" style="color: #ff0088;"><i class="bi bi-star-fill"></i> Pending Subscriptions</h3>
+          <p style="color:#aaa;">Sellers awaiting plan activation after payment. Approve to set their listings as Featured.</p>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover">
+              <thead>
+                <tr>
+                  <th>User Email</th>
+                  <th>Plan</th>
+                  <th>Requested</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="subscriptionsTableBody">
+                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Verified Sellers Tab -->
+        <div id="verifiedTab" class="tab-content admin-card" style="display: none;">
+          <h3 class="mb-4" style="color: #ff0088;"><i class="bi bi-patch-check-fill" style="color:#00b4d8"></i> Verified Sellers</h3>
+          <p style="color:#aaa;">Mark sellers as verified. Their listings will show a <span style="background:linear-gradient(90deg,#00b4d8,#0077b6);color:#fff;padding:2px 8px;border-radius:8px;font-size:0.8rem;"><i class="bi bi-patch-check-fill"></i> Verified</span> badge.</p>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Verified At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="verifiedTableBody">
+                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-3">
+            <input type="text" id="verifyUserIdInput" class="form-control" style="background:rgba(0,255,255,0.1);border:1px solid #0ff;color:#fff;max-width:400px;display:inline-block;" placeholder="Enter User ID to verify...">
+            <button class="btn btn-success ms-2" onclick="verifySeller()"><i class="bi bi-patch-check-fill"></i> Verify Seller</button>
+          </div>
+        </div>
+
+      <!-- Edit Modal -->
   <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content" style="background:rgba(0,0,0,0.95);border:2px solid #ff0088;">
@@ -446,15 +528,218 @@
   
   <!-- Admin Access Check -->
   <script>
-    // Protect admin page with RBAC
+    // Admin panel handles its own authentication
+    // The admin-panel.js script will show login screen if not authenticated
+    // No need for RBAC check here - admin panel has its own auth system
     document.addEventListener('DOMContentLoaded', async () => {
-      // Wait for RBAC to initialize
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Ensure login screen is visible by default
+      const loginScreen = document.getElementById('loginScreen');
+      const adminPanel = document.getElementById('adminPanel');
       
-      if (!window.rbac || !window.rbac.hasRole('admin')) {
-        alert('Access denied. Admin privileges required.');
-        window.location.href = 'index.html';
+      if (loginScreen) {
+        loginScreen.style.display = 'flex';
+        loginScreen.style.visibility = 'visible';
+        loginScreen.style.position = 'relative';
+        loginScreen.style.zIndex = '100';
       }
+      
+      if (adminPanel) {
+        adminPanel.style.display = 'none';
+      }
+      
+      // Wait for admin panel to initialize
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Debug: Check what's visible
+      console.log('Login screen display:', loginScreen?.style.display);
+      console.log('Admin panel display:', adminPanel?.style.display);
+      console.log('Login screen exists:', !!loginScreen);
+      console.log('Admin panel exists:', !!adminPanel);
+      
+      // Check if form exists
+      const loginForm = document.getElementById('adminLoginForm');
+      console.log('Login form exists:', !!loginForm);
+      
+      // Check if button exists
+      const loginBtn = document.getElementById('loginSubmitBtn');
+      console.log('Login button exists:', !!loginBtn);
+      
+      // If login screen is still hidden, force show it
+      if (loginScreen && loginScreen.style.display === 'none') {
+        console.warn('Login screen was hidden, forcing it to show');
+        loginScreen.style.display = 'flex';
+        loginScreen.style.visibility = 'visible';
+      }
+      
+      // Test: Add click listener directly to button as fallback
+      if (loginBtn) {
+        loginBtn.addEventListener('click', function(e) {
+          console.log('🔘 BUTTON CLICKED DIRECTLY!');
+          const form = document.getElementById('adminLoginForm');
+          if (form) {
+            console.log('Triggering form submit from button click');
+            form.requestSubmit();
+          }
+        });
+      }
+    });
+  </script>
+
+  <script>
+    async function loadSubscriptions() {
+      const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+      if (!supabase) return;
+      const tbody = document.getElementById('subscriptionsTableBody');
+      if (!tbody) return;
+
+      const { data, error } = await supabase
+        .from('seller_subscriptions')
+        .select('id, user_id, plan, status, active, requested_at, expires_at')
+        .order('requested_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No pending subscriptions</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(sub => {
+        const statusBadge = sub.active
+          ? '<span class="badge bg-success">Active</span>'
+          : sub.status === 'pending_payment'
+            ? '<span class="badge bg-warning text-dark">Pending Payment</span>'
+            : '<span class="badge bg-secondary">Inactive</span>';
+        const approveBtn = (!sub.active && sub.status === 'pending_payment')
+          ? `<button class="btn btn-sm btn-success me-1" onclick="approveSubscription('${sub.id}', '${sub.user_id}')"><i class="bi bi-check-lg"></i> Approve</button>`
+          : '';
+        const rejectBtn = !sub.active
+          ? `<button class="btn btn-sm btn-danger" onclick="rejectSubscription('${sub.id}')"><i class="bi bi-x-lg"></i> Reject</button>`
+          : '<span class="text-success"><i class="bi bi-check-circle-fill"></i> Activated</span>';
+        const requested = sub.requested_at ? new Date(sub.requested_at).toLocaleString() : 'N/A';
+        return `<tr>
+          <td><small style="color:#aaa">${sub.user_id}</small></td>
+          <td><span class="badge" style="background:linear-gradient(90deg,#0ff,#8fff00);color:#000;">${sub.plan.toUpperCase()}</span></td>
+          <td>${requested}</td>
+          <td>${statusBadge}</td>
+          <td>${approveBtn}${rejectBtn}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function approveSubscription(subId, userId) {
+      const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+      if (!supabase) return;
+
+      if (!confirm('Confirm payment received and activate Featured for this seller?')) return;
+
+      const { error: subError } = await supabase
+        .from('seller_subscriptions')
+        .update({ active: true, status: 'active', started_at: new Date().toISOString() })
+        .eq('id', subId);
+
+      if (subError) { alert('Error updating subscription: ' + subError.message); return; }
+
+      const tables = ['apartments', 'cars', 'land_plots'];
+      for (const table of tables) {
+        await supabase.from(table).update({ featured: true }).eq('user_id', userId);
+      }
+
+      alert('Subscription approved! Seller listings are now Featured.');
+      loadSubscriptions();
+    }
+
+    async function rejectSubscription(subId) {
+      const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+      if (!supabase) return;
+
+      if (!confirm('Reject this subscription request?')) return;
+
+      await supabase.from('seller_subscriptions').update({ status: 'rejected', active: false }).eq('id', subId);
+      alert('Subscription rejected.');
+      loadSubscriptions();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const subsBtn = document.getElementById('subscriptionsTabBtn');
+      if (subsBtn) {
+        subsBtn.addEventListener('click', loadSubscriptions);
+      }
+    });
+  </script>
+
+  <script>
+    async function loadVerifiedSellers() {
+      const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+      if (!supabase) return;
+      const tbody = document.getElementById('verifiedTableBody');
+      if (!tbody) return;
+
+      const { data, error } = await supabase
+        .from('verified_sellers')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No verified sellers yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(row => {
+        const statusBadge = row.verified
+          ? '<span class="badge bg-success"><i class="bi bi-patch-check-fill"></i> Verified</span>'
+          : '<span class="badge bg-secondary">Unverified</span>';
+        const verifiedAt = row.verified_at ? new Date(row.verified_at).toLocaleString() : '—';
+        const revokeBtn = row.verified
+          ? `<button class="btn btn-sm btn-danger" onclick="revokeVerification('${row.id}', '${row.user_id}')"><i class="bi bi-x-lg"></i> Revoke</button>`
+          : '';
+        return `<tr>
+          <td><small style="color:#aaa">${row.user_id}</small></td>
+          <td><small style="color:#ccc">${row.verified_by || '—'}</small></td>
+          <td>${statusBadge}</td>
+          <td>${verifiedAt}</td>
+          <td>${revokeBtn}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function verifySeller() {
+      const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+      if (!supabase) return;
+      const userId = document.getElementById('verifyUserIdInput')?.value.trim();
+      if (!userId) { alert('Please enter a User ID'); return; }
+      if (!confirm(`Mark user ${userId} as Verified Seller?`)) return;
+
+      const { error } = await supabase.from('verified_sellers').upsert({
+        user_id: userId,
+        verified: true,
+        verified_at: new Date().toISOString(),
+        verified_by: 'admin'
+      }, { onConflict: 'user_id' });
+
+      if (error) { alert('Error: ' + error.message); return; }
+
+      // Also mark all their listings as verified
+      await supabase.from('listings').update({ verified: true }).eq('user_id', userId);
+
+      alert('Seller verified! Their listings now show the Verified badge.');
+      document.getElementById('verifyUserIdInput').value = '';
+      loadVerifiedSellers();
+    }
+
+    async function revokeVerification(rowId, userId) {
+      const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+      if (!supabase) return;
+      if (!confirm('Revoke verification for this seller?')) return;
+
+      await supabase.from('verified_sellers').update({ verified: false, verified_at: null }).eq('id', rowId);
+      await supabase.from('listings').update({ verified: false }).eq('user_id', userId);
+
+      alert('Verification revoked.');
+      loadVerifiedSellers();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const verBtn = document.getElementById('verifiedTabBtn');
+      if (verBtn) verBtn.addEventListener('click', loadVerifiedSellers);
     });
   </script>
 </body>

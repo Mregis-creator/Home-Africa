@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notifications - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <style>
+    body { background: linear-gradient(135deg,#0a0a1a 0%,#1a1a3a 100%); min-height:100vh; color:#fff; }
+
+    .notif-navbar {
+      background: rgba(0,0,0,0.92);
+      border-bottom: 1px solid rgba(0,255,255,0.3);
+      position: sticky; top: 0; z-index: 1000;
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, rgba(0,255,255,0.08) 0%, rgba(255,0,136,0.08) 100%);
+      border-bottom: 2px solid rgba(0,255,255,0.2);
+      padding: 2rem 0 1.5rem;
+    }
+
+    .notif-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,255,255,0.15);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: all 0.25s;
+      cursor: pointer;
+      position: relative;
+    }
+    .notif-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #0ff;
+      transform: translateX(4px);
+    }
+    .notif-card.unread {
+      border-left: 3px solid #0ff;
+      background: rgba(0,255,255,0.05);
+    }
+    .notif-card.unread::before {
+      content: '';
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 9px; height: 9px;
+      background: #0ff;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #0ff;
+    }
+
+    .notif-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .notif-icon.message   { background: linear-gradient(135deg,#0ff,#0077b6); color:#222; }
+    .notif-icon.favorite  { background: linear-gradient(135deg,#ff4444,#ff0088); color:#fff; }
+    .notif-icon.listing   { background: linear-gradient(135deg,#8fff00,#0ff); color:#222; }
+    .notif-icon.verified  { background: linear-gradient(135deg,#00b4d8,#0077b6); color:#fff; }
+    .notif-icon.system    { background: linear-gradient(135deg,#ff8800,#ff0088); color:#fff; }
+
+    .notif-title  { color:#fff; font-weight:600; font-size:0.95rem; margin-bottom:0.2rem; }
+    .notif-body   { color:rgba(255,255,255,0.6); font-size:0.85rem; margin-bottom:0.25rem; }
+    .notif-time   { color:rgba(255,255,255,0.35); font-size:0.78rem; }
+
+    .filter-bar { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .filter-btn {
+      border: 1px solid rgba(0,255,255,0.3);
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      padding: 0.35rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: linear-gradient(90deg,#0ff,#8fff00);
+      color: #222;
+      border-color: transparent;
+      font-weight: bold;
+    }
+
+    .mark-all-btn {
+      background: transparent;
+      border: 1px solid rgba(0,255,255,0.4);
+      color: #0ff;
+      padding: 0.35rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mark-all-btn:hover { background: rgba(0,255,255,0.1); }
+
+    .empty-state {
+      text-align: center; padding: 4rem 2rem;
+      border: 2px dashed rgba(0,255,255,0.2);
+      border-radius: 14px;
+    }
+    .empty-state i { font-size: 3.5rem; color: rgba(0,255,255,0.3); margin-bottom:1rem; display:block; }
+
+    .badge-unread {
+      background: linear-gradient(90deg,#0ff,#8fff00);
+      color: #222;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .notif-action-btn {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(0,255,255,0.4);
+      color: #0ff;
+      background: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .notif-action-btn:hover { background: rgba(0,255,255,0.1); }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="notif-navbar navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html" style="color:#0ff;">
+        <i class="bi bi-house-heart"></i> HOME AFRICA
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="messages.html"><i class="bi bi-chat-dots"></i> Messages</a></li>
+          <li class="nav-item"><a class="nav-link" href="favorites.html"><i class="bi bi-heart"></i> Favorites</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+          <li class="nav-item"><a class="nav-link active" href="notifications.html"><i class="bi bi-bell-fill" style="color:#0ff;"></i> Notifications</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h2 class="fw-bold mb-1">
+            <i class="bi bi-bell-fill" style="color:#0ff;"></i> Notifications
+            <span id="unreadBadge" class="badge-unread ms-2" style="display:none;"></span>
+          </h2>
+          <p class="text-white-50 mb-0" style="font-size:0.9rem;">Stay updated on messages, favorites, and listing activity</p>
+        </div>
+        <button class="mark-all-btn" onclick="markAllRead()">
+          <i class="bi bi-check2-all"></i> Mark all as read
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="container py-4">
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">
+        <i class="bi bi-grid"></i> All
+      </button>
+      <button class="filter-btn" data-filter="message" onclick="setFilter('message',this)">
+        <i class="bi bi-chat-dots"></i> Messages
+      </button>
+      <button class="filter-btn" data-filter="favorite" onclick="setFilter('favorite',this)">
+        <i class="bi bi-heart"></i> Favorites
+      </button>
+      <button class="filter-btn" data-filter="listing" onclick="setFilter('listing',this)">
+        <i class="bi bi-house"></i> Listings
+      </button>
+      <button class="filter-btn" data-filter="verified" onclick="setFilter('verified',this)">
+        <i class="bi bi-patch-check"></i> Verified
+      </button>
+      <button class="filter-btn" data-filter="system" onclick="setFilter('system',this)">
+        <i class="bi bi-gear"></i> System
+      </button>
+    </div>
+
+    <!-- Notifications list -->
+    <div id="notifList">
+      <div class="empty-state">
+        <div class="spinner-border text-info mb-3" role="status"></div>
+        <p class="text-white-50">Loading notifications...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3 mt-5" style="border-top:1px solid rgba(0,255,255,0.3);">
+    <div class="container text-center">
+      <p class="mb-0 text-white-50" style="font-size:0.85rem;">&copy; <span class="footer-year"></span> HOME AFRICA. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    let _allNotifs = [];
+    let _currentFilter = 'all';
+    let _supabase = null;
+    let _userId = null;
+
+    // ── Icon & colour map ──
+    const NOTIF_META = {
+      message:  { icon: 'bi-chat-dots-fill',     cls: 'message',  label: 'Message' },
+      favorite: { icon: 'bi-heart-fill',          cls: 'favorite', label: 'Favorite' },
+      listing:  { icon: 'bi-house-check-fill',    cls: 'listing',  label: 'Listing' },
+      verified: { icon: 'bi-patch-check-fill',    cls: 'verified', label: 'Verified' },
+      system:   { icon: 'bi-info-circle-fill',    cls: 'system',   label: 'System' },
+    };
+
+    // ── Time ago ──
+    function timeAgo(iso) {
+      const s = Math.floor((Date.now() - new Date(iso)) / 1000);
+      if (s < 60) return 'just now';
+      if (s < 3600) return Math.floor(s/60) + 'm ago';
+      if (s < 86400) return Math.floor(s/3600) + 'h ago';
+      if (s < 604800) return Math.floor(s/86400) + 'd ago';
+      return new Date(iso).toLocaleDateString();
+    }
+
+    // ── Render ──
+    function renderNotifs() {
+      const list = document.getElementById('notifList');
+      const items = _currentFilter === 'all'
+        ? _allNotifs
+        : _allNotifs.filter(n => n.type === _currentFilter);
+
+      if (items.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-bell-slash"></i>
+            <h5 class="text-white-50">No ${_currentFilter === 'all' ? '' : _currentFilter + ' '}notifications yet</h5>
+            <p class="text-white-50" style="font-size:0.85rem;">We'll let you know when something happens</p>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = items.map(n => {
+        const meta = NOTIF_META[n.type] || NOTIF_META.system;
+        const actionBtn = n.action_url
+          ? `<button class="notif-action-btn ms-auto flex-shrink-0" onclick="openNotif(event,'${n.id}','${n.action_url}')">View <i class="bi bi-arrow-right"></i></button>`
+          : '';
+        return `
+          <div class="notif-card ${n.read_at ? '' : 'unread'}" onclick="markRead('${n.id}', '${n.action_url || ''}')">
+            <div class="notif-icon ${meta.cls}">
+              <i class="bi ${meta.icon}"></i>
+            </div>
+            <div class="flex-grow-1 min-width-0">
+              <div class="notif-title">${n.title || meta.label}</div>
+              <div class="notif-body">${n.body || ''}</div>
+              <div class="notif-time"><i class="bi bi-clock"></i> ${timeAgo(n.created_at)}</div>
+            </div>
+            ${actionBtn}
+          </div>`;
+      }).join('');
+
+      // Update unread badge
+      const unread = _allNotifs.filter(n => !n.read_at).length;
+      const badge = document.getElementById('unreadBadge');
+      badge.textContent = unread + ' unread';
+      badge.style.display = unread > 0 ? 'inline' : 'none';
+    }
+
+    // ── Filter ──
+    function setFilter(filter, el) {
+      _currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      renderNotifs();
+    }
+
+    // ── Mark single read ──
+    async function markRead(id, url) {
+      const notif = _allNotifs.find(n => n.id === id);
+      if (notif && !notif.read_at) {
+        notif.read_at = new Date().toISOString();
+        renderNotifs();
+        // Persist to Supabase
+        if (_supabase && id !== 'local_' + id) {
+          await _supabase.from('notifications').update({ read_at: notif.read_at }).eq('id', id).catch(() => {});
+        }
+        // Update localStorage
+        saveLocalNotifs();
+      }
+      if (url && url !== 'undefined' && url !== '') window.location.href = url;
+    }
+
+    function openNotif(e, id, url) {
+      e.stopPropagation();
+      markRead(id, url);
+    }
+
+    // ── Mark all read ──
+    async function markAllRead() {
+      const now = new Date().toISOString();
+      _allNotifs.forEach(n => { if (!n.read_at) n.read_at = now; });
+      renderNotifs();
+      saveLocalNotifs();
+      if (_supabase && _userId) {
+        await _supabase.from('notifications')
+          .update({ read_at: now })
+          .eq('user_id', _userId)
+          .is('read_at', null)
+          .catch(() => {});
+      }
+    }
+
+    // ── LocalStorage helpers ──
+    function getLocalNotifs() {
+      try { return JSON.parse(localStorage.getItem('ha_notifications') || '[]'); }
+      catch(e) { return []; }
+    }
+    function saveLocalNotifs() {
+      localStorage.setItem('ha_notifications', JSON.stringify(_allNotifs.filter(n => n.id?.startsWith?.('local_'))));
+    }
+
+    // ── Seed local demo notifications if nothing exists ──
+    function seedDemoNotifs() {
+      const demo = [
+        { id:'local_1', type:'system',   title:'Welcome to HOME AFRICA!', body:'Your account is ready. Start browsing listings or post your own.',   created_at: new Date(Date.now()-60000).toISOString(),  read_at:null,    action_url:'index.html' },
+        { id:'local_2', type:'listing',  title:'New listing in your area', body:'A new apartment was posted in Kigali matching recent searches.', created_at: new Date(Date.now()-3600000).toISOString(), read_at:null,    action_url:'apartment.html' },
+        { id:'local_3', type:'favorite', title:'Someone saved your listing', body:'A buyer added one of your listings to their favorites.',         created_at: new Date(Date.now()-7200000).toISOString(), read_at: new Date().toISOString(), action_url:'dashboard.html' },
+      ];
+      return demo;
+    }
+
+    // ── Main init ──
+    async function init() {
+      _supabase = window.supabaseClient;
+
+      // Get session
+      if (_supabase) {
+        try {
+          const { data: { session } } = await _supabase.auth.getSession();
+          if (session?.user) _userId = session.user.id;
+        } catch(e) {}
+      }
+
+      let supabaseNotifs = [];
+
+      if (_supabase && _userId) {
+        try {
+          const { data, error } = await _supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', _userId)
+            .order('created_at', { ascending: false })
+            .limit(60);
+          if (!error && data?.length) supabaseNotifs = data;
+        } catch(e) { console.warn('notifications table not yet created', e); }
+      }
+
+      // Merge with localStorage notifs
+      const localNotifs = getLocalNotifs();
+      _allNotifs = supabaseNotifs.length > 0
+        ? [...supabaseNotifs, ...localNotifs]
+        : [...localNotifs, ...seedDemoNotifs()];
+
+      // Deduplicate by id
+      const seen = new Set();
+      _allNotifs = _allNotifs.filter(n => { if (seen.has(n.id)) return false; seen.add(n.id); return true; });
+
+      renderNotifs();
+
+      // Subscribe to real-time new notifications if logged in
+      if (_supabase && _userId) {
+        _supabase.channel('notifications_' + _userId)
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${_userId}`
+          }, payload => {
+            _allNotifs.unshift(payload.new);
+            renderNotifs();
+            showToast(payload.new);
+          })
+          .subscribe();
+      }
+    }
+
+    // ── Toast popup for real-time ──
+    function showToast(notif) {
+      const meta = NOTIF_META[notif.type] || NOTIF_META.system;
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:rgba(0,0,0,0.95);border:1px solid #0ff;border-radius:12px;padding:1rem 1.25rem;z-index:9999;max-width:320px;box-shadow:0 4px 20px rgba(0,255,255,0.2);animation:slideUp 0.3s ease;';
+      t.innerHTML = `<div style="color:#0ff;font-weight:bold;margin-bottom:0.3rem;"><i class="bi ${meta.icon}"></i> ${notif.title||'Notification'}</div><div style="color:rgba(255,255,255,0.7);font-size:0.85rem;">${notif.body||''}</div>`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+      document.querySelectorAll('.footer-year').forEach(e => e.textContent = new Date().getFullYear());
+    });
+  </script>
+
+  <style>
+    @keyframes slideUp { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .min-width-0 { min-width: 0; }
+  </style>
+</body>
+</html>

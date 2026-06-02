@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HOME AFRICA - Search Functionality
  * Provides comprehensive search across listings, users, and posts
  */
@@ -196,10 +196,13 @@ class HomeAfricaSearch {
     let html = '';
 
     // Display listings
+    // Display listings
     if (results.listings.length > 0 && (this.currentFilter === 'all' || this.currentFilter === 'listings')) {
+      html += '<div class="row g-3 mb-4">';
       results.listings.forEach(listing => {
-        html += this.renderListingCard(listing);
+        html += '<div class="col-md-4 col-sm-6">' + this.renderListingCard(listing) + '</div>';
       });
+      html += '</div>';
     }
 
     // Display users
@@ -220,32 +223,32 @@ class HomeAfricaSearch {
   }
 
   renderListingCard(listing) {
-    const typeLabels = {
-      'car': '🚗 Car',
-      'apartment': '🏠 Apartment',
-      'land': '🏞️ Land',
-      'driving_school': '🚦 Driving School'
-    };
-
-    const typeLabel = typeLabels[listing.type] || listing.type;
+    const typeIcons = { car: 'bi-car-front', apartment: 'bi-building', land: 'bi-geo' };
+    const typeColors = { car: '#ff0088', apartment: '#0ff', land: '#8fff00' };
+    const typeLabels2 = { car: 'Car', apartment: 'Apartment', land: 'Land' };
+    const t = listing.type || 'listing';
+    const icon = typeIcons[t] || 'bi-tag';
+    const color = typeColors[t] || '#0ff';
+    const label = typeLabels2[t] || t;
     const price = listing.price ? `RWF ${parseInt(listing.price).toLocaleString()}` : 'Price on request';
-    const images = listing.images && listing.images.length > 0 ? listing.images[0] : 'images/hero-bg.jpeg';
-    const location = listing.location?.city || listing.location || 'Location not specified';
-
+    const img = listing.images?.[0] || (t === 'car' ? 'images/car1.jpg' : t === 'land' ? 'images/land1.jpg' : 'images/house1.jpg');
+    const loc = (typeof listing.location === 'object' ? listing.location?.city : listing.location) || '';
+    const query = document.getElementById('searchInput')?.value || '';
+    const detailUrl = this.getListingDetailUrl(t) + '?id=' + listing.id;
+    const verBadge = listing.verified ? '<span style="background:linear-gradient(90deg,#00b4d8,#0077b6);color:#fff;padding:1px 7px;border-radius:8px;font-size:0.72rem;font-weight:bold;margin-left:4px;"><i class="bi bi-patch-check-fill"></i></span>' : '';
+    const featBadge = listing.featured ? '<span style="position:absolute;top:10px;right:10px;background:linear-gradient(90deg,#ff0088,#ff8800);color:#fff;padding:2px 8px;border-radius:8px;font-size:0.72rem;font-weight:bold;"><i class="bi bi-lightning-fill"></i> Featured</span>' : '';
     return `
-      <div class="result-card" onclick="window.location.href='${this.getListingDetailUrl(listing.type)}?id=${listing.id}'">
-        <span class="result-type-badge badge-listing">${typeLabel}</span>
-        <div class="d-flex gap-3">
-          <img src="${images}" alt="${listing.title}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #ff0088;">
-          <div class="flex-grow-1">
-            <h5 class="result-title">${this.highlightQuery(listing.title, document.getElementById('searchInput').value)}</h5>
-            <p class="result-description">${this.highlightQuery((listing.description || '').substring(0, 150), document.getElementById('searchInput').value)}...</p>
-            <div class="result-meta">
-              <span><i class="bi bi-geo-alt"></i> ${location}</span>
-              <span><i class="bi bi-currency-exchange"></i> ${price}</span>
-              <span><i class="bi bi-eye"></i> ${listing.views || 0} views</span>
-            </div>
-          </div>
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.25);border-radius:12px;overflow:hidden;cursor:pointer;height:100%;transition:all 0.3s;" onmouseover="this.style.borderColor='#0ff';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(0,255,255,0.25)';this.style.transform=''" onclick="window.location.href='${detailUrl}'">
+        <div style="position:relative;">
+          <img src="${img}" style="width:100%;height:160px;object-fit:cover;" alt="${listing.title}">
+          <span style="position:absolute;top:10px;left:10px;background:${color};color:#222;padding:2px 10px;border-radius:20px;font-size:0.78rem;font-weight:bold;"><i class="bi ${icon}"></i> ${label}</span>
+          ${featBadge}
+        </div>
+        <div style="padding:0.9rem;">
+          <h6 style="color:#fff;margin-bottom:0.3rem;">${this.highlightQuery(listing.title||'Listing',query)}${verBadge}</h6>
+          ${loc ? `<p style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:0.4rem;"><i class="bi bi-geo-alt"></i> ${loc}</p>` : '' }
+          <p style="font-weight:bold;color:#0ff;font-size:1rem;margin-bottom:0.5rem;">${price}</p>
+          <a href="${detailUrl}" class="btn btn-sm w-100" style="background:linear-gradient(90deg,#0ff,#8fff00);color:#222;border:none;font-weight:bold;">View Details</a>
         </div>
       </div>
     `;

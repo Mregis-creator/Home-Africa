@@ -233,6 +233,16 @@
             <strong>User:</strong> <span id="verifyUser"></span>
           </div>
           <div class="mb-3">
+            <label class="form-label">Verification Source</label>
+            <select class="form-select" id="verifySource">
+              <option value="manual" selected>Manual confirmation</option>
+              <option value="momo_sms">Confirmed via MoMo SMS</option>
+              <option value="bank_transfer">Confirmed via bank transfer evidence</option>
+              <option value="receipt_upload">Confirmed with uploaded receipt</option>
+              <option value="other">Other / manual review</option>
+            </select>
+          </div>
+          <div class="mb-3">
             <label class="form-label">Verification Notes (optional)</label>
             <textarea class="form-control" id="verifyNotes" rows="2" placeholder="e.g., Confirmed via MTN SMS, Transaction ID: 123456"></textarea>
           </div>
@@ -260,6 +270,13 @@
           <div class="alert alert-warning">
             <strong>Reference:</strong> <span id="rejectReference"></span><br>
             <strong>Amount:</strong> <span id="rejectAmount"></span>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reject As</label>
+            <select class="form-select" id="rejectStatus">
+              <option value="failed" selected>Mark as Failed</option>
+              <option value="cancelled">Mark as Cancelled</option>
+            </select>
           </div>
           <div class="mb-3">
             <label class="form-label">Rejection Reason (required)</label>
@@ -407,12 +424,18 @@
                 <p>
                   <strong>Method:</strong> ${formatPaymentMethod(payment.payment_method)}<br>
                   ${payment.sender_phone ? `<strong>Sender Phone:</strong> ****${payment.sender_phone}<br>` : ''}
+                  ${payment.momo_transaction_id ? `<strong>MoMo Transaction:</strong> ${payment.momo_transaction_id}<br>` : ''}
                   ${payment.sender_name ? `<strong>Sender Name:</strong> ${payment.sender_name}<br>` : ''}
+                  ${payment.verification_source ? `<strong>Source:</strong> ${payment.verification_source.replaceAll('_', ' ')}<br>` : ''}
                 </p>
 
                 ${payment.description ? `
                   <h6>Description</h6>
                   <p>${payment.description}</p>
+                ` : ''}
+                ${payment.verification_notes ? `
+                  <h6>Notes</h6>
+                  <p>${payment.verification_notes}</p>
                 ` : ''}
               </div>
               
@@ -427,6 +450,12 @@
                   ` : ''}
                   ${payment.payment_instructions?.account_number ? `
                     <p class="mb-1">Account: ${payment.payment_instructions.account_number}</p>
+                  ` : ''}
+                  ${payment.payment_instructions?.ussd_code ? `
+                    <p class="mb-1">USSD Code: <code>${payment.payment_instructions.ussd_code}</code></p>
+                  ` : ''}
+                  ${payment.payment_instructions?.reference ? `
+                    <p class="mb-1">Reference: <code>${payment.payment_instructions.reference}</code></p>
                   ` : ''}
                 </div>
 
@@ -477,7 +506,8 @@
         pending: 'warning',
         awaiting_confirmation: 'info',
         completed: 'success',
-        failed: 'danger'
+        failed: 'danger',
+        cancelled: 'secondary'
       };
       return colors[status] || 'secondary';
     }
@@ -518,12 +548,14 @@
       document.getElementById('verifyReference').textContent = reference;
       document.getElementById('verifyAmount').textContent = amount.toLocaleString() + ' RWF';
       document.getElementById('verifyUser').textContent = user || 'Unknown';
+      document.getElementById('verifySource').value = 'manual';
       document.getElementById('verifyNotes').value = '';
       
       new bootstrap.Modal(document.getElementById('verifyModal')).show();
     }
 
     async function confirmVerification() {
+      const source = document.getElementById('verifySource').value;
       const notes = document.getElementById('verifyNotes').value;
       
       try {
@@ -532,6 +564,7 @@
             p_transaction_id: currentPaymentId,
             p_verified_by: adminId,
             p_notes: notes,
+            p_verification_source: source,
             p_auto_verify: false
           });
 
@@ -562,6 +595,7 @@
 
     async function confirmRejection() {
       const reason = document.getElementById('rejectReason').value;
+      const status = document.getElementById('rejectStatus').value;
       
       if (!reason) {
         alert('Please provide a rejection reason');
@@ -572,7 +606,8 @@
         const { error } = await supabase
           .from('payment_transactions')
           .update({
-            status: 'failed',
+            status: status,
+            verification_source: 'manual_rejection',
             verification_notes: reason,
             verified_by: adminId,
             verified_at: new Date().toISOString(),
@@ -583,7 +618,7 @@
         if (error) throw error;
 
         bootstrap.Modal.getInstance(document.getElementById('rejectModal')).hide();
-        showNotification('Payment rejected', 'warning');
+        showNotification('Payment updated to ' + status.replace('_', ' ') + '.', 'warning');
         await loadPayments();
 
       } catch (error) {

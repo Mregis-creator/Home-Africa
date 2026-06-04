@@ -3011,6 +3011,7 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
   verification_method TEXT CHECK (verification_method IN ('manual', 'api_webhook', 'auto_simulation')),
   verified_by UUID REFERENCES auth.users(id), -- Admin who verified (if manual)
   verified_at TIMESTAMPTZ,
+  verification_source TEXT, -- e.g. momo_sms, bank_transfer, receipt_upload, manual
   verification_notes TEXT,
   
   -- MoMo/Bank specific tracking
@@ -3296,6 +3297,7 @@ CREATE OR REPLACE FUNCTION verify_payment(
   p_transaction_id UUID,
   p_verified_by UUID DEFAULT NULL,
   p_notes TEXT DEFAULT NULL,
+  p_verification_source TEXT DEFAULT NULL,
   p_auto_verify BOOLEAN DEFAULT false
 )
 RETURNS JSONB AS $$
@@ -3322,6 +3324,7 @@ BEGIN
     verified_at = NOW(),
     completed_at = NOW(),
     verification_method = CASE WHEN p_auto_verify THEN 'auto_simulation' ELSE 'manual' END,
+    verification_source = p_verification_source,
     verification_notes = p_notes,
     updated_at = NOW()
   WHERE id = p_transaction_id;

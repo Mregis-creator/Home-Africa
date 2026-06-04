@@ -9,6 +9,10 @@
   ],
   "routes": [
     {
+      "src": "/js/supabase-config\\.js",
+      "dest": "/api/supabase-config"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }

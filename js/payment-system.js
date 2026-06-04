@@ -150,6 +150,11 @@ class PaymentSystem {
     const instructions = paymentData.instructions || {};
     const isMoMo = paymentData.payment_method === 'momo_mtn';
     const isBank = paymentData.payment_method === 'bank_bok';
+    const amountValue = instructions.amount || paymentData.amount;
+    const referenceCode = instructions.reference || paymentData.reference;
+    const defaultUssd = `*182*1*1*0783962518*${amountValue}%23`;
+    const ussdCode = instructions.ussd_code || defaultUssd;
+    const ussdLink = `tel:${encodeURIComponent(ussdCode)}`;
 
     container.innerHTML = `
       <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);">
@@ -166,9 +171,8 @@ class PaymentSystem {
               <!-- Amount Display -->
               <div class="text-center mb-4">
                 <div class="display-4 fw-bold text-primary">${paymentData.amount.toLocaleString()} RWF</div>
-                <div class="text-muted">Reference: <code class="bg-light px-2 py-1 rounded">${paymentData.reference}</code></div>
-              </div>
-
+                <div class="text-muted">Reference: <code class="bg-light px-2 py-1 rounded">${referenceCode}</code></div>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="copyPaymentReference('${referenceCode}')">Copy Payment Reference</button>
               <!-- Payment Method Tabs -->
               <ul class="nav nav-pills nav-fill mb-4">
                 <li class="nav-item">
@@ -202,18 +206,24 @@ class PaymentSystem {
                     <div class="col-md-6">
                       <!-- ONE-TAP USSD BUTTON -->
                       <div class="d-grid gap-2 mb-3">
-                        <a href="tel:${instructions.ussd_code || '*182#'}" 
+                        <a href="${ussdLink}" 
                            class="btn btn-warning btn-lg"
                            onclick="trackUssdClick()">
                           <i class="bi bi-phone-fill"></i> Use MoMo
                         </a>
-                        <small class="text-center text-muted">Tap to open dialer with pre-filled code</small>
+                        <small class="text-center text-muted">Tap to open dialer with pre-filled amount</small>
                       </div>
                       
                       <!-- USSD Code Display -->
                       <div class="bg-dark text-warning p-2 rounded mb-2 font-monospace text-center">
-                        <small class="text-muted d-block">USSD Code:</small>
-                        <code class="fs-6">${instructions.ussd_code || '*182#'}</code>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <small class="text-muted">USSD Code:</small>
+                          <button type="button" class="btn btn-sm btn-outline-warning" onclick="copyUssdCode('${ussdCode}')">Copy</button>
+                        </div>
+                        <code class="fs-6">${ussdCode}</code>
+                      </div>
+                      <div class="alert alert-secondary small py-2">
+                        <i class="bi bi-info-circle"></i> Please include the payment reference <strong>${referenceCode}</strong> in your MoMo note if available.
                       </div>
                       
                       <div class="alert alert-info small py-2">
@@ -224,9 +234,11 @@ class PaymentSystem {
                       <ol class="small">
                         ${instructions.instructions?.map(step => `<li>${step}</li>`).join('')}
                       </ol>
+                      ${instructions.alternative ? `
                       <div class="mt-2 p-2 bg-light rounded small">
                         <i class="bi bi-info-circle"></i> ${instructions.alternative}
                       </div>
+                      ` : ''}
                     </div>
                   </div>
                 </div>
@@ -479,4 +491,13 @@ function trackUssdClick() {
 function copyUssdCode(code) {
   navigator.clipboard.writeText(code);
   showNotification('USSD code copied! Paste in dialer', 'success');
+}
+
+function copyPaymentReference(reference) {
+  navigator.clipboard.writeText(reference);
+  showNotification('Payment reference copied!', 'success');
+}
+
+function sanitizePhoneDigits(phone) {
+  return phone.replace(/\D/g, '').slice(-4);
 }

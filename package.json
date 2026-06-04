@@ -1,0 +1,16 @@
+{
+  "name": "home-africa",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev --listen 3000",
+    "local": "npx serve . --listen 3000",
+    "start": "npx serve . --listen 3000",
+    "build": "echo \"No build step required for this static site.\""
+  },
+  "devDependencies": {
+    "serve": "^14.2.0",
+    "vercel": "^35.0.0"
+  }
+}

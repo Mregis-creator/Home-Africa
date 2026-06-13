@@ -14,7 +14,7 @@ class EmailNotificationSystem {
     this.emailjsConfig = {
       publicKey: 'jajhnzR1AZ4LnNr20', // Replace with your EmailJS Public Key
       serviceId: 'service_fu4ebub', // Replace with your EmailJS Service ID
-      templateId: 'template_xl5fs1e' // Replace with your EmailJS Template ID
+      templateId: 'template_8j64wd6' // Shared EmailJS template (matches email-service-emailjs.js)
     };
     
     // Initialize EmailJS if available

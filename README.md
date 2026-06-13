@@ -37,9 +37,6 @@ Create a `.env` file from `.env.example`, and set:
 
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
-- `RESEND_API_KEY`
-- `FROM_EMAIL`
-- `SITE_URL`
 
 Vercel Dev will load the `.env` file locally, and Vercel will use the project environment variables in production.
 
@@ -50,19 +47,12 @@ Vercel Dev will load the `.env` file locally, and Vercel will use the project en
 - Injects `SUPABASE_URL` and `SUPABASE_ANON_KEY` into the browser.
 - Protects your application from hard-coded keys in committed source.
 
-### `/api/send-email`
+## Email
 
-- Sends email through Resend using `RESEND_API_KEY`.
-- Expected request body:
-
-```json
-{
-  "to": "user@example.com",
-  "subject": "Hello from HOME AFRICA",
-  "html": "<p>This is a test email.</p>",
-  "text": "This is a test email."
-}
-```
+Transactional email (welcome, leads, payments, messages, password reset) is sent
+client-side via [EmailJS](https://www.emailjs.com) in `js/email-service-emailjs.js`
+(global `emailService`) and `js/email-notifications.js`. No backend email function
+is required.
 
 ## Notes
 

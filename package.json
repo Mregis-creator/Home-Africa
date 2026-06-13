@@ -10,7 +10,6 @@
     "build": "echo \"No build step required for this static site.\""
   },
   "devDependencies": {
-    "serve": "^14.2.0",
-    "vercel": "^35.0.0"
+    "serve": "^14.2.0"
   }
 }

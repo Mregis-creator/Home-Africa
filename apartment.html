@@ -584,7 +584,7 @@
                 description: listing.description,
                 price: listing.price,
                 images: listing.images || [],
-                location: listing.location?.city || listing.location || '',
+                location: (window.HALocations ? HALocations.format(listing.location) : (listing.location?.city || listing.location || '')),
                 rooms: listing.metadata?.rooms || '',
                 status: listing.metadata?.status || 'For Sale',
                 merchantName: listing.metadata?.merchantName || '',
@@ -758,8 +758,10 @@
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/locations.js"></script>
   <script src="js/supabase-listings.js"></script>
-  
+
   <!-- URL search params (location, maxPrice from homepage form) -->
   <script src="js/url-search-params.js"></script>
 

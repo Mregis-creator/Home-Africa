@@ -6,7 +6,7 @@
   <title>Explore Marketplace | HOME AFRICA</title>
   <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
   <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
-  <meta name="description" content="HOME AFRICA — Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
+  <meta name="description" content="HOME AFRICA ï¿½ Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
 
   <!-- Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -493,6 +493,8 @@
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/locations.js"></script>
   <script src="js/supabase-listings.js"></script>
   <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
@@ -636,7 +638,7 @@
       if (searchTerm) {
         filteredListings = filteredListings.filter(l => {
           const title = (l.title || '').toLowerCase();
-          const location = (l.location || '').toLowerCase();
+          const location = (window.HALocations ? HALocations.format(l.location) : (l.location || '')).toLowerCase();
           const description = (l.description || '').toLowerCase();
           return title.includes(searchTerm) || location.includes(searchTerm) || description.includes(searchTerm);
         });
@@ -705,7 +707,7 @@
           : 'https://via.placeholder.com/400x200?text=' + encodeURIComponent(listing.categoryLabel);
         
         const price = listing.price ? `RWF ${parseFloat(listing.price).toLocaleString()}` : 'Price on request';
-        const location = listing.location || 'Location not specified';
+        const location = (window.HALocations ? HALocations.format(listing.location) : listing.location) || 'Location not specified';
         const detailUrl = getDetailUrl(listing.category, listing.id);
 
         return `

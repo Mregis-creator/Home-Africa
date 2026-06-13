@@ -213,6 +213,8 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/locations.js"></script>
   <script src="js/supabase-listings.js"></script>
 
   <!-- Favorites Script -->
@@ -259,7 +261,7 @@
                     title: listing.title,
                     price: listing.price,
                     image: listing.images?.[0] || '',
-                    location: listing.location?.city || listing.location || '',
+                    location: (window.HALocations ? HALocations.format(listing.location) : (listing.location?.city || listing.location || '')),
                     verified: listing.verified,
                     featured: listing.featured
                   } : (row.data || {})
@@ -324,7 +326,7 @@
       const rawPrice = d.price || 0;
       const price = isNaN(rawPrice) ? rawPrice : 'RWF ' + parseInt(rawPrice).toLocaleString();
       const image = d.image || (fav.type === 'car' ? 'images/car1.jpg' : fav.type === 'land' ? 'images/land1.jpg' : 'images/house1.jpg');
-      const location = d.location || '';
+      const location = (window.HALocations ? HALocations.format(d.location) : d.location) || '';
       const type = fav.type || 'listing';
       const detailPage = type === 'apartment' ? 'apartment-detail.html' : type === 'car' ? 'car-detail.html' : type === 'land' ? 'land-detail.html' : '#';
       const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);

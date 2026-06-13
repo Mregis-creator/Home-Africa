@@ -6,7 +6,7 @@
   <title>Post Your Property | HOME AFRICA</title>
   <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
   <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
-  <meta name="description" content="HOME AFRICA — Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
+  <meta name="description" content="HOME AFRICA ï¿½ Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
 
   <!-- Offline Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -746,6 +746,8 @@
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/locations.js"></script>
   <script src="js/supabase-storage.js"></script>
   <script src="js/supabase-merchants.js"></script>
   <script src="js/supabase-listings.js"></script>
@@ -835,10 +837,25 @@
               <input type="text" class="form-control" id="aptTitle" placeholder="e.g. Modern 3BR Apartment in Nyarutarama" required />
             <div class="invalid-feedback">Please enter the apartment title.</div>
           </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="aptDistrict" class="form-label"><i class="bi bi-geo-alt"></i> District *</label>
+              <select class="form-select location-district" id="aptDistrict" data-sector-target="aptSector" required>
+                <option value="" disabled selected>Select district</option>
+              </select>
+              <div class="invalid-feedback">Please select the district.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="aptSector" class="form-label"><i class="bi bi-pin-map"></i> Sector *</label>
+              <select class="form-select location-sector" id="aptSector" required>
+                <option value="" disabled selected>Select sector</option>
+              </select>
+              <div class="invalid-feedback">Please select the sector.</div>
+            </div>
+          </div>
           <div class="mb-3">
-              <label for="aptLocation" class="form-label"><i class="bi bi-geo-alt"></i> Location *</label>
-              <input type="text" class="form-control" id="aptLocation" placeholder="e.g. Nyarutarama, Kigali" required />
-            <div class="invalid-feedback">Please enter the location.</div>
+              <label for="aptArea" class="form-label"><i class="bi bi-signpost"></i> Neighbourhood / Street <span class="text-muted">(optional)</span></label>
+              <input type="text" class="form-control" id="aptArea" placeholder="e.g. Nyarutarama, KG 9 Ave" />
           </div>
             <div class="row">
               <div class="col-md-6 mb-3">
@@ -959,10 +976,25 @@
               <input type="text" class="form-control" id="landTitle" placeholder="e.g. Prime Land Plot in Kimironko" required />
             <div class="invalid-feedback">Please enter the land title.</div>
           </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="landDistrict" class="form-label"><i class="bi bi-geo-alt"></i> District *</label>
+              <select class="form-select location-district" id="landDistrict" data-sector-target="landSector" required>
+                <option value="" disabled selected>Select district</option>
+              </select>
+              <div class="invalid-feedback">Please select the district.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="landSector" class="form-label"><i class="bi bi-pin-map"></i> Sector *</label>
+              <select class="form-select location-sector" id="landSector" required>
+                <option value="" disabled selected>Select sector</option>
+              </select>
+              <div class="invalid-feedback">Please select the sector.</div>
+            </div>
+          </div>
           <div class="mb-3">
-              <label for="landLocation" class="form-label"><i class="bi bi-geo-alt"></i> Location *</label>
-              <input type="text" class="form-control" id="landLocation" placeholder="e.g. Kimironko, Kigali" required />
-            <div class="invalid-feedback">Please enter the location.</div>
+              <label for="landArea" class="form-label"><i class="bi bi-signpost"></i> Neighbourhood / Street <span class="text-muted">(optional)</span></label>
+              <input type="text" class="form-control" id="landArea" placeholder="e.g. Kimironko, KG 11 Ave" />
           </div>
             <div class="row">
               <div class="col-md-6 mb-3">
@@ -1007,10 +1039,25 @@
               <input type="text" class="form-control" id="dsName" placeholder="e.g. Elite Driving Academy" required />
             <div class="invalid-feedback">Please enter the school name.</div>
           </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="dsDistrict" class="form-label"><i class="bi bi-geo-alt"></i> District *</label>
+              <select class="form-select location-district" id="dsDistrict" data-sector-target="dsSector" required>
+                <option value="" disabled selected>Select district</option>
+              </select>
+              <div class="invalid-feedback">Please select the district.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="dsSector" class="form-label"><i class="bi bi-pin-map"></i> Sector *</label>
+              <select class="form-select location-sector" id="dsSector" required>
+                <option value="" disabled selected>Select sector</option>
+              </select>
+              <div class="invalid-feedback">Please select the sector.</div>
+            </div>
+          </div>
           <div class="mb-3">
-              <label for="dsLocation" class="form-label"><i class="bi bi-geo-alt"></i> Location *</label>
-              <input type="text" class="form-control" id="dsLocation" placeholder="e.g. Kigali, Nyarugenge" required />
-            <div class="invalid-feedback">Please enter the location.</div>
+              <label for="dsArea" class="form-label"><i class="bi bi-signpost"></i> Neighbourhood / Street <span class="text-muted">(optional)</span></label>
+              <input type="text" class="form-control" id="dsArea" placeholder="e.g. Nyamirambo, KN 2 Ave" />
           </div>
           <div class="mb-3">
               <label for="dsContact" class="form-label"><i class="bi bi-telephone"></i> Contact Number *</label>
@@ -1369,7 +1416,7 @@
           // Add product-specific fields
           if (selectedType === 'apartment') {
             listingData.title = document.getElementById('aptTitle').value.trim();
-            listingData.location = document.getElementById('aptLocation').value.trim();
+            listingData.location = window.HALocations.build({ districtId: 'aptDistrict', sectorId: 'aptSector', detailId: 'aptArea' });
             listingData.rooms = parseInt(document.getElementById('aptRooms').value);
             listingData.price = document.getElementById('aptPrice').value.trim();
             listingData.description = document.getElementById('aptDesc').value.trim();
@@ -1565,7 +1612,7 @@
               });
           } else if (selectedType === 'land') {
             listingData.title = document.getElementById('landTitle').value.trim();
-            listingData.location = document.getElementById('landLocation').value.trim();
+            listingData.location = window.HALocations.build({ districtId: 'landDistrict', sectorId: 'landSector', detailId: 'landArea' });
             listingData.size = document.getElementById('landSize').value.trim();
             listingData.price = document.getElementById('landPrice').value.trim();
             
@@ -1658,7 +1705,7 @@
             }
             
             listingData.name = document.getElementById('dsName').value.trim();
-            listingData.location = document.getElementById('dsLocation').value.trim();
+            listingData.location = window.HALocations.build({ districtId: 'dsDistrict', sectorId: 'dsSector', detailId: 'dsArea' });
             listingData.contact = document.getElementById('dsContact').value.trim();
             listingData.services = services;
             listingData.description = document.getElementById('dsDescription').value.trim() || '';

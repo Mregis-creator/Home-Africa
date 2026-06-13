@@ -59,7 +59,7 @@ class SupabaseListings {
         title: listingData.title || '',
         description: listingData.description || '',
         price: parseFloat(listingData.price) || 0,
-        currency: 'RWF',
+        currency: listingData.currency || (window.APP_CONFIG && window.APP_CONFIG.defaultCurrency) || 'RWF',
         status: 'active',
         location: listingData.location ? (typeof listingData.location === 'string' ? { city: listingData.location } : listingData.location) : { city: listingData.city || '', district: listingData.district || '', address: listingData.address || '' },
         images: listingData.images || [],

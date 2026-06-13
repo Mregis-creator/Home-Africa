@@ -729,8 +729,9 @@
       // Set title and price
       document.getElementById('landTitle').textContent = land.title || 'Land Plot';
       document.getElementById('landPrice').textContent = `RWF ${parseInt(land.price || 0).toLocaleString()}`;
-      document.getElementById('landLocation').textContent = land.location || 'N/A';
-      initListingMap(land.location || 'N/A');
+      const landLocationText = (window.HALocations ? HALocations.format(land.location) : land.location) || 'N/A';
+      document.getElementById('landLocation').textContent = landLocationText;
+      initListingMap(landLocationText);
       document.getElementById('landSize').textContent = land.size ? land.size + ' sqm' : 'N/A';
       document.getElementById('landDescription').textContent = land.description || 'No description available.';
       document.getElementById('merchantName').textContent = land.merchantName || 'Seller';
@@ -915,6 +916,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="js/bookings.js"></script>
   <script src="js/email-notifications.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/locations.js"></script>
   <script src="js/supabase-listings.js"></script>
   
   <!-- Comments System -->

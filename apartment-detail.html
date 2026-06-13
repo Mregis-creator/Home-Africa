@@ -661,7 +661,7 @@
       document.getElementById('aptTitle').textContent = apt.title || 'Apartment';
       document.getElementById('aptPrice').textContent = `RWF ${parseInt(apt.price || 0).toLocaleString()}`;
       document.getElementById('aptStatus').textContent = apt.status || 'For Sale';
-      document.getElementById('aptLocation').textContent = apt.location || 'N/A';
+      document.getElementById('aptLocation').textContent = (window.HALocations ? HALocations.format(apt.location) : apt.location) || 'N/A';
       document.getElementById('aptRooms').textContent = apt.rooms ? apt.rooms + ' rooms' : 'N/A';
       document.getElementById('aptDescription').textContent = apt.description || 'No description available.';
       document.getElementById('merchantName').textContent = apt.merchantName || 'Seller';
@@ -785,6 +785,8 @@
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/locations.js"></script>
   <script src="js/supabase-listings.js"></script>
   <script src="js/bookings.js"></script>
   <script src="js/email-notifications.js"></script>

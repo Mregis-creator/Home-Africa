@@ -1,4 +1,5 @@
 {
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/js/supabase-config.js", "destination": "/api/supabase-config" }
   ],

@@ -595,7 +595,7 @@
       padding: 1rem;
     }
     .merchant-info-card {
-      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,136,255,0.1) 100%);
+      background: linear-gradient(135deg, rgba(0,0,0,0.88) 0%, rgba(0,136,255,0.22) 100%);
       border: 2px solid rgba(0,255,255,0.3);
       border-radius: 12px;
       padding: 1.5rem;
@@ -604,6 +604,14 @@
     .merchant-info-card h5 {
       color: #8fff00;
       margin-bottom: 1rem;
+    }
+    /* Keep helper/muted text readable against the dark card */
+    .merchant-info-card .text-muted,
+    .merchant-info-card p {
+      color: #cbd5e1 !important;
+    }
+    .merchant-info-card .form-label {
+      color: #e8f9ff;
     }
     .success-message {
       background: linear-gradient(90deg, #28a745 0%, #20c997 100%);

@@ -47,6 +47,9 @@
       flex-direction: column;
       min-height: 100vh;
     }
+    /* Sticky footer: in the flex-column layout, push the footer to the
+       bottom on short pages so it never floats up into the content. */
+    footer.bg-dark { margin-top: auto !important; }
     body::before {
       content: '';
       position: fixed;

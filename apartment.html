@@ -11,6 +11,7 @@
   <!-- Offline Bootstrap CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/theme.css" />
 
   <!-- ✨ Custom Styles -->
   <style>
@@ -735,28 +736,11 @@
   </script>
 </body>
 
-<!-- 🌍 Minimal Footer -->
-<footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff;">
-  <div class="container">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-      <div class="small">
-        &copy; <span class="footer-year">2026</span> HOME AFRICA ·
-        <a href="privacy-policy.html" class="footer-link text-white">Privacy</a> ·
-        <a href="terms-of-service.html" class="footer-link text-white">Terms</a>
-      </div>
-      <div>
-        <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>
-        <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>
-        <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>
-        <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>
-      </div>
-    </div>
-  </div>
-  <script>document.querySelectorAll('.footer-year').forEach(function(e){e.textContent=new Date().getFullYear();});</script>
-</footer>
+<div data-ha-footer="minimal"></div>
 
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/components.js"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/config.js"></script>
   <script src="js/locations.js"></script>

@@ -17,9 +17,11 @@ migrated page updates. `index.html` is the reference implementation.
    ```html
    <script src="js/components.js"></script>
    ```
-3. **Replace the hand-written `<footer>…</footer>`** with a mount point:
+3. **Replace the hand-written `<footer>…</footer>`** with a mount point.
+   There are two footer variants — pick the one matching the page's current footer:
    ```html
-   <div data-ha-footer></div>
+   <div data-ha-footer></div>            <!-- full 4-column footer (index.html) -->
+   <div data-ha-footer="minimal"></div>  <!-- compact single-row footer (most content pages) -->
    ```
 4. **(Optional) Replace the hand-written `<nav>…</nav>`** with:
    ```html

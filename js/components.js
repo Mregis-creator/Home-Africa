@@ -94,16 +94,41 @@
     '</footer>';
   }
 
+  // Compact single-row footer used by most content pages (explore, apartment,
+  // land, cars, about, driving-school, search ...). Visually identical to the
+  // hand-written "Minimal Footer" those pages carried.
+  function minimalFooterHTML() {
+    return '' +
+    '<footer class="bg-dark text-light py-2 mt-5" style="border-top:2px solid #0ff; position:relative; z-index:1;">' +
+      '<div class="container">' +
+        '<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">' +
+          '<div class="small">&copy; ' + YEAR_SPAN + ' HOME AFRICA · ' +
+            '<a href="privacy-policy.html" class="footer-link text-white">Privacy</a> · ' +
+            '<a href="terms-of-service.html" class="footer-link text-white">Terms</a>' +
+          '</div>' +
+          '<div>' +
+            '<a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="text-white me-2"><i class="bi bi-facebook"></i></a>' +
+            '<a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="text-white me-2"><i class="bi bi-twitter"></i></a>' +
+            '<a href="https://www.instagram.com/home_africa_" target="_blank" rel="noopener" aria-label="Instagram" class="text-white me-2"><i class="bi bi-instagram"></i></a>' +
+            '<a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn" class="text-white"><i class="bi bi-linkedin"></i></a>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</footer>';
+  }
+
   var HAComponents = {
     renderNav: function (mount, active) {
       var el = typeof mount === 'string' ? document.querySelector(mount) : mount;
       if (!el) return;
       el.innerHTML = navHTML(active || el.getAttribute('data-active') || '');
     },
-    renderFooter: function (mount) {
+    // variant: '' (default full 4-column) or 'minimal' (compact single row)
+    renderFooter: function (mount, variant) {
       var el = typeof mount === 'string' ? document.querySelector(mount) : mount;
       if (!el) return;
-      el.innerHTML = footerHTML();
+      var v = variant || el.getAttribute('data-ha-footer') || '';
+      el.innerHTML = v === 'minimal' ? minimalFooterHTML() : footerHTML();
       el.querySelectorAll('.footer-year').forEach(function (s) { s.textContent = new Date().getFullYear(); });
     },
     // Auto-inject any mount points found on the page.

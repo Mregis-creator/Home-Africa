@@ -249,29 +249,42 @@ GRANT EXECUTE ON FUNCTION create_payment_transaction(UUID, TEXT, DECIMAL, TEXT, 
 --   NOTE: Supabase grants EXECUTE to anon/authenticated via default privileges,
 --   so you must REVOKE FROM anon explicitly (REVOKE FROM PUBLIC is not enough).
 -- ============================================================
--- Internal-only (triggers / edge functions): no end-user access at all.
-REVOKE EXECUTE ON FUNCTION public.queue_email(character varying, text, jsonb)        FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.process_email_queue(integer)                        FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_user_email(uuid)                                FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.generate_monthly_invoice(uuid)                      FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.generate_market_alert(text, text, text, text, uuid, jsonb, boolean, text, text) FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.refresh_supply_demand_gaps()                        FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.refresh_activity_aggregates()                       FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.mark_recovery_sent(uuid, text)                      FROM anon, authenticated;
+-- IMPORTANT: EXECUTE is granted to PUBLIC by default, and anon/authenticated
+-- inherit it through PUBLIC. So we must REVOKE ... FROM PUBLIC (not just anon).
+-- Where we want to keep authenticated access, we re-GRANT it explicitly after.
 
--- Business/PII reads: block anonymous. (Follow-up: these are SECURITY DEFINER and
--- take a uuid, so an authenticated user can still pass another merchant's id --
--- add an internal `auth.uid()`/is_admin() check to each to stop cross-tenant reads.)
-REVOKE EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)                   FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)                  FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer)          FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer)          FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                           FROM anon;
-REVOKE EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)                     FROM anon;
+-- Internal-only (triggers / edge functions): no end-user access at all.
+REVOKE EXECUTE ON FUNCTION public.queue_email(character varying, text, jsonb)        FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.process_email_queue(integer)                        FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_user_email(uuid)                                FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.generate_monthly_invoice(uuid)                      FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.generate_market_alert(text, text, text, text, uuid, jsonb, boolean, text, text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.refresh_supply_demand_gaps()                        FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.refresh_activity_aggregates()                       FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.mark_recovery_sent(uuid, text)                      FROM PUBLIC, anon, authenticated;
+
+-- Business/PII reads: block anonymous, keep authenticated. (Follow-up: these are
+-- SECURITY DEFINER and take a uuid, so an authenticated user can still pass
+-- another merchant's id -- add an internal auth.uid()/is_admin() check to each
+-- to stop cross-tenant reads.)
+REVOKE EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)          FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)          TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)         FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)         TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer) FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer) FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                  FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                  TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)           FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)           TO authenticated;
 
 -- Client-called (keep authenticated, block anonymous).
-REVOKE EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer)                   FROM anon;
+REVOKE EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer)          FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer)          TO authenticated;
 
 
 -- ============================================================

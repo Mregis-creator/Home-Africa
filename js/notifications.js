@@ -4,13 +4,17 @@
 
 class NotificationService {
   constructor() {
-    // EmailJS configuration (replace with your actual EmailJS public key)
+    // EmailJS configuration. The REAL EmailJS setup lives in
+    // js/email-service-emailjs.js (the single source of truth). These remain
+    // placeholders on purpose; this class must NOT re-init EmailJS with a bogus
+    // key. Left here only so legacy references don't break.
     this.emailjsPublicKey = 'YOUR_EMAILJS_PUBLIC_KEY';
     this.emailjsServiceId = 'YOUR_EMAILJS_SERVICE_ID';
     this.emailjsTemplateId = 'YOUR_EMAILJS_TEMPLATE_ID';
-    
-    // Initialize EmailJS if available
-    if (typeof emailjs !== 'undefined') {
+
+    // Do not initialize EmailJS with placeholder credentials.
+    const looksConfigured = this.emailjsPublicKey && this.emailjsPublicKey.indexOf('YOUR_') !== 0;
+    if (typeof emailjs !== 'undefined' && looksConfigured) {
       emailjs.init(this.emailjsPublicKey);
     }
   }

@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Keep operator/admin/debug surfaces out of the index
+Disallow: /admin.html
+Disallow: /admin-payments.html
+Disallow: /admin-business-dashboard.html
+Disallow: /dev-dashboard.html
+Disallow: /crm-dashboard.html
+Disallow: /support-dashboard.html
+Disallow: /business-settings.html
+Disallow: /vip-analytics.html
+Disallow: /funnel-dashboard.html
+Disallow: /merchant-dashboard.html
+Disallow: /agent-dashboard.html
+Disallow: /payment-success.html
+
+Sitemap: https://homeafrica.it.com/sitemap.xml

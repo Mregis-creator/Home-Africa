@@ -1,4 +1,14 @@
 /**
+ * @deprecated Do NOT use for new cross-cutting changes.
+ *
+ * This regex batch-patcher existed because nav/footer/scripts were copy-pasted
+ * into every page. That is now solved by js/components.js (injected nav/footer)
+ * and css/theme.css (shared tokens). For any site-wide UI change, edit those
+ * files instead of regex-rewriting every HTML file. See docs/COMPONENT-MIGRATION.md.
+ *
+ * Kept only for historical reference.
+ *
+ * ---
  * Script to update all HTML pages with chatbot integration
  * Run this in Node.js or use as reference for manual updates
  */

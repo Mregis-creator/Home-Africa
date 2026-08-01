@@ -358,6 +358,28 @@
           </div>
         </div>
       </div>
+
+      <!-- Admin: Billing Mode (campaign switch) -->
+      <div class="settings-card" id="billingModeCard" style="display:none;">
+        <h5><i class="bi bi-toggles"></i> Billing Mode <span class="badge bg-warning text-dark">Admin</span></h5>
+        <p class="text-white-50" style="font-size:0.9rem;">
+          Control whether paid features (subscriptions, boosts) require payment, or are
+          handed out free during a launch/marketing campaign. Takes effect immediately for all users.
+        </p>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" role="switch" id="billingEnabled" style="width:3rem;height:1.5rem;">
+          <label class="form-check-label ms-2" for="billingEnabled">
+            <strong id="billingEnabledLabel">Free-access mode (billing OFF)</strong>
+          </label>
+        </div>
+        <label class="form-label">Free-access banner message (shown to users when billing is OFF)</label>
+        <input type="text" id="freeAccessMessage" class="form-input"
+               placeholder="All features are free during our launch campaign.">
+        <button class="btn btn-sm btn-success mt-3" onclick="saveBillingMode()">
+          <i class="bi bi-save"></i> Save Billing Mode
+        </button>
+        <span id="billingModeStatus" class="ms-2"></span>
+      </div>
     </div>
 
     <!-- Transactions Tab -->
@@ -410,10 +432,62 @@
 
       await loadSettings();
       await loadTransactions();
+      await loadBillingMode();
       updateEarnings();
 
       document.querySelectorAll('.footer-year').forEach(e => e.textContent = new Date().getFullYear());
     });
+
+    // ── Billing Mode (admin only) ──
+    async function isAdmin() {
+      try {
+        const { data } = await window.supabaseClient
+          .from('user_profiles').select('role').eq('id', currentUser.id).single();
+        return data?.role === 'admin';
+      } catch (_) { return false; }
+    }
+
+    async function loadBillingMode() {
+      if (!window.supabaseClient || !currentUser) return;
+      if (!(await isAdmin())) return; // card stays hidden for non-admins
+      document.getElementById('billingModeCard').style.display = 'block';
+      try {
+        const { data } = await window.supabaseClient
+          .from('payment_platform_config')
+          .select('billing_enabled, free_access_message')
+          .limit(1).single();
+        const enabled = data?.billing_enabled === true;
+        document.getElementById('billingEnabled').checked = enabled;
+        document.getElementById('freeAccessMessage').value = data?.free_access_message || '';
+        syncBillingLabel(enabled);
+      } catch (e) { console.log('billing config load:', e.message); }
+      document.getElementById('billingEnabled').addEventListener('change', e => syncBillingLabel(e.target.checked));
+    }
+
+    function syncBillingLabel(enabled) {
+      document.getElementById('billingEnabledLabel').textContent =
+        enabled ? 'Billing ON (payment required)' : 'Free-access mode (billing OFF)';
+    }
+
+    async function saveBillingMode() {
+      const status = document.getElementById('billingModeStatus');
+      const enabled = document.getElementById('billingEnabled').checked;
+      const msg = document.getElementById('freeAccessMessage').value.trim();
+      status.textContent = 'Saving…';
+      try {
+        // Update the single config row. RLS restricts this to admins server-side.
+        const { data: rows } = await window.supabaseClient
+          .from('payment_platform_config').select('id').limit(1).single();
+        const { error } = await window.supabaseClient
+          .from('payment_platform_config')
+          .update({ billing_enabled: enabled, free_access_message: msg || null })
+          .eq('id', rows.id);
+        if (error) throw error;
+        status.innerHTML = '<span class="text-success">Saved ✓</span>';
+      } catch (e) {
+        status.innerHTML = '<span class="text-danger">Failed: ' + e.message + '</span>';
+      }
+    }
 
     // ── Tab Switching ──
     function switchTab(tab, btn) {

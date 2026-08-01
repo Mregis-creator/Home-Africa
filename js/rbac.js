@@ -139,11 +139,12 @@ class RBACSystem {
         }
       }
 
-      // Fallback: Check localStorage
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        await this.loadUserRole(userId);
-      }
+      // No authenticated session => guest. We deliberately do NOT fall back to
+      // a localStorage userId: role/identity must come from the Supabase
+      // session only. (Client storage is user-writable and cannot be trusted
+      // for authorization.)
+      this.currentRole = 'guest';
+      this.permissions = this.rolePermissions['guest'] || this.universalPermissions;
 
     } catch (error) {
       console.error('Error loading current user:', error);
@@ -169,17 +170,10 @@ class RBACSystem {
         .single();
 
       if (error || !data) {
-        // Check if user is merchant via localStorage
-        const isMerchant = localStorage.getItem('isMerchant') === 'true';
-        const isVIP = localStorage.getItem('isVIP') === 'true';
-        
-        if (isMerchant && isVIP) {
-          this.currentRole = 'vip_merchant';
-        } else if (isMerchant) {
-          this.currentRole = 'merchant';
-        } else {
-          this.currentRole = 'user';
-        }
+        // Fail CLOSED to least privilege. Never elevate to merchant/vip based on
+        // localStorage flags — those are user-writable and were trivially
+        // spoofable. Real privilege is enforced by Supabase RLS regardless.
+        this.currentRole = 'user';
       } else {
         // Check for VIP merchant status
         if (data.role === 'merchant' && (data.is_vip || data.merchant_tier === 'vip')) {
@@ -193,7 +187,9 @@ class RBACSystem {
       const rolePerms = this.rolePermissions[this.currentRole] || this.rolePermissions['user'];
       this.permissions = [...new Set([...this.universalPermissions, ...rolePerms])];
 
-      // Store in localStorage for quick access
+      // Cache for UX only (e.g. instant nav rendering). NON-AUTHORITATIVE:
+      // never use this value to grant access — authorization is enforced by
+      // Supabase RLS and the in-DB is_admin() checks.
       localStorage.setItem('userRole', this.currentRole);
 
     } catch (error) {

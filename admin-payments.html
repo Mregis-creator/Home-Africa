@@ -461,10 +461,9 @@
 
                 ${payment.receipt_url ? `
                   <h6 class="mt-3">Payment Proof</h6>
-                  <img src="${payment.receipt_url}" 
-                       class="proof-image" 
-                       onclick="window.open('${payment.receipt_url}', '_blank')"
-                       alt="Payment Proof">
+                  <img data-proof-path="${payment.receipt_url}"
+                       class="proof-image"
+                       alt="Payment Proof (loading secure link…)">
                 ` : `
                   <div class="alert alert-warning mt-3">
                     <i class="bi bi-exclamation-triangle"></i> No proof uploaded yet
@@ -473,7 +472,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="payment-footer">
             <button class="btn btn-verify flex-fill" onclick="showVerifyModal('${payment.id}', '${payment.internal_reference}', ${payment.amount}, '${payment.user_name}')">
               <i class="bi bi-check-lg"></i> Verify Payment
@@ -487,6 +486,32 @@
           </div>
         </div>
       `).join('');
+
+      // Proof screenshots live in a PRIVATE bucket. Resolve each into a
+      // short-lived signed URL after render (never expose a public path).
+      hydrateProofImages();
+    }
+
+    async function hydrateProofImages() {
+      const imgs = document.querySelectorAll('img.proof-image[data-proof-path]');
+      for (const img of imgs) {
+        let path = img.getAttribute('data-proof-path') || '';
+        const marker = '/payments/';
+        if (path.includes(marker)) path = path.substring(path.indexOf(marker) + marker.length);
+        try {
+          const { data } = await supabase.storage.from('payments').createSignedUrl(path, 300);
+          if (data?.signedUrl) {
+            img.src = data.signedUrl;
+            img.alt = 'Payment Proof';
+            img.style.cursor = 'pointer';
+            img.onclick = () => window.open(data.signedUrl, '_blank');
+          } else {
+            img.alt = 'Proof unavailable';
+          }
+        } catch (_) {
+          img.alt = 'Proof unavailable';
+        }
+      }
     }
 
     function filterPayments(status) {

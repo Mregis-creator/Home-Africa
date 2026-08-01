@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://homeafrica.it.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://homeafrica.it.com/explore.html</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://homeafrica.it.com/apartment.html</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://homeafrica.it.com/land.html</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://homeafrica.it.com/cars.html</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://homeafrica.it.com/map-explore.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://homeafrica.it.com/driving-school.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://homeafrica.it.com/post.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://homeafrica.it.com/property-feed.html</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://homeafrica.it.com/partnerships.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://homeafrica.it.com/premium.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://homeafrica.it.com/about.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://homeafrica.it.com/search.html</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://homeafrica.it.com/signin.html</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://homeafrica.it.com/signup.html</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://homeafrica.it.com/privacy-policy.html</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://homeafrica.it.com/terms-of-service.html</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+</urlset>

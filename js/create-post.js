@@ -253,10 +253,6 @@ function getCurrentUserId() {
   
   const userId = localStorage.getItem('userId');
   if (userId) return userId;
-    } catch (e) {
-      // Session check failed, continue
-    }
-  }
 
   return null;
 }

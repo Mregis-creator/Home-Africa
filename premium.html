@@ -313,7 +313,7 @@
             <li class="list-group-item">🌐 24/7 dashboard access and mobile learner support</li>
             <li class="list-group-item">🎓 Graduation certificate with bonus highway module</li>
           </ul>
-          <h4 class="text-success price-gradient">Price: 250,000 RWF</h4>
+          <h4 class="text-success price-gradient">Price: <span id="premiumDrivingPrice">250,000 RWF</span></h4>
           <a href="booking.html" class="btn vibrant-btn decorated-btn mt-3">Book Now</a>
         </div>
       </div>
@@ -337,7 +337,7 @@
           <div class="card h-100" style="background: rgba(0,0,0,0.8); border: 2px solid rgba(0,255,255,0.3); border-radius: 16px;">
             <div class="card-body p-4">
               <h4 class="text-white mb-3">Basic</h4>
-              <h2 class="text-white mb-4">RWF 0<span class="fs-4 text-white-50">/month</span></h2>
+              <h2 class="text-white mb-4"><span id="basicTierPrice">0 RWF</span><span class="fs-4 text-white-50">/month</span></h2>
               <ul class="list-unstyled text-white-50 mb-4">
                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Up to 5 listings</li>
                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Basic visibility</li>
@@ -355,7 +355,7 @@
             <div class="card-body p-4">
               <span class="badge bg-warning text-dark mb-2">POPULAR</span>
               <h4 class="text-white mb-3">Pro</h4>
-              <h2 class="text-white mb-4">RWF 50,000<span class="fs-4 text-white-50">/month</span></h2>
+              <h2 class="text-white mb-4"><span id="proTierPrice">50,000 RWF</span><span class="fs-4 text-white-50">/month</span></h2>
               <ul class="list-unstyled text-white-50 mb-4">
                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Unlimited listings</li>
                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Featured badge on listings</li>
@@ -372,7 +372,7 @@
           <div class="card h-100" style="background: rgba(0,0,0,0.8); border: 2px solid rgba(255,107,53,0.5); border-radius: 16px;">
             <div class="card-body p-4">
               <h4 class="text-white mb-3">Enterprise</h4>
-              <h2 class="text-white mb-4">RWF 150,000<span class="fs-4 text-white-50">/month</span></h2>
+              <h2 class="text-white mb-4"><span id="enterpriseTierPrice">150,000 RWF</span><span class="fs-4 text-white-50">/month</span></h2>
               <ul class="list-unstyled text-white-50 mb-4">
                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Unlimited listings</li>
                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Always featured placement</li>
@@ -475,12 +475,33 @@
   <!-- Rejo AI Chatbot -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
   <script src="js/footer-fix.js"></script>
 
   <script>
-    const PLAN_PRICES = { pro: 'RWF 50,000', enterprise: 'RWF 150,000' };
+    // Pricing from the single source of truth: APP_CONFIG.PRICING (js/config.js), all RWF
+    const PRICING = window.APP_CONFIG.PRICING;
+    const formatPrice = window.APP_CONFIG.formatPrice;
+    const getMerchantTier = (id) => PRICING.merchantTiers.find(t => t.id === id);
+
+    const PLAN_PRICES = {
+      pro: formatPrice(getMerchantTier('professional').monthly),
+      enterprise: formatPrice(getMerchantTier('enterprise').monthly)
+    };
+
+    // Render tier + driving package prices from config
+    (function () {
+      document.getElementById('basicTierPrice').textContent = formatPrice(getMerchantTier('free').monthly);
+      document.getElementById('proTierPrice').textContent = PLAN_PRICES.pro;
+      document.getElementById('enterpriseTierPrice').textContent = PLAN_PRICES.enterprise;
+
+      const premiumDriving = PRICING.drivingSchool.find(p => p.id === 'ds_premium');
+      if (premiumDriving) {
+        document.getElementById('premiumDrivingPrice').textContent = formatPrice(premiumDriving.amount);
+      }
+    })();
 
     async function requestUpgrade(plan) {
       const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;

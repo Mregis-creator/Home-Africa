@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Agent dashboard for HOME AFRICA: manage property listings, leads and client activity across Rwanda's real estate marketplace." />
   <title>Agent Dashboard – HOME AFRICA</title>
   <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -87,32 +88,7 @@
       <h3><i class="bi bi-people-fill"></i> Client Pipeline</h3>
       <div id="clientPipeline">
         <div class="client-row">
-          <div>
-            <div class="client-name">Jean Paul Habimana</div>
-            <div class="client-meta">Looking for 3BR apartment · Kacyiru</div>
-          </div>
-          <span class="badge-stage stage-negotiating">Negotiating</span>
-        </div>
-        <div class="client-row">
-          <div>
-            <div class="client-name">Alice Mukamana</div>
-            <div class="client-meta">Land plot · Bugesera</div>
-          </div>
-          <span class="badge-stage stage-viewing">Viewing Scheduled</span>
-        </div>
-        <div class="client-row">
-          <div>
-            <div class="client-name">Eric Niyonzima</div>
-            <div class="client-meta">Toyota Corolla 2020</div>
-          </div>
-          <span class="badge-stage stage-inquiry">Inquiry</span>
-        </div>
-        <div class="client-row">
-          <div>
-            <div class="client-name">Grace Uwimana</div>
-            <div class="client-meta">2BR apartment · Kimihurura</div>
-          </div>
-          <span class="badge-stage stage-closed">Closed ✓</span>
+          <div class="client-meta">Loading pipeline...</div>
         </div>
       </div>
     </div>
@@ -154,7 +130,85 @@
       const { data: profile } = await supabase.from('user_profiles').select('full_name, role').eq('user_id', session.user.id).single();
       if (profile && profile.role !== 'agent' && profile.role !== 'admin') { window.location.href = 'profile.html'; return; }
       document.getElementById('agentName').textContent = (profile?.full_name || session.user.email) + ' · Agent';
+
+      await loadAgentData(supabase, session.user.id);
     }
+
+    function renderEmptyPipeline() {
+      document.getElementById('clientPipeline').innerHTML = `
+        <div style="text-align:center; padding:1.5rem 0; color:#aaa;">
+          <div style="font-size:2rem;">👥</div>
+          <div style="font-weight:600; color:#ddd; margin-top:0.3rem;">No clients yet</div>
+          <div style="font-size:0.85rem;">When buyers inquire about your listings, they will appear here.</div>
+        </div>`;
+    }
+
+    async function loadAgentData(supabase, userId) {
+      // Listings managed (real count)
+      try {
+        const { count, error } = await supabase
+          .from('listings')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', userId);
+        if (!error && typeof count === 'number') {
+          document.getElementById('activeListings').textContent = count;
+        }
+      } catch (err) {
+        console.warn('Could not load listings count:', err);
+      }
+
+      // Client pipeline (real leads from merchant_leads; empty state otherwise)
+      try {
+        const { data: leads, error } = await supabase
+          .from('merchant_leads')
+          .select('id, user_id, pipeline_stage, status, source, temperature, last_activity_at')
+          .eq('merchant_id', userId)
+          .order('last_activity_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+
+        if (!leads || leads.length === 0) {
+          renderEmptyPipeline();
+          return;
+        }
+
+        const active = leads.filter(l => l.status !== 'closed' && l.pipeline_stage !== 'closed');
+        document.getElementById('totalClients').textContent = active.length;
+
+        const monthStart = new Date();
+        monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+        const closedThisMonth = leads.filter(l =>
+          (l.pipeline_stage === 'closed' || l.status === 'closed') &&
+          l.last_activity_at && new Date(l.last_activity_at) >= monthStart
+        ).length;
+        document.getElementById('dealsClosedMonth').textContent = closedThisMonth;
+
+        const stageBadge = (stage) => {
+          const s = (stage || 'inquiry').toLowerCase();
+          if (s.includes('negotiat')) return '<span class="badge-stage stage-negotiating">Negotiating</span>';
+          if (s.includes('view')) return '<span class="badge-stage stage-viewing">Viewing</span>';
+          if (s.includes('closed')) return '<span class="badge-stage stage-closed">Closed ✓</span>';
+          return '<span class="badge-stage stage-inquiry">Inquiry</span>';
+        };
+        const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        document.getElementById('clientPipeline').innerHTML = leads.map(l => `
+          <div class="client-row">
+            <div>
+              <div class="client-name">Lead ${esc(String(l.id).slice(0, 8))}</div>
+              <div class="client-meta">Source: ${esc(l.source || 'organic')}${l.temperature ? ' · ' + esc(l.temperature) : ''}</div>
+            </div>
+            ${stageBadge(l.pipeline_stage)}
+          </div>
+        `).join('');
+      } catch (err) {
+        console.warn('Could not load client pipeline (table may not exist yet):', err);
+        renderEmptyPipeline();
+      }
+      // Note: commission stays at 0 until the commission module ships (see banner below).
+    }
+
     initDashboard();
   </script>
 </body>

@@ -16,6 +16,8 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
   />
+  <!-- Shared theme tokens (single source of truth) -->
+  <link rel="stylesheet" href="css/theme.css" />
   <!-- ✨ Custom Styles -->
 <style>
   #particles-js {
@@ -938,60 +940,17 @@
     </section>
 
     <!-- �� Footer -->
-    <footer class="bg-dark text-light pt-4 pb-3 mt-5">
-      <div class="container">
-        <div class="row">
-          <!-- Brand Info -->
-          <div class="col-md-3 mb-3">
-            <h5>🏠 HOME AFRICA</h5>
-            <p>Your trusted real estate & lifestyle platform for Rwanda and beyond. Find verified listings, connect instantly, and discover life made easier.</p>
-          </div>
-
-          <!-- Quick Links -->
-          <div class="col-md-3 mb-3">
-            <h6>Quick Links</h6>
-            <ul class="list-unstyled">
-              <li><a href="index.html" class="footer-link">Home</a></li>
-              <li><a href="driving-school.html" class="footer-link">Driving School</a></li>
-              <li><a href="apartment.html" class="footer-link">Apartments</a></li>
-              <li><a href="land.html" class="footer-link">Land</a></li>
-              <li><a href="cars.html" class="footer-link">Cars</a></li>
-            </ul>
-          </div>
-
-          <!-- Contact Info -->
-          <div class="col-md-3 mb-3">
-            <h6>Contact Us</h6>
-            <ul class="list-unstyled">
-              <li>Phone: +788 123 456</li>
-              <li>Email: info@home.africa</li>
-              <li>Address: Kigali, Rwanda</li>
-            </ul>
-          </div>
-
-          <!-- Social Links -->
-          <div class="col-md-3 mb-3">
-            <h6>Follow Us</h6>
-            <a href="https://facebook.com/homeafrica" target="_blank" rel="noopener" aria-label="Facebook" class="me-2"><i class="bi bi-facebook"></i></a>
-            <a href="https://twitter.com/homeafrica" target="_blank" rel="noopener" aria-label="Twitter" class="me-2"><i class="bi bi-twitter"></i></a>
-            <a href="https://www.instagram.com/home_africa_?igsh=MTczYzA5OWhhcDUwdA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" class="me-2"><i class="bi bi-instagram"></i></a>
-            <a href="https://linkedin.com/company/homeafrica" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-          </div>
-        </div>
-        <hr style="border-color: rgba(255,255,255,0.1)" />
-        <div class="text-center small">
-          &copy; 2025 HOME AFRICA. All rights reserved. | 
-          <a href="privacy-policy.html" class="footer-link">Privacy Policy</a> | 
-          <a href="terms-of-service.html" class="footer-link">Terms of Service</a>
-        </div>
-      </div>
-    </footer>
+    <!-- Shared footer injected by js/components.js (see docs/COMPONENT-MIGRATION.md) -->
+    <div data-ha-footer></div>
   </div>
+
+  <!-- Shared UI components (injects [data-ha-footer]/[data-ha-nav]) -->
+  <script src="js/components.js"></script>
 
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
-  
+
   <!-- Auth System -->
   <script src="js/auth.js"></script>
   

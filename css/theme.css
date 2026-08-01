@@ -1,0 +1,75 @@
+/*
+ * HOME AFRICA — Shared theme tokens & common component styles
+ *
+ * First shared stylesheet for the site. Previously every page redeclared its
+ * own :root palette with INCONSISTENT names (--primary, --primary-cyan,
+ * --primary-dark, --bg-dark, --dark-bg ...). This file is the single source of
+ * truth. Include once per page:  <link rel="stylesheet" href="css/theme.css">
+ *
+ * Aliases are provided for the historical names so pages can be migrated
+ * incrementally without a flag-day rename.
+ */
+:root {
+  /* Canonical brand palette */
+  --ha-cyan:        #00e6d8;   /* primary brand cyan */
+  --ha-cyan-bright: #0ff;      /* neon accent used in dashboards */
+  --ha-green:       #00c853;   /* success / money green */
+  --ha-green-neon:  #8fff00;   /* secondary neon green */
+  --ha-gold:        #ffd700;
+  --ha-red:         #dc3545;
+  --ha-danger:      #ff3366;
+  --ha-warning:     #ffaa00;
+  --ha-info:        #66aaff;
+  --ha-success:     #00ff88;
+
+  --ha-bg-dark:     #0a0a0a;   /* page background (near-black) */
+  --ha-bg-panel:    #0a0f1c;   /* dashboard panel background */
+  --ha-text:        #f5f5f5;
+  --ha-text-muted:  rgba(255,255,255,0.6);
+  --ha-border:      rgba(0,255,255,0.3);
+
+  /* ---- Back-compat aliases (historical per-page names) ---- */
+  --primary:        var(--ha-cyan-bright);
+  --primary-cyan:   var(--ha-cyan-bright);
+  --primary-dark:   var(--ha-green);
+  --primary-green:  var(--ha-green-neon);
+  --secondary:      var(--ha-green-neon);
+  --danger:         var(--ha-danger);
+  --warning:        var(--ha-warning);
+  --info:           var(--ha-info);
+  --success:        var(--ha-success);
+  --dark-bg:        var(--ha-bg-dark);
+  --bg-dark:        var(--ha-bg-panel);
+  --admin-red:      var(--ha-red);
+  --admin-gold:     var(--ha-gold);
+}
+
+/* ---- Shared footer styles (injected by js/components.js) ---- */
+.footer-link {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.footer-link:hover {
+  color: var(--ha-cyan-bright);
+  text-decoration: underline;
+}
+
+/* ---- Shared nav brand basics (injected by js/components.js) ---- */
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+.navbar-brand img {
+  height: 36px;
+  width: auto;
+  transition: transform 0.2s ease;
+}
+.navbar-brand img:hover {
+  transform: scale(1.05);
+}
+.nav-link.current {
+  border-bottom: 2px solid var(--ha-cyan-bright);
+}

@@ -69,61 +69,83 @@ class RevenueSystem {
     this.analytics = data;
   }
 
-  // Get pricing tiers
+  // Format an amount in the platform currency (RWF)
+  formatPrice(amount) {
+    if (window.APP_CONFIG && window.APP_CONFIG.formatPrice) {
+      return window.APP_CONFIG.formatPrice(amount);
+    }
+    return (Number(amount) || 0).toLocaleString() + ' RWF';
+  }
+
+  // Get pricing tiers — sourced from APP_CONFIG.PRICING (js/config.js), all amounts in RWF
   getPricingTiers() {
+    const pricing = (window.APP_CONFIG && window.APP_CONFIG.PRICING) || {};
+    const leads = pricing.leads || { freePerMonth: 30, pricePerLead: 500 };
+    const byId = {};
+    (pricing.merchantTiers || []).forEach(t => { byId[t.id] = t; });
+
+    const UNLIMITED = 999999;
+    const cap = n => (n === -1 || n == null) ? UNLIMITED : n; // -1 in config means unlimited
+    const label = n => (n === -1 || n == null) ? 'Unlimited' : n;
+    const leadCostText = `${this.formatPrice(leads.pricePerLead)} per lead after ${leads.freePerMonth}`;
+
+    const free = byId.free || { name: 'Free', monthly: 0, yearly: 0, limits: { listings: 5, featured: 1, leadsPerMonth: 30, sponsoredPosts: 0 } };
+    const pro = byId.professional || { name: 'Professional', monthly: 50000, yearly: 500000, limits: { listings: 20, featured: 5, leadsPerMonth: 200, sponsoredPosts: 2 } };
+    const ent = byId.enterprise || { name: 'Enterprise', monthly: 150000, yearly: 1500000, limits: { listings: -1, featured: 10, leadsPerMonth: -1, sponsoredPosts: -1 } };
+
     return {
       free: {
-        name: 'Free',
-        monthlyPrice: 0,
-        yearlyPrice: 0,
-        leadsPerMonth: 30,
-        leadCostExcess: 0.50,
-        maxListings: 5,
-        maxFeaturedListings: 1,
-        maxSponsoredPosts: 0,
+        name: free.name,
+        monthlyPrice: free.monthly,
+        yearlyPrice: free.yearly,
+        leadsPerMonth: leads.freePerMonth,
+        leadCostExcess: leads.pricePerLead,
+        maxListings: cap(free.limits.listings),
+        maxFeaturedListings: cap(free.limits.featured),
+        maxSponsoredPosts: cap(free.limits.sponsoredPosts),
         features: [
-          '5 property listings',
-          '1 featured listing',
-          '30 free leads/month',
-          '$0.50 per lead after 30',
+          `${label(free.limits.listings)} property listings`,
+          `${label(free.limits.featured)} featured listing`,
+          `${leads.freePerMonth} free leads/month`,
+          leadCostText,
           'Basic analytics'
         ]
       },
       professional: {
-        name: 'Professional',
-        monthlyPrice: 19,
-        yearlyPrice: 190, // 2 months free
-        leadsPerMonth: 30,
-        leadCostExcess: 0.50,
-        maxListings: 20,
-        maxFeaturedListings: 5,
-        maxSponsoredPosts: 2,
+        name: pro.name,
+        monthlyPrice: pro.monthly,
+        yearlyPrice: pro.yearly, // 2 months free
+        leadsPerMonth: leads.freePerMonth,
+        leadCostExcess: leads.pricePerLead,
+        maxListings: cap(pro.limits.listings),
+        maxFeaturedListings: cap(pro.limits.featured),
+        maxSponsoredPosts: cap(pro.limits.sponsoredPosts),
         features: [
-          '20 property listings',
-          '5 featured listings',
-          '2 sponsored posts/month',
-          '30 free leads/month',
-          '$0.50 per lead after 30',
+          `${label(pro.limits.listings)} property listings`,
+          `${label(pro.limits.featured)} featured listings`,
+          `${label(pro.limits.sponsoredPosts)} sponsored posts/month`,
+          `${leads.freePerMonth} free leads/month`,
+          leadCostText,
           'Advanced analytics dashboard',
           'Priority support',
           'API access'
         ]
       },
       enterprise: {
-        name: 'Enterprise',
-        monthlyPrice: 49,
-        yearlyPrice: 490, // 2 months free
-        leadsPerMonth: 30,
-        leadCostExcess: 0.50,
-        maxListings: 999999, // Unlimited
-        maxFeaturedListings: 10,
-        maxSponsoredPosts: 999999, // Unlimited
+        name: ent.name,
+        monthlyPrice: ent.monthly,
+        yearlyPrice: ent.yearly, // 2 months free
+        leadsPerMonth: leads.freePerMonth,
+        leadCostExcess: leads.pricePerLead,
+        maxListings: cap(ent.limits.listings),
+        maxFeaturedListings: cap(ent.limits.featured),
+        maxSponsoredPosts: cap(ent.limits.sponsoredPosts),
         features: [
-          'Unlimited property listings',
-          '10 featured listings',
-          'Unlimited sponsored posts',
-          '30 free leads/month',
-          '$0.50 per lead after 30',
+          `${label(ent.limits.listings)} property listings`,
+          `${label(ent.limits.featured)} featured listings`,
+          `${label(ent.limits.sponsoredPosts)} sponsored posts`,
+          `${leads.freePerMonth} free leads/month`,
+          leadCostText,
           'Full analytics suite',
           'Virtual tours included',
           'Dedicated account manager',
@@ -393,11 +415,11 @@ class RevenueSystem {
       <div class="pricing-header">
         <h3>${tierData.name}</h3>
         <div class="pricing-price">
-          <span class="currency">$</span>
-          <span class="amount">${tierData.monthlyPrice}</span>
+          <span class="amount">${(Number(tierData.monthlyPrice) || 0).toLocaleString()}</span>
+          <span class="currency">RWF</span>
           <span class="period">/month</span>
         </div>
-        ${tierData.yearlyPrice > 0 ? `<div class="yearly-price">$${Math.round(tierData.yearlyPrice / 12)}/mo billed yearly</div>` : ''}
+        ${tierData.yearlyPrice > 0 ? `<div class="yearly-price">${this.formatPrice(Math.round(tierData.yearlyPrice / 12))}/mo billed yearly</div>` : ''}
       </div>
       <div class="pricing-features">
         ${tierData.features.map(f => `
@@ -456,17 +478,17 @@ class RevenueSystem {
           <div class="stat-card">
             <div class="stat-value">${this.analytics.paid_leads_this_month || 0}</div>
             <div class="stat-label">Paid Leads</div>
-            <small class="text-muted">$${this.analytics.total_lead_cost_this_month || 0} this month</small>
+            <small class="text-muted">${this.formatPrice(this.analytics.total_lead_cost_this_month || 0)} this month</small>
           </div>
           
           <div class="stat-card">
             <div class="stat-value">${this.analytics.active_sponsored_posts || 0}</div>
             <div class="stat-label">Active Sponsored Posts</div>
-            <small class="text-muted">Spent: $${this.analytics.total_sponsored_spend || 0}</small>
+            <small class="text-muted">Spent: ${this.formatPrice(this.analytics.total_sponsored_spend || 0)}</small>
           </div>
           
           <div class="stat-card">
-            <div class="stat-value">$${this.analytics.pending_invoice_amount || 0}</div>
+            <div class="stat-value">${this.formatPrice(this.analytics.pending_invoice_amount || 0)}</div>
             <div class="stat-label">Pending Invoice</div>
             <small class="text-muted">Due in 7 days</small>
           </div>

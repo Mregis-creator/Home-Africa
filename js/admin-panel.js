@@ -1009,8 +1009,7 @@ async function deleteListing(collection, id) {
       }
     }
 
-    // Get listing data to delete images
-    const supabase = getSupabase();
+    // Get listing data to delete images (reuse `supabase` from above)
     const { data: listing } = await supabase
       .from('listings')
       .select('images')

@@ -85,25 +85,49 @@ class PaymentSystem {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = this.supabase.storage
+      // The `payments` bucket is PRIVATE (see supabase/security-hardening.sql).
+      // Store the storage PATH (not a public URL). Viewers get short-lived
+      // signed URLs on demand via getProofSignedUrl(). This keeps payment-proof
+      // screenshots (which contain PII) from being publicly readable.
+      const { data: signed } = await this.supabase.storage
         .from('payments')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 300); // 5-minute TTL for immediate display
 
       // Update transaction
       await this.supabase
         .from('payment_transactions')
         .update({
-          receipt_url: publicUrl,
+          receipt_url: fileName,
           status: 'awaiting_confirmation',
           updated_at: new Date().toISOString()
         })
         .eq('id', transactionId)
         .eq('user_id', this.userId);
 
-      return { success: true, url: publicUrl };
+      return { success: true, url: signed?.signedUrl || null, path: fileName };
     } catch (error) {
       return { success: false, error: error.message };
+    }
+  }
+
+  // Generate a short-lived signed URL for a payment proof stored in the private
+  // `payments` bucket. Accepts either a raw storage path or a legacy full URL
+  // (older rows stored a public URL — extract the path from those).
+  async getProofSignedUrl(receiptRef, ttlSeconds = 300) {
+    if (!receiptRef) return null;
+    try {
+      let path = receiptRef;
+      const marker = '/payments/';
+      if (receiptRef.includes(marker)) {
+        path = receiptRef.substring(receiptRef.indexOf(marker) + marker.length);
+      }
+      const { data, error } = await this.supabase.storage
+        .from('payments')
+        .createSignedUrl(path, ttlSeconds);
+      if (error) return null;
+      return data?.signedUrl || null;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -152,8 +176,12 @@ class PaymentSystem {
     const isBank = paymentData.payment_method === 'bank_bok';
     const amountValue = instructions.amount || paymentData.amount;
     const referenceCode = instructions.reference || paymentData.reference;
-    const defaultUssd = `*182*1*1*0783962518*${amountValue}%23`;
-    const ussdCode = instructions.ussd_code || defaultUssd;
+    // The authoritative USSD string is built server-side in create_payment_transaction
+    // from payment_platform_config (the platform's own MoMo number). Never hardcode a
+    // personal/receiving number in client code. Fall back to a config value only.
+    const cfgMomo = (window.APP_CONFIG && window.APP_CONFIG.PAYMENTS && window.APP_CONFIG.PAYMENTS.momoNumber) || '';
+    const cfgUssd = cfgMomo ? `*182*1*1*${cfgMomo.replace(/[^0-9]/g, '')}*${amountValue}%23` : '';
+    const ussdCode = instructions.ussd_code || cfgUssd;
     const ussdLink = `tel:${encodeURIComponent(ussdCode)}`;
 
     container.innerHTML = `

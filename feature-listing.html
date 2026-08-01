@@ -89,8 +89,8 @@
       box-shadow: 0 5px 20px rgba(255,153,0,0.4);
     }
 
-    .airtel-btn {
-      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    .bank-btn {
+      background: linear-gradient(135deg, #0066cc 0%, #003d7a 100%);
       color: #fff;
       border: none;
       font-weight: bold;
@@ -98,9 +98,9 @@
       border-radius: 12px;
       transition: all 0.3s;
     }
-    .airtel-btn:hover {
+    .bank-btn:hover {
       transform: scale(1.02);
-      box-shadow: 0 5px 20px rgba(255,0,0,0.4);
+      box-shadow: 0 5px 20px rgba(0,102,204,0.4);
     }
 
     .benefit-list {
@@ -117,19 +117,6 @@
     .benefit-list li i {
       color: #0ff;
       margin-right: 0.5rem;
-    }
-
-    .phone-input {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(0,255,255,0.3);
-      color: #fff;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      width: 100%;
-    }
-    .phone-input:focus {
-      outline: none;
-      border-color: #0ff;
     }
 
     .listing-preview {
@@ -209,87 +196,44 @@
 
         <div class="payment-form">
           <h5 class="mb-3"><i class="bi bi-phone" style="color:#0ff;"></i> Payment Method</h5>
-          
+
           <div class="mb-3">
-            <label class="text-white-50" style="font-size:0.85rem;">Select Network</label>
+            <label class="text-white-50" style="font-size:0.85rem;">Pay With</label>
             <div class="d-flex gap-2 mt-2">
-              <button class="btn flex-grow-1 momo-btn" id="momoBtn" onclick="selectNetwork('momo')">
+              <button class="btn flex-grow-1 momo-btn" id="momoBtn" onclick="selectMethod('momo_mtn')">
                 <i class="bi bi-wallet2"></i> MTN MoMo
               </button>
-              <button class="btn flex-grow-1 airtel-btn" id="airtelBtn" onclick="selectNetwork('airtel')">
-                <i class="bi bi-phone"></i> Airtel
+              <button class="btn flex-grow-1 bank-btn" id="bankBtn" onclick="selectMethod('bank_bok')">
+                <i class="bi bi-bank"></i> Bank of Kigali
               </button>
             </div>
           </div>
 
-          <div class="mb-3">
-            <label class="text-white-50" style="font-size:0.85rem;">Phone Number</label>
-            <input type="tel" id="phoneNumber" class="phone-input mt-1" placeholder="2507XXXXXXXX" value="2507">
-            <small class="text-white-50" style="font-size:0.75rem;">
-              <i class="bi bi-info-circle"></i> Include country code (250 for Rwanda)
-            </small>
-          </div>
-
-          <div class="mb-3">
-            <label class="text-white-50" style="font-size:0.85rem;">Your Email</label>
-            <input type="email" id="customerEmail" class="phone-input mt-1" placeholder="email@example.com">
-          </div>
+          <p class="text-white-50 mb-0" style="font-size:0.8rem;">
+            <i class="bi bi-info-circle"></i> You'll get payment instructions with a reference code.
+            After you pay and confirm, our team verifies the payment and your boost is activated.
+          </p>
         </div>
       </div>
 
       <!-- Right: Pricing Plans -->
       <div class="col-lg-8">
         <h4 class="mb-3">Select Duration</h4>
-        <div class="row g-3 mb-4">
-          
-          <div class="col-md-4">
-            <div class="pricing-card" data-plan="3days" data-amount="5000" onclick="selectPlan(this)">
-              <div class="price-tag">5,000 RWF</div>
-              <h5>3 Days</h5>
-              <ul class="benefit-list">
-                <li><i class="bi bi-check-circle-fill"></i> Homepage featured</li>
-                <li><i class="bi bi-check-circle-fill"></i> Search priority</li>
-                <li><i class="bi bi-check-circle-fill"></i> Featured badge</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="pricing-card featured-plan selected" data-plan="7days" data-amount="10000" onclick="selectPlan(this)">
-              <span class="plan-badge">POPULAR</span>
-              <div class="price-tag">10,000 RWF</div>
-              <h5>7 Days</h5>
-              <ul class="benefit-list">
-                <li><i class="bi bi-check-circle-fill"></i> Homepage featured</li>
-                <li><i class="bi bi-check-circle-fill"></i> Search priority</li>
-                <li><i class="bi bi-check-circle-fill"></i> Featured badge</li>
-                <li><i class="bi bi-check-circle-fill"></i> 2x more views</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="pricing-card" data-plan="30days" data-amount="35000" onclick="selectPlan(this)">
-              <div class="price-tag">35,000 RWF</div>
-              <h5>30 Days</h5>
-              <ul class="benefit-list">
-                <li><i class="bi bi-check-circle-fill"></i> Homepage featured</li>
-                <li><i class="bi bi-check-circle-fill"></i> Top search results</li>
-                <li><i class="bi bi-check-circle-fill"></i> Featured badge</li>
-                <li><i class="bi bi-check-circle-fill"></i> Best value</li>
-              </ul>
-            </div>
+        <div class="row g-3 mb-4" id="boostPlans">
+          <div class="col-12 text-center text-white-50 py-4">
+            <div class="spinner-border text-info" role="status"></div>
+            <p class="mt-2">Loading plans...</p>
           </div>
         </div>
 
         <!-- Payment Button -->
         <div class="d-grid gap-2">
-          <button class="btn btn-lg" id="payBtn" onclick="initiatePayment()" 
+          <button class="btn btn-lg" id="payBtn" onclick="initiatePayment()"
                   style="background:linear-gradient(90deg,#0ff,#8fff00);color:#222;font-weight:bold;padding:1rem;">
-            <i class="bi bi-lightning-charge"></i> Feature Now — 10,000 RWF
+            <i class="bi bi-lightning-charge"></i> Feature Now
           </button>
           <p class="text-center text-white-50 mb-0" style="font-size:0.8rem;">
-            <i class="bi bi-shield-check"></i> Secure payment powered by Flutterwave
+            <i class="bi bi-shield-check"></i> Pay via MTN MoMo or Bank of Kigali — verified by the HOME AFRICA team
           </p>
         </div>
 
@@ -298,6 +242,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Payment modal mount point (used by payment-system.js) -->
+  <div id="paymentModalContainer"></div>
 
   <!-- Footer -->
   <footer class="bg-dark text-white py-3 mt-5" style="border-top:1px solid rgba(0,255,255,0.3);">
@@ -308,18 +255,18 @@
     </div>
   </footer>
 
-  <!-- Flutterwave Script -->
-  <script src="https://checkout.flutterwave.com/v3.js"></script>
   <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <!-- Pricing source of truth: APP_CONFIG.PRICING (must load before this page's script) -->
+  <script src="js/config.js"></script>
+  <!-- Live payment rail: MTN MoMo / Bank of Kigali (create_payment_transaction -> admin verification) -->
+  <script src="js/payment-system.js"></script>
 
   <script>
-    // ── Config ──
-    const FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK_TEST-xxxxxxxxxxxxxxxx-X'; // Replace with your Flutterwave public key
-    
-    let selectedPlan = { plan: '7days', amount: 10000, days: 7 };
-    let selectedNetwork = 'momo';
+    // ── State ──
+    let selectedPlan = null;              // { id, label, days, amount } from APP_CONFIG.PRICING.boosts
+    let selectedMethod = 'momo_mtn';      // 'momo_mtn' | 'bank_bok'
     let listingId = null;
     let listingData = null;
     let currentUser = null;
@@ -329,7 +276,7 @@
       // Get listing ID from URL
       const urlParams = new URLSearchParams(window.location.search);
       listingId = urlParams.get('listingId') || urlParams.get('id');
-      
+
       if (!listingId) {
         showError('No listing specified. Please select a listing from your dashboard.');
         return;
@@ -343,37 +290,80 @@
           return;
         }
         currentUser = session.user;
-        document.getElementById('customerEmail').value = currentUser.email || '';
       }
+
+      // Render boost plans from APP_CONFIG.PRICING (RWF, single source of truth)
+      renderPlans();
 
       // Load listing data
       await loadListing();
-      
+
       // Preselect MTN MoMo
-      selectNetwork('momo');
-      
+      selectMethod('momo_mtn');
+
       document.querySelectorAll('.footer-year').forEach(e => e.textContent = new Date().getFullYear());
     });
+
+    // ── Render Plans (from APP_CONFIG.PRICING.boosts) ──
+    function benefitsFor(days) {
+      if (days >= 30) return ['Homepage featured', 'Top search results', 'Featured badge', 'Best value'];
+      if (days >= 7)  return ['Homepage featured', 'Search priority', 'Featured badge', '2x more views'];
+      return ['Homepage featured', 'Search priority', 'Featured badge'];
+    }
+
+    function renderPlans() {
+      const container = document.getElementById('boostPlans');
+      const boosts = (window.APP_CONFIG && window.APP_CONFIG.PRICING && window.APP_CONFIG.PRICING.boosts) || [];
+
+      if (!boosts.length) {
+        container.innerHTML = `
+          <div class="col-12 text-center text-white-50 py-4">
+            <i class="bi bi-exclamation-triangle" style="font-size:2rem;color:#ffc107;"></i>
+            <p class="mt-2">Pricing is unavailable right now. Please try again later.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = boosts.map(b => `
+        <div class="col-md-4">
+          <div class="pricing-card ${b.popular ? 'featured-plan' : ''}"
+               data-id="${b.id}" data-days="${b.days}" data-amount="${b.amount}" data-label="${b.label}"
+               onclick="selectPlan(this)">
+            ${b.popular ? '<span class="plan-badge">POPULAR</span>' : ''}
+            <div class="price-tag">${window.APP_CONFIG.formatPrice(b.amount)}</div>
+            <h5>${b.label}</h5>
+            <ul class="benefit-list">
+              ${benefitsFor(b.days).map(t => `<li><i class="bi bi-check-circle-fill"></i> ${t}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `).join('');
+
+      // Preselect the popular plan (or the first one)
+      const preferred = container.querySelector('.pricing-card.featured-plan') || container.querySelector('.pricing-card');
+      if (preferred) selectPlan(preferred);
+    }
 
     // ── Load Listing ──
     async function loadListing() {
       try {
         if (!window.supabaseClient || !listingId) return;
-        
+
         const { data, error } = await window.supabaseClient
           .from('listings')
           .select('*')
           .eq('id', listingId)
           .single();
-        
+
         if (error || !data) throw error;
-        
+
         listingData = data;
         const type = data.type || 'listing';
         const image = data.images?.[0] || (type === 'car' ? 'images/car1.jpg' : type === 'land' ? 'images/land1.jpg' : 'images/house1.jpg');
-        const price = data.price ? `RWF ${parseInt(data.price).toLocaleString()}` : 'Price on request';
+        const price = data.price ? window.APP_CONFIG.formatPrice(parseInt(data.price)) : 'Price on request';
         const location = typeof data.location === 'object' ? data.location?.city : data.location;
-        
+
         document.getElementById('listingPreview').innerHTML = `
           <img src="${image}" alt="${data.title}">
           <div class="p-3">
@@ -397,139 +387,93 @@
     function selectPlan(el) {
       document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
-      
+
       selectedPlan = {
-        plan: el.dataset.plan,
+        id: el.dataset.id,
+        label: el.dataset.label,
         amount: parseInt(el.dataset.amount),
-        days: parseInt(el.dataset.plan)
+        days: parseInt(el.dataset.days)
       };
-      
+
       // Update button text
       document.getElementById('payBtn').innerHTML = `
-        <i class="bi bi-lightning-charge"></i> Feature Now — ${selectedPlan.amount.toLocaleString()} RWF
+        <i class="bi bi-lightning-charge"></i> Feature Now — ${window.APP_CONFIG.formatPrice(selectedPlan.amount)}
       `;
     }
 
-    // ── Select Network ──
-    function selectNetwork(network) {
-      selectedNetwork = network;
-      document.getElementById('momoBtn').style.opacity = network === 'momo' ? '1' : '0.5';
-      document.getElementById('airtelBtn').style.opacity = network === 'airtel' ? '1' : '0.5';
-      
-      // Update phone placeholder
-      const phoneInput = document.getElementById('phoneNumber');
-      if (network === 'momo' && !phoneInput.value.startsWith('2507')) {
-        phoneInput.value = '25078';
-      } else if (network === 'airtel' && !phoneInput.value.startsWith('2507')) {
-        phoneInput.value = '25079';
-      }
+    // ── Select Payment Method ──
+    function selectMethod(method) {
+      selectedMethod = method;
+      document.getElementById('momoBtn').style.opacity = method === 'momo_mtn' ? '1' : '0.5';
+      document.getElementById('bankBtn').style.opacity = method === 'bank_bok' ? '1' : '0.5';
     }
 
-    // ── Initiate Payment ──
+    // ── Initiate Payment (MoMo / Bank of Kigali via payment-system.js) ──
     async function initiatePayment() {
-      const phone = document.getElementById('phoneNumber').value.trim();
-      const email = document.getElementById('customerEmail').value.trim();
-      
-      if (!phone || phone.length < 10) {
-        showError('Please enter a valid phone number with country code (e.g., 250788123456)');
-        return;
-      }
-      if (!email || !email.includes('@')) {
-        showError('Please enter a valid email address');
-        return;
-      }
       if (!currentUser) {
         showError('Please sign in to continue');
+        return;
+      }
+      if (!selectedPlan) {
+        showError('Please select a boost duration first');
+        return;
+      }
+      if (typeof paymentSystem === 'undefined' || !paymentSystem) {
+        showError('Payment system is still loading. Please try again in a moment.');
         return;
       }
 
       // Disable button
       const btn = document.getElementById('payBtn');
+      const btnLabel = `<i class="bi bi-lightning-charge"></i> Feature Now — ${window.APP_CONFIG.formatPrice(selectedPlan.amount)}`;
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
 
       try {
-        // Create pending transaction record
-        const txRef = 'HA_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        
-        const { data: txRecord, error: txError } = await window.supabaseClient
-          .from('transactions')
-          .insert({
-            user_id: currentUser.id,
-            listing_id: listingId,
-            type: 'feature_listing',
-            amount: selectedPlan.amount,
-            currency: 'RWF',
-            status: 'pending',
-            provider: 'flutterwave',
-            provider_ref: txRef,
-            metadata: {
-              plan: selectedPlan.plan,
-              days: selectedPlan.days,
-              network: selectedNetwork,
-              phone: phone
-            }
-          })
-          .select()
-          .single();
+        // Make sure the payment system knows who is paying
+        if (!paymentSystem.userId) paymentSystem.userId = currentUser.id;
 
-        if (txError) throw txError;
-
-        // Initialize Flutterwave
-        FlutterwaveCheckout({
-          public_key: FLUTTERWAVE_PUBLIC_KEY,
-          tx_ref: txRef,
+        // Create pending payment via the platform RPC (create_payment_transaction)
+        const result = await paymentSystem.createPayment({
+          type: 'featured_listing',
           amount: selectedPlan.amount,
-          currency: 'RWF',
-          payment_options: 'mobilemoneyrwanda',
-          customer: {
-            email: email,
-            phone_number: phone,
-            name: currentUser.email?.split('@')[0] || 'Customer'
-          },
-          customizations: {
-            title: 'HOME AFRICA - Feature Listing',
-            description: `Feature listing for ${selectedPlan.days} days`,
-            logo: 'https://your-domain.com/homeafricabanneralternative_III.png'
-          },
-          callback: function(response) {
-            handlePaymentSuccess(response, txRecord.id);
-          },
-          onclose: function() {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="bi bi-lightning-charge"></i> Feature Now — ${selectedPlan.amount.toLocaleString()} RWF`;
+          method: selectedMethod,
+          description: `Feature listing ${listingId} for ${selectedPlan.days} days (${selectedPlan.label})`
+        });
+
+        if (!result || !result.success) {
+          throw new Error(result?.error || 'Could not create payment');
+        }
+
+        // Show MoMo/Bank instructions modal (reference code, USSD, confirm form)
+        paymentSystem.renderPaymentModal('paymentModalContainer', result);
+
+        showPending(`Payment created (reference: <strong>${result.reference || ''}</strong>).
+          Follow the instructions, then confirm. Our team verifies payments manually —
+          your listing will be featured as soon as the payment is verified.`);
+
+        // Poll status while the page is open; activate the boost once verified
+        pollPaymentStatus(result.transaction_id, async (status) => {
+          if (status.isCompleted) {
+            await activateFeature();
           }
         });
 
       } catch (e) {
         console.error('Payment error:', e);
         showError('Could not initiate payment. Please try again.');
+      } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-lightning-charge"></i> Feature Now — ${selectedPlan.amount.toLocaleString()} RWF`;
+        btn.innerHTML = btnLabel;
       }
     }
 
-    // ── Handle Success ──
-    async function handlePaymentSuccess(response, txId) {
+    // ── Activate Feature (after admin verifies the payment) ──
+    async function activateFeature() {
       const statusDiv = document.getElementById('paymentStatus');
       statusDiv.style.display = 'block';
-      statusDiv.innerHTML = `
-        <div class="alert" style="background:rgba(0,255,136,0.1);border:1px solid #00ff88;color:#00ff88;">
-          <i class="bi bi-check-circle-fill"></i> Payment successful! Activating your featured listing...
-        </div>
-      `;
 
       try {
-        // Update transaction
-        await window.supabaseClient
-          .from('transactions')
-          .update({
-            status: 'completed',
-            provider_response: response,
-            completed_at: new Date().toISOString()
-          })
-          .eq('id', txId);
-
         // Calculate featured_until date
         const featuredUntil = new Date();
         featuredUntil.setDate(featuredUntil.getDate() + selectedPlan.days);
@@ -557,7 +501,7 @@
         // Show success
         statusDiv.innerHTML = `
           <div class="alert" style="background:rgba(0,255,136,0.15);border:1px solid #00ff88;color:#00ff88;border-radius:10px;padding:1rem;">
-            <h5><i class="bi bi-check-circle-fill"></i> Success!</h5>
+            <h5><i class="bi bi-check-circle-fill"></i> Payment verified!</h5>
             <p class="mb-2">Your listing is now featured until ${featuredUntil.toLocaleDateString()}.</p>
             <a href="dashboard.html" class="btn" style="background:#00ff88;color:#222;font-weight:bold;">
               <i class="bi bi-speedometer2"></i> Go to Dashboard
@@ -575,13 +519,23 @@
         console.error('Post-payment error:', e);
         statusDiv.innerHTML = `
           <div class="alert" style="background:rgba(255,193,7,0.15);border:1px solid #ffc107;color:#ffc107;">
-            <i class="bi bi-exclamation-triangle"></i> Payment received but activation pending. Please contact support.
+            <i class="bi bi-exclamation-triangle"></i> Payment verified but activation pending. Please contact support.
           </div>
         `;
       }
     }
 
     // ── Helpers ──
+    function showPending(msg) {
+      const statusDiv = document.getElementById('paymentStatus');
+      statusDiv.style.display = 'block';
+      statusDiv.innerHTML = `
+        <div class="alert" style="background:rgba(255,193,7,0.12);border:1px solid #ffc107;color:#ffc107;border-radius:10px;padding:1rem;">
+          <i class="bi bi-hourglass-split"></i> ${msg}
+        </div>
+      `;
+    }
+
     function showError(msg) {
       const statusDiv = document.getElementById('paymentStatus');
       statusDiv.style.display = 'block';

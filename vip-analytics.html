@@ -387,8 +387,9 @@
       async checkVIPAccess() {
         try {
           const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          if (!client) { console.warn('Supabase client unavailable; cannot verify VIP access.'); return; }
           const { data: { user } } = await client.auth.getUser();
-          
+
           if (!user) {
             window.location.href = 'signin.html';
             return;
@@ -415,6 +416,7 @@
       async loadMarketData() {
         try {
           const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+          if (!client) { console.warn('Supabase client unavailable; market data not loaded.'); return; }
           const days = this.getDaysFromPeriod(this.currentPeriod);
           const startDate = new Date();
           startDate.setDate(startDate.getDate() - days);
@@ -454,11 +456,33 @@
         
         const prices = listings.map(l => parseInt(l.price) || 0).filter(p => p > 0);
         const avgPrice = prices.length ? prices.reduce((a,b) => a+b, 0) / prices.length : 0;
-        document.getElementById('avgMarketPrice').textContent = (avgPrice / 1000000).toFixed(1) + 'M';
+        document.getElementById('avgMarketPrice').textContent = prices.length ? (avgPrice / 1000000).toFixed(1) + 'M' : '—';
 
-        // Price change (mock calculation)
-        document.getElementById('priceChange').textContent = '+5.2%';
-        document.getElementById('priceChange').className = 'kpi-value trend-up';
+        // Price trend: compare avg price of listings created in the current
+        // period vs the period before it. Show "—" when there isn't enough data.
+        const days = this.getDaysFromPeriod(this.currentPeriod);
+        const now = Date.now();
+        const periodStart = now - days * 24 * 60 * 60 * 1000;
+        const prevStart = now - 2 * days * 24 * 60 * 60 * 1000;
+
+        const priced = listings.filter(l => (parseInt(l.price) || 0) > 0 && l.created_at);
+        const currentBucket = priced.filter(l => new Date(l.created_at).getTime() >= periodStart);
+        const prevBucket = priced.filter(l => {
+          const t = new Date(l.created_at).getTime();
+          return t >= prevStart && t < periodStart;
+        });
+
+        const bucketAvg = arr => arr.reduce((s, l) => s + (parseInt(l.price) || 0), 0) / arr.length;
+        const priceChangeEl = document.getElementById('priceChange');
+        if (currentBucket.length >= 3 && prevBucket.length >= 3) {
+          const change = ((bucketAvg(currentBucket) - bucketAvg(prevBucket)) / bucketAvg(prevBucket)) * 100;
+          priceChangeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+          priceChangeEl.className = 'kpi-value ' + (change >= 0 ? 'trend-up' : 'trend-down');
+        } else {
+          priceChangeEl.textContent = '—';
+          priceChangeEl.className = 'kpi-value';
+          priceChangeEl.title = 'Not enough listing data yet to compute a price trend';
+        }
 
         // Hottest district
         const districtViews = {};
@@ -475,24 +499,38 @@
       }
 
       renderCharts(listings, views, areaStats) {
-        // Market trend chart
+        // ---- Market trend chart: REAL weekly new-listing counts (last 4 weeks) ----
         const trendCtx = document.getElementById('marketTrendChart').getContext('2d');
-        
+
         if (this.charts.trend) this.charts.trend.destroy();
-        
+
+        const weekMs = 7 * 24 * 60 * 60 * 1000;
+        const now = Date.now();
+        const weekLabels = ['3 wks ago', '2 wks ago', 'Last week', 'This week'];
+        const weeklyCounts = (type) => {
+          const counts = [0, 0, 0, 0];
+          listings.forEach(l => {
+            if (l.type !== type || !l.created_at) return;
+            const age = now - new Date(l.created_at).getTime();
+            if (age < 0 || age >= 4 * weekMs) return;
+            counts[3 - Math.floor(age / weekMs)]++;
+          });
+          return counts;
+        };
+
         this.charts.trend = new Chart(trendCtx, {
           type: 'line',
           data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            labels: weekLabels,
             datasets: [{
-              label: 'Apartments',
-              data: [45, 52, 48, 58],
+              label: 'New Apartment Listings',
+              data: weeklyCounts('apartments'),
               borderColor: '#0ff',
               backgroundColor: 'rgba(0, 255, 255, 0.1)',
               fill: true
             }, {
-              label: 'Land',
-              data: [30, 35, 32, 40],
+              label: 'New Land Listings',
+              data: weeklyCounts('land'),
               borderColor: '#8fff00',
               backgroundColor: 'rgba(143, 255, 0, 0.1)',
               fill: true
@@ -503,23 +541,36 @@
             plugins: { legend: { labels: { color: '#fff' } } },
             scales: {
               x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.6)', precision: 0 }, grid: { color: 'rgba(255,255,255,0.1)' } }
             }
           }
         });
 
-        // District share pie chart
+        // ---- District share: REAL share of listings by district ----
         const districtCtx = document.getElementById('districtShareChart').getContext('2d');
-        
+
         if (this.charts.district) this.charts.district.destroy();
-        
+
+        const districtCounts = {};
+        listings.forEach(l => {
+          const d = l.district || l.location || 'Unspecified';
+          districtCounts[d] = (districtCounts[d] || 0) + 1;
+        });
+        const sortedDistricts = Object.entries(districtCounts).sort((a, b) => b[1] - a[1]);
+        const topDistricts = sortedDistricts.slice(0, 4);
+        const otherCount = sortedDistricts.slice(4).reduce((s, [, c]) => s + c, 0);
+        const shareLabels = topDistricts.map(([d]) => d).concat(otherCount > 0 ? ['Other'] : []);
+        const shareData = topDistricts.map(([, c]) => c).concat(otherCount > 0 ? [otherCount] : []);
+
         this.charts.district = new Chart(districtCtx, {
           type: 'doughnut',
           data: {
-            labels: ['Kigali', 'Musanze', 'Rubavu', 'Rwamagana', 'Other'],
+            labels: shareLabels.length ? shareLabels : ['No listings yet'],
             datasets: [{
-              data: [45, 20, 15, 10, 10],
-              backgroundColor: ['#ffd700', '#0ff', '#8fff00', '#ff0088', '#ff8800']
+              data: shareData.length ? shareData : [1],
+              backgroundColor: shareData.length
+                ? ['#ffd700', '#0ff', '#8fff00', '#ff0088', '#ff8800']
+                : ['rgba(255,255,255,0.15)']
             }]
           },
           options: {
@@ -530,22 +581,29 @@
           }
         });
 
-        // Supply vs Demand chart
+        // ---- Supply vs Demand: REAL listing counts vs view counts per district ----
         const supplyCtx = document.getElementById('supplyDemandChart').getContext('2d');
-        
+
         if (this.charts.supply) this.charts.supply.destroy();
-        
+
+        const viewsByDistrict = {};
+        views.forEach(v => {
+          const d = v.district || 'Unspecified';
+          viewsByDistrict[d] = (viewsByDistrict[d] || 0) + 1;
+        });
+        const sdLabels = sortedDistricts.slice(0, 5).map(([d]) => d);
+
         this.charts.supply = new Chart(supplyCtx, {
           type: 'bar',
           data: {
-            labels: ['Kigali', 'Musanze', 'Rubavu', 'Rwamagana', 'Huye'],
+            labels: sdLabels.length ? sdLabels : ['No data yet'],
             datasets: [{
               label: 'Listings (Supply)',
-              data: [120, 80, 60, 40, 35],
+              data: sdLabels.length ? sdLabels.map(d => districtCounts[d] || 0) : [0],
               backgroundColor: 'rgba(255, 215, 0, 0.6)'
             }, {
               label: 'Views (Demand)',
-              data: [450, 200, 150, 100, 80],
+              data: sdLabels.length ? sdLabels.map(d => viewsByDistrict[d] || 0) : [0],
               backgroundColor: 'rgba(0, 255, 255, 0.6)'
             }]
           },
@@ -554,7 +612,7 @@
             plugins: { legend: { labels: { color: '#fff' } } },
             scales: {
               x: { ticks: { color: 'rgba(255,255,255,0.6)' } },
-              y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+              y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.6)', precision: 0 }, grid: { color: 'rgba(255,255,255,0.1)' } }
             }
           }
         });
@@ -588,37 +646,40 @@
           }
         });
 
-        const avg = arr => arr.length ? (arr.reduce((a,b) => a+b, 0) / arr.length) : 0;
-        
+        const avgLabel = arr => arr.length
+          ? ((arr.reduce((a,b) => a+b, 0) / arr.length) / 1000000).toFixed(1) + 'M RWF'
+          : '—';
+
         document.getElementById('priceBenchmarks').innerHTML = `
           <div class="market-item">
             <span>Apartments (Avg)</span>
-            <span class="trend-up">${(avg(types.apartments) / 1000000).toFixed(1)}M RWF</span>
+            <span class="${types.apartments.length ? 'trend-up' : 'text-white-50'}">${avgLabel(types.apartments)}</span>
           </div>
           <div class="market-item">
             <span>Land Plots (Avg)</span>
-            <span class="trend-up">${(avg(types.land) / 1000000).toFixed(1)}M RWF</span>
+            <span class="${types.land.length ? 'trend-up' : 'text-white-50'}">${avgLabel(types.land)}</span>
           </div>
           <div class="market-item">
             <span>Cars (Avg)</span>
-            <span class="trend-up">${(avg(types.cars) / 1000000).toFixed(1)}M RWF</span>
+            <span class="${types.cars.length ? 'trend-up' : 'text-white-50'}">${avgLabel(types.cars)}</span>
           </div>
         `;
 
-        // Demand indicators
-        const inquiryRate = views.length / Math.max(listings.length, 1);
+        // Demand indicators — real counts only, no invented labels
+        const inquiryRate = listings.length > 0 ? views.length / listings.length : null;
+        const uniqueBuyers = new Set(views.map(v => v.viewer_id).filter(Boolean)).size;
         document.getElementById('demandIndicators').innerHTML = `
           <div class="market-item">
             <span>Views per Listing</span>
-            <span class="${inquiryRate > 10 ? 'trend-up' : 'trend-down'}">${inquiryRate.toFixed(1)}</span>
+            <span class="${inquiryRate !== null && inquiryRate > 10 ? 'trend-up' : 'text-white-50'}">${inquiryRate === null ? '—' : inquiryRate.toFixed(1)}</span>
           </div>
           <div class="market-item">
-            <span>Market Velocity</span>
-            <span class="trend-up">High</span>
+            <span>Total Views (period)</span>
+            <span class="${views.length ? 'trend-up' : 'text-white-50'}">${views.length.toLocaleString()}</span>
           </div>
           <div class="market-item">
-            <span>Buyer Activity</span>
-            <span class="trend-up">+23% this month</span>
+            <span>Unique Buyers (period)</span>
+            <span class="${uniqueBuyers ? 'trend-up' : 'text-white-50'}">${uniqueBuyers.toLocaleString()}</span>
           </div>
         `;
 
@@ -651,32 +712,50 @@
       setTimeout(loadMarketGaps, 1500);
     });
     
-    // Load market supply/demand gaps
+    // Load market supply/demand gaps (real query via market-intelligence.js:
+    // user_activities searches vs active listings)
     async function loadMarketGaps() {
       try {
-        if (!window.marketIntelligence) {
+        if (!window.marketIntelligence || !window.supabaseClient) {
           console.warn('Market Intelligence not available');
-          showMockMarketGaps();
+          showGapsUnavailable();
           return;
         }
-        
+
         await window.marketIntelligence.init();
         const gaps = await window.marketIntelligence.analyzeSupplyDemandGaps();
+
+        // analyzeSupplyDemandGaps falls back to demo gaps on internal errors —
+        // never present those as real market data.
+        if (isDemoGaps(gaps)) {
+          console.warn('Gap analysis query failed upstream; showing empty state instead of demo data.');
+          showGapsUnavailable();
+          return;
+        }
+
         renderMarketGaps(gaps.slice(0, 4));
       } catch (err) {
-        console.error('Error loading market gaps:', err);
-        showMockMarketGaps();
+        console.warn('Error loading market gaps:', err);
+        showGapsUnavailable();
       }
     }
-    
-    function showMockMarketGaps() {
-      const mockGaps = [
-        { district: 'Nyarutarama', type: 'apartment', demand: 145, supply: 12, ratio: 12.1, opportunity_score: 95, severity: 'critical', recommendation: 'Extreme undersupply - list immediately!' },
-        { district: 'Kacyiru', type: 'land', demand: 89, supply: 18, ratio: 4.9, opportunity_score: 75, severity: 'high', recommendation: 'High demand - fast sale expected' },
-        { district: 'Remera', type: 'house', demand: 67, supply: 15, ratio: 4.5, opportunity_score: 70, severity: 'moderate', recommendation: 'Good opportunity - consider listing' },
-        { district: 'Kimihurura', type: 'apartment', demand: 52, supply: 14, ratio: 3.7, opportunity_score: 55, severity: 'moderate', recommendation: 'Decent demand - price competitively' }
-      ];
-      renderMarketGaps(mockGaps);
+
+    // Detects the hardcoded fallback from js/market-intelligence.js getMockGaps()
+    function isDemoGaps(gaps) {
+      try {
+        return Array.isArray(gaps) && gaps.length > 0 &&
+          gaps[0].district === 'Nyarutarama' && gaps[0].demand === 145 && gaps[0].supply === 12;
+      } catch (e) { return false; }
+    }
+
+    function showGapsUnavailable() {
+      document.getElementById('marketGapsList').innerHTML = `
+        <div class="col-12 text-center py-3 text-white-50">
+          <i class="bi bi-bar-chart" style="font-size: 2rem;"></i>
+          <p class="mb-0 mt-2">Not enough market data yet to detect supply/demand gaps.</p>
+          <small>Gap analysis appears once search and listing activity accumulates.</small>
+        </div>
+      `;
     }
     
     function renderMarketGaps(gaps) {

@@ -6,7 +6,7 @@
   <title>Book a Lesson | HOME AFRICA</title>
   <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
   <link rel="apple-touch-icon" href="homeafricabanneralternative_III.png" />
-  <meta name="description" content="HOME AFRICA — Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
+  <meta name="description" content="HOME AFRICA ï¿½ Rwanda's trusted real estate and lifestyle platform. Browse verified apartments, land, and cars, and connect instantly with sellers." />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   <style>
@@ -303,7 +303,8 @@
   <div class="container">
     <div class="booking-form">
       <h2>Book a Driving Lesson</h2>
-      <form>
+      <div id="bookingStatus" class="mb-3" style="display:none;" role="alert"></div>
+      <form id="lessonBookingForm" novalidate>
         <div class="mb-3">
           <label for="name">Full Name</label>
           <input type="text" class="form-control" id="name" placeholder="e.g. Regis Muhakwa" required />
@@ -339,7 +340,7 @@
           <label for="message">Message / Notes</label>
           <textarea class="form-control" id="message" rows="3" placeholder="Any special request?"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary vibrant-btn decorated-btn">Confirm Booking</button>
+        <button type="submit" class="btn btn-primary vibrant-btn decorated-btn" id="bookingSubmitBtn">Confirm Booking</button>
       </form>
     </div>
   </div>
@@ -410,5 +411,97 @@
   <script src="js/nav-active.js"></script>
   <script src="js/ai-chatbot.js"></script>
   <script src="js/footer-fix.js"></script>
+
+  <!-- Booking form submit handler -->
+  <script>
+    (function () {
+      const form = document.getElementById('lessonBookingForm');
+      if (!form) return;
+
+      const statusBox = document.getElementById('bookingStatus');
+      const submitBtn = document.getElementById('bookingSubmitBtn');
+
+      function showStatus(type, html) {
+        statusBox.className = 'mb-3 alert alert-' + type;
+        statusBox.style.display = 'block';
+        statusBox.innerHTML = html;
+        statusBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // --- Validate ---
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const pkg = document.getElementById('package').value.trim();
+        const schedule = document.getElementById('schedule').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        if (!name || name.length < 2) { showStatus('warning', 'Please enter your full name.'); return; }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStatus('warning', 'Please enter a valid email address.'); return; }
+        if (!phone || phone.replace(/\D/g, '').length < 7) { showStatus('warning', 'Please enter a valid phone number.'); return; }
+        if (!pkg) { showStatus('warning', 'Please select a lesson package.'); return; }
+        if (!schedule) { showStatus('warning', 'Please select a preferred schedule.'); return; }
+
+        // Extract lesson count from package label, e.g. "Beginner Package - 10 Lessons"
+        const lessonsMatch = pkg.match(/(\d+)\s*Lessons?/i);
+        const lessons = lessonsMatch ? parseInt(lessonsMatch[1], 10) : null;
+
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        try {
+          const client = (typeof window.getSupabaseClient === 'function' ? window.getSupabaseClient() : null) || window.supabaseClient;
+          if (!client) throw new Error('Supabase client not available');
+
+          // Attach the logged-in user if there is one (booking works for guests too)
+          let userId = null;
+          try {
+            const { data: { session } } = await client.auth.getSession();
+            userId = session && session.user ? session.user.id : null;
+          } catch (authErr) {
+            console.warn('Could not read auth session for booking:', authErr);
+          }
+
+          const record = {
+            booking_type: 'driving_lesson',
+            contact_name: name,
+            contact_email: email,
+            contact_phone: phone,
+            notes: 'Package: ' + pkg +
+                   (lessons ? ' (' + lessons + ' lessons)' : '') +
+                   ' | Preferred schedule: ' + schedule +
+                   (message ? ' | Notes: ' + message : ''),
+            status: 'pending',
+            created_at: new Date().toISOString()
+          };
+          if (userId) record.user_id = userId;
+
+          const { error } = await client.from('bookings').insert([record]);
+          if (error) throw error;
+
+          form.reset();
+          form.style.display = 'none';
+          showStatus('success',
+            '<strong>Booking received!</strong> Thank you, ' +
+            name.replace(/[&<>"']/g, '') +
+            '. Your request for the <em>' + pkg.replace(/[&<>"']/g, '') +
+            '</em> is pending confirmation â€” we will contact you at ' +
+            phone.replace(/[&<>"']/g, '') + '.');
+        } catch (err) {
+          console.warn('Booking submission failed (bookings table may not be set up yet):', err);
+          showStatus('danger',
+            '<strong>Sorry, we could not submit your booking right now.</strong><br>' +
+            'Please try again in a few minutes, or contact us directly and we will book you in manually.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

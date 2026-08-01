@@ -292,7 +292,7 @@
       <div class="stat-card">
         <div class="stat-value" id="paidLeadsCount">0</div>
         <div class="stat-label">Paid Leads This Month</div>
-        <small class="text-muted">$<span id="leadCostTotal">0.00</span> total cost</small>
+        <small class="text-muted"><span id="leadCostTotal">0</span> RWF total cost</small>
       </div>
       
       <div class="stat-card">
@@ -343,7 +343,7 @@
               <div class="d-flex justify-content-between align-items-center">
                 <div>
                   <h4 class="mb-1"><i class="bi bi-lightning-charge"></i> Upgrade to Professional</h4>
-                  <p class="mb-0 opacity-75">Get 20 listings, 5 featured slots, and advanced analytics for only $19/month</p>
+                  <p class="mb-0 opacity-75">Get 20 listings, 5 featured slots, and advanced analytics for only <span id="upgradeBannerPrice">50,000 RWF</span>/month</p>
                 </div>
                 <button class="btn btn-light btn-lg" onclick="showUpgradeModal()">
                   Upgrade Now
@@ -368,7 +368,7 @@
                       </tr>
                       <tr>
                         <td class="text-muted">Monthly Price</td>
-                        <td class="fw-bold" id="currentPlanPrice">$0</td>
+                        <td class="fw-bold" id="currentPlanPrice">0 RWF</td>
                       </tr>
                       <tr>
                         <td class="text-muted">Listings</td>
@@ -444,7 +444,7 @@
                 </h5>
               </div>
               <div class="dashboard-card-body">
-                <h3 class="text-center mb-3">$<span id="pendingAmount">0.00</span></h3>
+                <h3 class="text-center mb-3"><span id="pendingAmount">0</span> RWF</h3>
                 <p class="text-muted text-center">Due in 7 days</p>
                 <button class="btn btn-warning w-100" onclick="payInvoice()">
                   <i class="bi bi-credit-card"></i> Pay Now
@@ -492,8 +492,8 @@
             <div class="pricing-card free position-relative">
               <h4>Free</h4>
               <div class="pricing-price">
-                <span class="currency">$</span>
-                <span class="amount">0</span>
+                <span class="amount" id="freeTierAmount">0</span>
+                <span class="currency">RWF</span>
                 <span class="period">/month</span>
               </div>
               <div class="text-start mt-4">
@@ -511,7 +511,7 @@
                 </div>
                 <div class="feature-item">
                   <i class="bi bi-check2-circle"></i>
-                  <span>$0.50 per lead after 30</span>
+                  <span id="freeLeadCostFeature">500 RWF per lead after 30</span>
                 </div>
                 <div class="feature-item">
                   <i class="bi bi-check2-circle"></i>
@@ -530,11 +530,11 @@
               <div class="current-badge" id="proBadge" style="display: none;">Current Plan</div>
               <h4>Professional</h4>
               <div class="pricing-price">
-                <span class="currency">$</span>
-                <span class="amount">19</span>
+                <span class="amount" id="proTierAmount">50,000</span>
+                <span class="currency">RWF</span>
                 <span class="period">/month</span>
               </div>
-              <div class="text-muted mb-3">$190/year (2 months free)</div>
+              <div class="text-muted mb-3"><span id="proTierYearly">500,000 RWF</span>/year (2 months free)</div>
               <div class="text-start">
                 <div class="feature-item">
                   <i class="bi bi-check2-circle"></i>
@@ -577,11 +577,11 @@
               <div class="current-badge" id="enterpriseBadge" style="display: none;">Current Plan</div>
               <h4>Enterprise</h4>
               <div class="pricing-price">
-                <span class="currency">$</span>
-                <span class="amount">49</span>
+                <span class="amount" id="enterpriseTierAmount">150,000</span>
+                <span class="currency">RWF</span>
                 <span class="period">/month</span>
               </div>
-              <div class="text-muted mb-3">$490/year (2 months free)</div>
+              <div class="text-muted mb-3"><span id="enterpriseTierYearly">1,500,000 RWF</span>/year (2 months free)</div>
               <div class="text-start">
                 <div class="feature-item">
                   <i class="bi bi-check2-circle"></i>
@@ -646,6 +646,9 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
+  <!-- Global config (pricing source of truth) — must load before revenue-system.js -->
+  <script src="js/config.js"></script>
+
   <!-- Revenue System -->
   <script src="js/revenue-system.js"></script>
   
@@ -661,8 +664,31 @@
       invoices: []
     };
 
+    // Pricing helpers — single source of truth: APP_CONFIG.PRICING (js/config.js), all RWF
+    const PRICING = window.APP_CONFIG.PRICING;
+    const formatPrice = window.APP_CONFIG.formatPrice;
+    const getMerchantTier = (id) => PRICING.merchantTiers.find(t => t.id === id);
+
+    // Populate static pricing UI from config so amounts are never hardcoded
+    function renderConfigPricing() {
+      const free = getMerchantTier('free');
+      const pro = getMerchantTier('professional');
+      const ent = getMerchantTier('enterprise');
+
+      document.getElementById('freeTierAmount').textContent = free.monthly.toLocaleString();
+      document.getElementById('proTierAmount').textContent = pro.monthly.toLocaleString();
+      document.getElementById('enterpriseTierAmount').textContent = ent.monthly.toLocaleString();
+      document.getElementById('proTierYearly').textContent = formatPrice(pro.yearly);
+      document.getElementById('enterpriseTierYearly').textContent = formatPrice(ent.yearly);
+      document.getElementById('upgradeBannerPrice').textContent = formatPrice(pro.monthly);
+      document.getElementById('freeLeadCostFeature').textContent =
+        `${formatPrice(PRICING.leads.pricePerLead)} per lead after ${PRICING.leads.freePerMonth}`;
+    }
+
     // Initialize Dashboard
     document.addEventListener('DOMContentLoaded', async () => {
+      renderConfigPricing();
+
       // Wait for revenue system to initialize
       await waitForRevenueSystem();
       
@@ -726,14 +752,14 @@
       document.getElementById('freeLeadsText').textContent = `${freeUsed}/${freeTotal} used this month`;
 
       document.getElementById('paidLeadsCount').textContent = analytics?.paid_leads_this_month || 0;
-      document.getElementById('leadCostTotal').textContent = (analytics?.total_lead_cost_this_month || 0).toFixed(2);
+      document.getElementById('leadCostTotal').textContent = (analytics?.total_lead_cost_this_month || 0).toLocaleString();
 
       document.getElementById('activeListings').textContent = analytics?.active_listings || 0;
       document.getElementById('maxListings').textContent = sub.max_listings;
 
       // Update current plan summary
       document.getElementById('currentPlanName').textContent = capitalize(sub.tier);
-      document.getElementById('currentPlanPrice').textContent = `$${sub.monthly_price}`;
+      document.getElementById('currentPlanPrice').textContent = formatPrice(sub.monthly_price);
       document.getElementById('listingsUsed').textContent = analytics?.active_listings || 0;
       document.getElementById('listingsMax').textContent = sub.max_listings;
       document.getElementById('featuredUsed').textContent = analytics?.featured_used || 0;
@@ -760,7 +786,7 @@
       // Show pending invoice if exists
       if (analytics?.pending_invoice_amount > 0) {
         document.getElementById('pendingInvoiceCard').style.display = 'block';
-        document.getElementById('pendingAmount').textContent = analytics.pending_invoice_amount.toFixed(2);
+        document.getElementById('pendingAmount').textContent = analytics.pending_invoice_amount.toLocaleString();
       }
 
       // Render leads
@@ -801,7 +827,7 @@
           </div>
           <div>
             <span class="lead-badge ${lead.is_free_lead ? 'free' : 'paid'}">
-              ${lead.is_free_lead ? 'FREE' : `$${lead.lead_cost}`}
+              ${lead.is_free_lead ? 'FREE' : formatPrice(lead.lead_cost)}
             </span>
           </div>
         </div>
@@ -841,7 +867,7 @@
               <tr>
                 <td>${inv.invoice_number}</td>
                 <td>${formatDate(inv.period_start)} - ${formatDate(inv.period_end)}</td>
-                <td>$${inv.total_amount.toFixed(2)}</td>
+                <td>${formatPrice(inv.total_amount)}</td>
                 <td>
                   <span class="badge bg-${inv.status === 'paid' ? 'success' : inv.status === 'overdue' ? 'danger' : 'warning'}">
                     ${capitalize(inv.status)}
@@ -897,8 +923,9 @@
     }
 
     async function payInvoice() {
-      const amount = parseFloat(document.getElementById('pendingAmount').textContent) * 1000; // Convert USD to RWF (approx)
-      
+      // Amount is already RWF (single source of truth: APP_CONFIG.PRICING)
+      const amount = dashboardState.analytics?.pending_invoice_amount || 0;
+
       if (!amount || amount <= 0) {
         alert('No pending amount to pay');
         return;
@@ -931,15 +958,16 @@
       }
     }
 
-    // Upgrade subscription with payment
+    // Upgrade subscription with payment (amounts in RWF from APP_CONFIG.PRICING)
     async function upgradeWithPayment(tier) {
-      const tiers = {
-        professional: { monthly: 19000, yearly: 190000 }, // RWF
-        enterprise: { monthly: 49000, yearly: 490000 }
-      };
-      
+      const tierConfig = getMerchantTier(tier);
+      if (!tierConfig) {
+        alert('Unknown plan: ' + tier);
+        return;
+      }
+
       const cycle = confirm('Click OK for Yearly (2 months free)\nClick Cancel for Monthly') ? 'yearly' : 'monthly';
-      const amount = tiers[tier][cycle];
+      const amount = cycle === 'yearly' ? tierConfig.yearly : tierConfig.monthly;
       
       const method = confirm('Click OK for MTN MoMo\nClick Cancel for Bank Transfer') ? 'momo_mtn' : 'bank_bok';
       

@@ -409,8 +409,8 @@
           <p class="plan-tagline">For property owners & sellers</p>
         </div>
         <div class="plan-price">
-          <div class="price-amount">$0<span>/month</span></div>
-          <p class="price-note">Pay per lead: $0.50 - $2.00 • 30 free leads/month</p>
+          <div class="price-amount" id="merchantPlanPrice">0 RWF<span>/month</span></div>
+          <p class="price-note" id="merchantPlanNote">Pay per lead: 500 RWF • 30 free leads/month</p>
         </div>
         <ul class="plan-features">
           <li><i class="bi bi-check-circle-fill"></i> Everything in Explorer</li>
@@ -433,7 +433,7 @@
           <p class="plan-tagline">For licensed real estate agents</p>
         </div>
         <div class="plan-price">
-          <div class="price-amount">$49<span>/month</span></div>
+          <div class="price-amount" id="agentProPlanPrice">50,000 RWF<span>/month</span></div>
           <p class="price-note">Per agent • License verification required</p>
         </div>
         <ul class="plan-features">
@@ -557,8 +557,24 @@
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
   <script>
     particlesJS('particles-js', { particles: { number: { value: 40 }, color: { value: '#00ffff' }, opacity: { value: 0.15 }, size: { value: 2 }, line_linked: { enable: true, color: '#00ffff', opacity: 0.08 }, move: { enable: true, speed: 1 } }, retina_detect: true });
+
+    // Render plan prices from the single pricing source of truth (APP_CONFIG.PRICING, RWF)
+    (function () {
+      const P = window.APP_CONFIG && window.APP_CONFIG.PRICING;
+      if (!P) return;
+      const fmt = window.APP_CONFIG.formatPrice;
+
+      const merchantFree = P.merchantTiers.find(t => t.id === 'free');
+      const agentPro = P.agentTiers.find(t => t.id === 'agent_pro');
+
+      document.getElementById('merchantPlanPrice').innerHTML = fmt(merchantFree.monthly) + '<span>/month</span>';
+      document.getElementById('merchantPlanNote').textContent =
+        'Pay per lead: ' + fmt(P.leads.pricePerLead) + ' • ' + P.leads.freePerMonth + ' free leads/month';
+      document.getElementById('agentProPlanPrice').innerHTML = fmt(agentPro.monthly) + '<span>/month</span>';
+    })();
   </script>
   <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>

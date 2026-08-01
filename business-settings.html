@@ -291,14 +291,13 @@
 
     <!-- Payment Config Tab -->
     <div id="paymentsTab" class="tab-content" style="display:none;">
-      <div class="settings-card">
-        <h5><i class="bi bi-credit-card"></i> Flutterwave API Configuration</h5>
-        <p class="text-white-50" style="font-size:0.85rem;">Enter your Flutterwave API keys to start accepting payments. Keep your secret key secure.</p>
-        
-        <div class="alert" style="background:rgba(255,193,7,0.1);border:1px solid #ffc107;color:#ffc107;border-radius:10px;padding:1rem;margin-bottom:1rem;">
-          <i class="bi bi-exclamation-triangle-fill"></i> 
-          <strong>Important:</strong> Use <strong>Test Keys</strong> for development. Switch to <strong>Live Keys</strong> only when ready to accept real payments.
-        </div>
+      <!-- DEPRECATED: Flutterwave is retired. Payments use MoMo (MTN) + Bank of
+           Kigali via js/payment-system.js. This card is hidden but the input
+           nodes are kept so existing loadSettings()/updateStatusBadge() JS does
+           not null-error. Configure receiving accounts under Payout Settings. -->
+      <div class="settings-card" style="display:none;">
+        <h5><i class="bi bi-credit-card"></i> Payment Gateway (deprecated)</h5>
+        <p class="text-white-50" style="font-size:0.85rem;">Home Africa now accepts payments via MTN Mobile Money and Bank of Kigali. Configure your receiving accounts under Payout Settings.</p>
 
         <div class="row">
           <div class="col-md-6">

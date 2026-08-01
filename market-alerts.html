@@ -455,7 +455,8 @@
 
   <!-- Scripts -->
   <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="js/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/market-intelligence.js"></script>
   
   <script>
@@ -469,56 +470,75 @@
 
     async function loadData() {
       try {
-        if (!window.marketIntelligence) {
+        if (!window.marketIntelligence || !window.supabaseClient) {
           console.warn('Market Intelligence not initialized');
-          showMockData();
+          showEmptyState();
           return;
         }
 
         await window.marketIntelligence.init();
-        
-        // Load seasonal data
+        if (!window.marketIntelligence.supabase) {
+          showEmptyState();
+          return;
+        }
+
+        // Load seasonal data (deterministic calendar-based forecast, not market data)
         const seasonal = await window.marketIntelligence.getSeasonalForecast();
         renderSeasonal(seasonal);
-        
-        // Load gaps
+
+        // Load gaps (real query: user_activities searches vs active listings).
+        // analyzeSupplyDemandGaps falls back to demo numbers on internal errors —
+        // never present those as real market data.
         currentGaps = await window.marketIntelligence.analyzeSupplyDemandGaps();
+        if (isDemoGaps(currentGaps)) {
+          console.warn('Gap analysis query failed upstream; showing empty state instead of demo data.');
+          currentGaps = [];
+        }
         renderOpportunities(currentGaps);
         updateStats(currentGaps);
-        
-        // Load alerts
+
+        // Load alerts, dropping any alerts derived from the demo gap fallback
         currentAlerts = await window.marketIntelligence.generateMarketAlerts();
+        if (currentGaps.length === 0) {
+          currentAlerts = (currentAlerts || []).filter(a => a.type !== 'supply_demand_gap');
+        }
         renderAlerts(currentAlerts);
       } catch (err) {
-        console.error('Error loading market data:', err);
-        showMockData();
+        console.warn('Error loading market data:', err);
+        showEmptyState();
       }
     }
 
-    function showMockData() {
-      // Mock data for demo
-      const mockGaps = [
-        { district: 'Nyarutarama', type: 'apartment', demand: 145, supply: 12, ratio: 12.1, opportunity_score: 95, severity: 'critical', recommendation: '🚨 CRITICAL: Extreme undersupply. List immediately!' },
-        { district: 'Kacyiru', type: 'land', demand: 89, supply: 18, ratio: 4.9, opportunity_score: 75, severity: 'high', recommendation: '⚡ HIGH DEMAND: Fast sale expected. List now!' },
-        { district: 'Remera', type: 'house', demand: 67, supply: 15, ratio: 4.5, opportunity_score: 70, severity: 'moderate', recommendation: '📈 MODERATE: Good opportunity. Consider listing.' },
-        { district: 'Kimihurura', type: 'apartment', demand: 52, supply: 14, ratio: 3.7, opportunity_score: 55, severity: 'moderate', recommendation: '📈 MODERATE: Decent demand. Price competitively.' }
-      ];
+    // Detects the hardcoded fallback from js/market-intelligence.js getMockGaps()
+    function isDemoGaps(gaps) {
+      try {
+        return Array.isArray(gaps) && gaps.length > 0 &&
+          gaps[0].district === 'Nyarutarama' && gaps[0].demand === 145 && gaps[0].supply === 12;
+      } catch (e) { return false; }
+    }
 
-      const mockAlerts = [
-        { type: 'supply_demand_gap', severity: 'critical', title: 'Nyarutarama: Apartment Undersupply', message: '🚨 CRITICAL: Nyarutarama has extreme undersupply of apartments. 12 listings for 145 searches. Immediate opportunity to list.', actionable: true, action_text: 'View Details' },
-        { type: 'seasonal', severity: 'positive', title: 'Seasonal Market Update: HIGH ACTIVITY', message: '📈 PEAK SEASON: List now for maximum exposure and faster sales.', actionable: false },
-        { type: 'price_trend', severity: 'positive', title: 'Kacyiru land prices rising', message: 'Land plots in Kacyiru are appreciating by 8.5%. Good time to sell.', actionable: false }
-      ];
+    function showEmptyState() {
+      // Honest empty state — no fabricated market numbers
+      currentGaps = [];
+      currentAlerts = [];
 
-      const mockSeasonal = {
-        current_month: { activity: 'very_high', factor: 1.4, reason: 'Holiday season + year-end bonuses' },
-        recommendation: '📈 PEAK SEASON: List now for maximum exposure and faster sales.'
-      };
+      document.getElementById('seasonalIndicator').innerHTML = `
+        <div class="seasonal-icon">📊</div>
+        <div class="flex-grow-1">
+          <h5 class="mb-1">Market Season</h5>
+          <p class="mb-0 text-muted">Seasonal forecast unavailable right now.</p>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-info">—</span>
+        </div>
+      `;
 
-      renderSeasonal(mockSeasonal);
-      renderOpportunities(mockGaps);
-      updateStats(mockGaps);
-      renderAlerts(mockAlerts);
+      renderOpportunities([]);
+      document.getElementById('totalGaps').textContent = '—';
+      document.getElementById('avgRatio').textContent = '—';
+      document.getElementById('hotDistricts').textContent = '—';
+      document.getElementById('criticalGaps').textContent = '—';
+      renderAlerts([]);
     }
 
     function renderSeasonal(seasonal) {
@@ -546,9 +566,10 @@
       
       if (gaps.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-4">
-            <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
-            <p class="mt-2">No significant supply/demand gaps found. Market is balanced.</p>
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-bar-chart" style="font-size: 3rem;"></i>
+            <p class="mt-2 mb-0">No supply/demand gap data yet.</p>
+            <small>Opportunities appear once enough search and listing activity accumulates.</small>
           </div>
         `;
         return;

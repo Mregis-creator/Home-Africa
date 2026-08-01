@@ -263,28 +263,133 @@ REVOKE EXECUTE ON FUNCTION public.refresh_supply_demand_gaps()                  
 REVOKE EXECUTE ON FUNCTION public.refresh_activity_aggregates()                       FROM PUBLIC, anon, authenticated;
 REVOKE EXECUTE ON FUNCTION public.mark_recovery_sent(uuid, text)                      FROM PUBLIC, anon, authenticated;
 
--- Business/PII reads: block anonymous, keep authenticated. (Follow-up: these are
--- SECURITY DEFINER and take a uuid, so an authenticated user can still pass
--- another merchant's id -- add an internal auth.uid()/is_admin() check to each
--- to stop cross-tenant reads.)
-REVOKE EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)          FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)          TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)         FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)         TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer) FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer) FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                  FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                  TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)           FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)           TO authenticated;
+-- Business/PII reads: these are SECURITY DEFINER, take a merchant uuid, and have
+-- NO in-body owner check -> an authenticated user could pass another merchant's
+-- id and read their stats/leads/funnel (cross-tenant leak). None are called by
+-- the app (verified by grep), so the safest fix is to fully lock them: revoke
+-- from authenticated too. When a dashboard later needs one, re-grant it AFTER
+-- adding an internal `auth.uid()`/is_admin() guard.
+-- (calculate_lead_cost / get_free_leads_used are still callable internally by
+--  record_merchant_lead, which is SECURITY DEFINER and runs as the owner.)
+REVOKE EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)          FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)         FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                  FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)           FROM PUBLIC, anon, authenticated;
 
 -- Client-called (keep authenticated, block anonymous).
 REVOKE EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) FROM PUBLIC, anon;
 GRANT  EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer)          FROM PUBLIC, anon;
 GRANT  EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer)          TO authenticated;
+
+
+-- ============================================================
+-- A2d. In-body cross-tenant guards for the two client-called functions.
+--   These keep `authenticated` access (the app needs them) but add an owner
+--   check so a logged-in user cannot act on another user's data. Bodies are
+--   reproduced verbatim from supabase-tables.sql with ONLY the guard added.
+-- ============================================================
+
+-- generate_user_feed: a user may only (re)generate their OWN feed.
+CREATE OR REPLACE FUNCTION generate_user_feed(
+  p_user_id UUID,
+  p_limit INTEGER DEFAULT 20
+) RETURNS TABLE (
+  id UUID,
+  feed_type TEXT,
+  listing_id TEXT,
+  title TEXT,
+  description TEXT,
+  priority INTEGER
+) AS $$
+BEGIN
+  -- GUARD
+  IF p_user_id IS DISTINCT FROM auth.uid() AND NOT public.is_admin(auth.uid()) THEN
+    RAISE EXCEPTION 'Not authorized: you may only generate your own feed' USING ERRCODE = '42501';
+  END IF;
+
+  -- Delete old feed items
+  DELETE FROM user_feed_items
+  WHERE user_id = p_user_id
+    AND created_at < NOW() - INTERVAL '7 days';
+
+  -- Return the feed
+  RETURN QUERY
+  SELECT
+    ufi.id,
+    ufi.feed_type,
+    ufi.listing_id,
+    ufi.title,
+    ufi.description,
+    ufi.priority
+  FROM user_feed_items ufi
+  WHERE ufi.user_id = p_user_id
+    AND ufi.dismissed = false
+    AND (ufi.expires_at IS NULL OR ufi.expires_at > NOW())
+  ORDER BY ufi.priority DESC, ufi.created_at DESC
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+REVOKE EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer) FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer) TO authenticated;
+
+-- record_merchant_lead: the caller is the buyer contacting the merchant, so
+-- caller <> p_merchant_id is expected. The guard prevents forging a lead as
+-- some OTHER user (identity attribution). Billing-spam (many leads from one
+-- caller) is a separate rate-limiting follow-up.
+CREATE OR REPLACE FUNCTION record_merchant_lead(
+  p_merchant_id UUID,
+  p_listing_id TEXT,
+  p_listing_type TEXT,
+  p_source TEXT,
+  p_lead_user_id UUID DEFAULT NULL,
+  p_lead_email TEXT DEFAULT NULL,
+  p_lead_phone TEXT DEFAULT NULL
+)
+RETURNS JSONB AS $$
+DECLARE
+  v_is_free BOOLEAN;
+  v_cost DECIMAL(5,2);
+  v_lead_id UUID;
+  v_result JSONB;
+BEGIN
+  -- GUARD: cannot attribute a lead to a different user.
+  IF p_lead_user_id IS NOT NULL
+     AND p_lead_user_id IS DISTINCT FROM auth.uid()
+     AND NOT public.is_admin(auth.uid()) THEN
+    RAISE EXCEPTION 'Not authorized: lead must be attributed to the calling user' USING ERRCODE = '42501';
+  END IF;
+
+  -- Calculate if free and cost
+  SELECT * INTO v_is_free, v_cost FROM calculate_lead_cost(p_merchant_id, p_source);
+
+  -- Insert lead
+  INSERT INTO merchant_leads (
+    merchant_id, listing_id, listing_type, source, lead_user_id,
+    lead_email, lead_phone, is_free_lead, lead_cost
+  ) VALUES (
+    p_merchant_id, p_listing_id, p_listing_type, p_source, p_lead_user_id,
+    p_lead_email, p_lead_phone, v_is_free, v_cost
+  )
+  RETURNING id INTO v_lead_id;
+
+  v_result := jsonb_build_object(
+    'lead_id', v_lead_id,
+    'is_free', v_is_free,
+    'cost', v_cost,
+    'message', CASE
+      WHEN v_is_free THEN 'Free lead! (' || (get_free_leads_used(p_merchant_id) + 1) || '/30 used this month)'
+      ELSE 'Paid lead: ' || v_cost || ' RWF (Free limit reached)'
+    END
+  );
+
+  RETURN v_result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+REVOKE EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) TO authenticated;
 
 
 -- ============================================================

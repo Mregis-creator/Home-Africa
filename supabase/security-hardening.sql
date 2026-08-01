@@ -26,8 +26,11 @@ RETURNS BOOLEAN AS $$
   );
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
-REVOKE ALL ON FUNCTION public.is_admin(UUID) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.is_admin(UUID) TO authenticated;
+-- is_admin must remain executable by BOTH anon and authenticated: RLS policies
+-- (e.g. on payment_platform_config, which anon reads) call is_admin(auth.uid())
+-- during policy evaluation, and that runs with the querying role's privileges.
+-- It returns false for anon, so leaving it callable is harmless.
+GRANT EXECUTE ON FUNCTION public.is_admin(UUID) TO anon, authenticated;
 
 
 -- ============================================================
@@ -234,6 +237,41 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 REVOKE ALL ON FUNCTION create_payment_transaction(UUID, TEXT, DECIMAL, TEXT, TEXT, UUID, UUID) FROM PUBLIC;
 REVOKE ALL ON FUNCTION create_payment_transaction(UUID, TEXT, DECIMAL, TEXT, TEXT, UUID, UUID) FROM anon;
 GRANT EXECUTE ON FUNCTION create_payment_transaction(UUID, TEXT, DECIMAL, TEXT, TEXT, UUID, UUID) TO authenticated;
+
+
+-- ============================================================
+-- A2c. Lock down other SECURITY DEFINER functions that were executable by anon.
+--   A live audit (pg_proc.prosecdef + has_function_privilege) found ~16
+--   SECURITY DEFINER functions callable by the anon (unauthenticated) role that
+--   move money, send email, or expose other users' data. None of the internal
+--   ones are called from client code (verified by grep); the two that are
+--   (record_merchant_lead, generate_user_feed) keep `authenticated` access.
+--   NOTE: Supabase grants EXECUTE to anon/authenticated via default privileges,
+--   so you must REVOKE FROM anon explicitly (REVOKE FROM PUBLIC is not enough).
+-- ============================================================
+-- Internal-only (triggers / edge functions): no end-user access at all.
+REVOKE EXECUTE ON FUNCTION public.queue_email(character varying, text, jsonb)        FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.process_email_queue(integer)                        FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_user_email(uuid)                                FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.generate_monthly_invoice(uuid)                      FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.generate_market_alert(text, text, text, text, uuid, jsonb, boolean, text, text) FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.refresh_supply_demand_gaps()                        FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.refresh_activity_aggregates()                       FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.mark_recovery_sent(uuid, text)                      FROM anon, authenticated;
+
+-- Business/PII reads: block anonymous. (Follow-up: these are SECURITY DEFINER and
+-- take a uuid, so an authenticated user can still pass another merchant's id --
+-- add an internal `auth.uid()`/is_admin() check to each to stop cross-tenant reads.)
+REVOKE EXECUTE ON FUNCTION public.get_merchant_stats(uuid, integer)                   FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_merchant_funnel(uuid, integer)                  FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_leads_needing_follow_up(uuid, integer)          FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_abandoned_opportunities(uuid, integer)          FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_free_leads_used(uuid)                           FROM anon;
+REVOKE EXECUTE ON FUNCTION public.calculate_lead_cost(uuid, text)                     FROM anon;
+
+-- Client-called (keep authenticated, block anonymous).
+REVOKE EXECUTE ON FUNCTION public.record_merchant_lead(uuid, text, text, text, uuid, text, text) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.generate_user_feed(uuid, integer)                   FROM anon;
 
 
 -- ============================================================

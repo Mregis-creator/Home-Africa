@@ -118,6 +118,13 @@ REVOKE ALL ON FUNCTION verify_payment(UUID, UUID, TEXT, TEXT, BOOLEAN) FROM PUBL
 REVOKE ALL ON FUNCTION verify_payment(UUID, UUID, TEXT, TEXT, BOOLEAN) FROM anon;
 GRANT EXECUTE ON FUNCTION verify_payment(UUID, UUID, TEXT, TEXT, BOOLEAN) TO authenticated;
 
+-- A1b. Drop the LEGACY 4-arg overload verify_payment(uuid, uuid, text, boolean).
+-- It predates the 5-arg version, was still SECURITY DEFINER *and executable by
+-- anon*, and had no admin check — i.e. the self-verification hole was still open
+-- through this overload. No application code calls it (the app always passes
+-- p_verification_source -> resolves to the 5-arg version), so it is dead + unsafe.
+DROP FUNCTION IF EXISTS verify_payment(UUID, UUID, TEXT, BOOLEAN);
+
 
 -- ============================================================
 -- A2. Harden create_payment_transaction

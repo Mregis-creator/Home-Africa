@@ -28,14 +28,27 @@ RLS: public reads `active` (or own); INSERT is authenticated + `auth.uid() = use
 (tightened in security-hardening.sql — previously anonymous).
 
 ### Users / social
-`users`, `user_profiles` (holds `role`: user/merchant/agent/admin; `is_vip`,
-`merchant_tier`), `connections`, `favorites`, `messages`/`message_threads`,
+**`public.users` is the canonical user backbone** (see `supabase/user-backbone.sql`).
+- PK `id` == `auth.users.id`, so every business table joins to it directly.
+- Auto-created for every signup by the `handle_new_user` trigger on `auth.users`
+  (no dependence on client code) and backfilled from `auth.users`.
+- Rich user columns: identity (email, phone, full_name, display_name, avatar_url,
+  bio, dob, gender), status (role, account_status, is_verified, email/phone_verified,
+  is_vip, merchant_tier), location+prefs (country/city/district/sector,
+  preferred_language, preferred_currency, marketing_opt_in), audit (signup_source,
+  referred_by, created_at, updated_at, last_login, last_seen_at).
+- RLS: own row + admin only (protects email/phone). Public displays use the
+  `public_user_cards` VIEW (no PII).
+- `auth.users` remains the immutable registration source of truth above it.
+
+`user_profiles` is now a **secondary/legacy** table (own `id` PK + `user_id` FK).
+`is_admin()` bridges BOTH `users.role` and `user_profiles.role='admin'` during the
+transition; role-truth is consolidating into `public.users`. Fold `user_profiles`'s
+extra fields (bio/phone/location/avatar) into `users` and retire it over time.
+
+Other social tables: `connections`, `favorites`, `messages`/`message_threads`,
 `comments`, `notifications`, `activity_feed`,
 `property_status_updates` / `_likes` / `_comments`.
-
-> Note: `rbac.js` reads role from **`users`**, while admin gating / `is_admin()`
-> read from **`user_profiles`**. These should be reconciled to a single source;
-> until then keep `role` consistent across both.
 
 ### Monetization / payments
 `merchants`, `merchant_leads`, `merchant_subscriptions`, `merchant_invoices`,

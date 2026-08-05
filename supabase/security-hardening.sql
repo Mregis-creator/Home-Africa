@@ -18,11 +18,14 @@
 --    SECURITY DEFINER so it can read user_profiles regardless of the
 --    caller's own RLS view. STABLE, no side effects.
 -- ============================================================
+-- NOTE: user_profiles keys the auth user by the `user_id` column
+-- (`id` is the profile row's own PK). Match every other admin policy in the
+-- schema, which checks `user_id = auth.uid()`.
 CREATE OR REPLACE FUNCTION public.is_admin(p_uid UUID DEFAULT auth.uid())
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.user_profiles
-    WHERE id = p_uid AND role = 'admin'
+    WHERE user_id = p_uid AND role = 'admin'
   );
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 

@@ -441,8 +441,9 @@
     // ── Billing Mode (admin only) ──
     async function isAdmin() {
       try {
+        // user_profiles keys the auth user by user_id (not the profile PK `id`).
         const { data } = await window.supabaseClient
-          .from('user_profiles').select('role').eq('id', currentUser.id).single();
+          .from('user_profiles').select('role').eq('user_id', currentUser.id).single();
         return data?.role === 'admin';
       } catch (_) { return false; }
     }

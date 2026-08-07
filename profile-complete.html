@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Complete your HOME AFRICA profile to get matched with the right apartments, land, and cars across Rwanda — and unlock a verified, trusted account." />
+  <title>Complete Your Profile - HOME AFRICA</title>
+  <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <style>
+    body { background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%); min-height: 100vh; color: #fff; }
+    .card-glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(0,255,255,0.2); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .card-glass h5 { color: #0ff; display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+    .form-control, .form-select { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,255,0.3); color: #fff; }
+    .form-control:focus, .form-select:focus { background: rgba(255,255,255,0.08); border-color: #0ff; color: #fff; box-shadow: none; }
+    .form-label { color: rgba(255,255,255,0.75); font-size: .85rem; }
+    .chip { display:inline-flex; align-items:center; gap:.4rem; margin:.2rem; padding:.4rem .8rem; border:1px solid rgba(0,255,255,.3); border-radius:20px; cursor:pointer; user-select:none; }
+    .chip input { accent-color:#0ff; }
+    .save-btn { background: linear-gradient(90deg,#0ff,#8fff00); color:#111; border:none; font-weight:700; padding:.7rem 2.2rem; border-radius:10px; }
+    .progress { height: 1.4rem; background: rgba(255,255,255,0.08); }
+    .progress-bar { background: linear-gradient(90deg,#0ff,#8fff00); color:#111; font-weight:700; }
+    .muted { color: rgba(255,255,255,.5); font-size:.8rem; }
+  </style>
+</head>
+<body>
+  <div data-ha-nav data-active=""></div>
+
+  <div class="container py-4" style="max-width: 860px;">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h2 class="fw-bold mb-0"><i class="bi bi-person-badge" style="color:#0ff;"></i> Complete Your Profile</h2>
+      <span id="kycBadge" class="badge bg-secondary">KYC: —</span>
+    </div>
+    <p class="muted">The more we know, the better we match you with the right listings — and a complete, verified profile builds trust with sellers and agents.</p>
+
+    <!-- Completion bar -->
+    <div class="card-glass">
+      <div class="d-flex justify-content-between mb-1"><span>Profile completion</span><span id="pcLabel">0%</span></div>
+      <div class="progress"><div id="pcBar" class="progress-bar" role="progressbar" style="width:0%">0%</div></div>
+      <div class="muted mt-2" id="pcHint"></div>
+    </div>
+
+    <form id="profileForm">
+      <!-- Basics -->
+      <div class="card-glass">
+        <h5><i class="bi bi-person"></i> About you</h5>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Full name</label><input class="form-control" id="full_name"></div>
+          <div class="col-md-6"><label class="form-label">Display name</label><input class="form-control" id="display_name"></div>
+          <div class="col-md-6"><label class="form-label">Phone</label><input class="form-control" id="phone" type="tel" placeholder="+250…"></div>
+          <div class="col-md-6"><label class="form-label">WhatsApp number</label><input class="form-control" id="whatsapp_number" type="tel" placeholder="+250…"></div>
+          <div class="col-md-6"><label class="form-label">Occupation</label><input class="form-control" id="occupation"></div>
+          <div class="col-md-6"><label class="form-label">Avatar URL</label><input class="form-control" id="avatar_url" placeholder="https://…"></div>
+          <div class="col-md-4"><label class="form-label">City</label><input class="form-control" id="city" value="Kigali"></div>
+          <div class="col-md-4"><label class="form-label">District</label>
+            <select class="form-select" id="district"><option value="">—</option><option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option></select>
+          </div>
+          <div class="col-md-4"><label class="form-label">Preferred contact</label>
+            <select class="form-select" id="preferred_contact_method"><option value="whatsapp">WhatsApp</option><option value="call">Call</option><option value="sms">SMS</option><option value="email">Email</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-estate intent -->
+      <div class="card-glass">
+        <h5><i class="bi bi-house-heart"></i> What you're looking for</h5>
+        <label class="form-label">I am a… (select all that apply)</label>
+        <div id="persona" class="mb-3">
+          <label class="chip"><input type="checkbox" value="buyer"> Buyer</label>
+          <label class="chip"><input type="checkbox" value="renter"> Renter</label>
+          <label class="chip"><input type="checkbox" value="seller"> Seller</label>
+          <label class="chip"><input type="checkbox" value="landlord"> Landlord</label>
+          <label class="chip"><input type="checkbox" value="investor"> Investor</label>
+          <label class="chip"><input type="checkbox" value="agent"> Agent</label>
+          <label class="chip"><input type="checkbox" value="developer"> Developer</label>
+        </div>
+        <label class="form-label">Interested in</label>
+        <div id="property_interests" class="mb-3">
+          <label class="chip"><input type="checkbox" value="apartment"> Apartments</label>
+          <label class="chip"><input type="checkbox" value="house"> Houses</label>
+          <label class="chip"><input type="checkbox" value="land"> Land</label>
+          <label class="chip"><input type="checkbox" value="commercial"> Commercial</label>
+          <label class="chip"><input type="checkbox" value="car"> Cars</label>
+          <label class="chip"><input type="checkbox" value="driving_school"> Driving school</label>
+        </div>
+        <label class="form-label">Preferred districts</label>
+        <div id="preferred_districts" class="mb-3">
+          <label class="chip"><input type="checkbox" value="Gasabo"> Gasabo</label>
+          <label class="chip"><input type="checkbox" value="Kicukiro"> Kicukiro</label>
+          <label class="chip"><input type="checkbox" value="Nyarugenge"> Nyarugenge</label>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4"><label class="form-label">Primary intent</label>
+            <select class="form-select" id="primary_intent"><option value="">—</option><option value="buy">Buy</option><option value="rent">Rent</option><option value="sell">Sell</option><option value="invest">Invest</option><option value="browse">Just browsing</option></select>
+          </div>
+          <div class="col-md-4"><label class="form-label">Budget min (RWF)</label><input class="form-control" id="budget_min" type="number" min="0"></div>
+          <div class="col-md-4"><label class="form-label">Budget max (RWF)</label><input class="form-control" id="budget_max" type="number" min="0"></div>
+          <div class="col-md-6"><label class="form-label">Timeline</label>
+            <select class="form-select" id="purchase_timeline"><option value="">—</option><option value="immediate">Immediately</option><option value="1_3_months">1–3 months</option><option value="3_6_months">3–6 months</option><option value="6_12_months">6–12 months</option><option value="browsing">Just browsing</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- KYC -->
+      <div class="card-glass">
+        <h5><i class="bi bi-shield-check"></i> Identity &amp; verification</h5>
+        <div class="row g-3">
+          <div class="col-md-4"><label class="form-label">Nationality</label><input class="form-control" id="nationality" value="Rwandan"></div>
+          <div class="col-md-4"><label class="form-label">ID document type</label>
+            <select class="form-select" id="id_document_type"><option value="">—</option><option value="national_id">National ID</option><option value="passport">Passport</option><option value="driving_license">Driving license</option></select>
+          </div>
+          <div class="col-md-4"><label class="form-label">ID document number</label><input class="form-control" id="id_document_number"></div>
+        </div>
+        <div id="merchantKyc" class="row g-3 mt-1" style="display:none;">
+          <div class="col-12"><span class="muted">Business details (merchant accounts)</span></div>
+          <div class="col-md-4"><label class="form-label">Company name</label><input class="form-control" id="company_name"></div>
+          <div class="col-md-4"><label class="form-label">Company reg. number</label><input class="form-control" id="company_reg_number"></div>
+          <div class="col-md-4"><label class="form-label">TIN number</label><input class="form-control" id="tin_number"></div>
+        </div>
+        <div id="agentKyc" class="row g-3 mt-1" style="display:none;">
+          <div class="col-md-6"><label class="form-label">Agent license number</label><input class="form-control" id="agent_license_number"></div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-3 mb-5">
+        <button type="submit" class="save-btn"><i class="bi bi-save"></i> Save profile</button>
+        <span id="saveStatus"></span>
+      </div>
+    </form>
+  </div>
+
+  <div data-ha-footer="minimal"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/components.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    const ARRAY_GROUPS = ['persona', 'property_interests', 'preferred_districts'];
+    const TEXT_FIELDS = ['full_name','display_name','phone','whatsapp_number','occupation','avatar_url','city','district',
+      'preferred_contact_method','primary_intent','purchase_timeline','nationality','id_document_type','id_document_number',
+      'company_name','company_reg_number','tin_number','agent_license_number'];
+    const NUM_FIELDS = ['budget_min','budget_max'];
+
+    let sb = null, currentUser = null;
+
+    async function waitForClient(tries = 30) {
+      while (tries-- > 0) {
+        const c = (window.getSupabaseClient && window.getSupabaseClient()) || window.supabaseClient;
+        if (c) return c;
+        await new Promise(r => setTimeout(r, 100));
+      }
+      return null;
+    }
+
+    function setArray(group, values) {
+      document.querySelectorAll(`#${group} input[type=checkbox]`).forEach(cb => { cb.checked = (values || []).includes(cb.value); });
+    }
+    function getArray(group) {
+      return Array.from(document.querySelectorAll(`#${group} input[type=checkbox]:checked`)).map(cb => cb.value);
+    }
+
+    function renderCompletion(pct, row) {
+      pct = pct || 0;
+      const bar = document.getElementById('pcBar');
+      bar.style.width = pct + '%'; bar.textContent = pct + '%';
+      document.getElementById('pcLabel').textContent = pct + '%';
+      const hint = pct >= 100 ? 'All set — your profile is complete! 🎉'
+        : pct >= 60 ? 'Nearly there — add your budget and preferred districts to get better matches.'
+        : 'Add your intent, budget, and interests so we can match you with the right listings.';
+      document.getElementById('pcHint').textContent = hint;
+      const kyc = (row && row.kyc_status) || 'unverified';
+      const badge = document.getElementById('kycBadge');
+      badge.textContent = 'KYC: ' + kyc;
+      badge.className = 'badge ' + (kyc === 'verified' ? 'bg-success' : kyc === 'pending' ? 'bg-warning text-dark' : 'bg-secondary');
+    }
+
+    function toggleRoleKyc(role) {
+      document.getElementById('merchantKyc').style.display = (role === 'merchant') ? 'flex' : 'none';
+      document.getElementById('agentKyc').style.display = (role === 'agent') ? 'flex' : 'none';
+    }
+
+    async function load() {
+      sb = await waitForClient();
+      if (!sb) { document.getElementById('pcHint').textContent = 'Could not connect. Please refresh.'; return; }
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session?.user) { window.location.href = 'signin.html?redirect=' + encodeURIComponent(location.href); return; }
+      currentUser = session.user;
+
+      const { data: row, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
+      if (error) { console.warn('load profile:', error.message); }
+      const u = row || {};
+      TEXT_FIELDS.forEach(f => { const el = document.getElementById(f); if (el && u[f] != null) el.value = u[f]; });
+      NUM_FIELDS.forEach(f => { const el = document.getElementById(f); if (el && u[f] != null) el.value = u[f]; });
+      ARRAY_GROUPS.forEach(g => setArray(g, u[g]));
+      toggleRoleKyc(u.role);
+      renderCompletion(u.profile_completion, u);
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('saveStatus');
+      status.textContent = 'Saving…';
+      const update = {};
+      TEXT_FIELDS.forEach(f => { const el = document.getElementById(f); if (el) update[f] = el.value.trim() || null; });
+      NUM_FIELDS.forEach(f => { const el = document.getElementById(f); if (el) update[f] = el.value ? Number(el.value) : null; });
+      ARRAY_GROUPS.forEach(g => { update[g] = getArray(g); });
+      update.updated_at = new Date().toISOString();
+      try {
+        const { error } = await sb.from('users').update(update).eq('id', currentUser.id);
+        if (error) throw error;
+        // Re-read to pick up the DB-computed profile_completion.
+        const { data: row } = await sb.from('users').select('profile_completion, kyc_status, role').eq('id', currentUser.id).single();
+        renderCompletion(row?.profile_completion, row);
+        status.innerHTML = '<span class="text-success">Saved ✓</span>';
+      } catch (err) {
+        status.innerHTML = '<span class="text-danger">Failed: ' + err.message + '</span>';
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>

@@ -565,6 +565,74 @@
           </div>
         </div>
 
+        <!-- Role-gated KYC: Merchant (hidden by default) -->
+        <div class="mb-3" id="merchantKyc" style="display:none;">
+          <label class="form-label"><i class="bi bi-building"></i> Business details (optional)</label>
+          <input type="text" class="form-control mb-2" id="company_name" placeholder="Company name" />
+          <input type="text" class="form-control mb-2" id="company_reg_number" placeholder="Company registration number" />
+          <input type="text" class="form-control" id="tin_number" placeholder="TIN number" />
+        </div>
+
+        <!-- Role-gated KYC: Agent (hidden by default) -->
+        <div class="mb-3" id="agentKyc" style="display:none;">
+          <label class="form-label"><i class="bi bi-patch-check"></i> Agent details (optional)</label>
+          <input type="text" class="form-control" id="agent_license_number" placeholder="Agent license number" />
+        </div>
+
+        <!-- Lean profile fields (all optional) -->
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-people"></i> I am a… (optional)</label>
+          <div class="row">
+            <div class="col-6 col-md-4 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="persona" id="personaBuyer" value="buyer" />
+                <label class="form-check-label" for="personaBuyer">Buyer</label>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="persona" id="personaSeller" value="seller" />
+                <label class="form-check-label" for="personaSeller">Seller</label>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="persona" id="personaRenter" value="renter" />
+                <label class="form-check-label" for="personaRenter">Renter</label>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="persona" id="personaLandlord" value="landlord" />
+                <label class="form-check-label" for="personaLandlord">Landlord</label>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="persona" id="personaInvestor" value="investor" />
+                <label class="form-check-label" for="personaInvestor">Investor</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="primary_intent" class="form-label"><i class="bi bi-search"></i> Looking to (optional)</label>
+          <select class="form-control" id="primary_intent">
+            <option value="">Select…</option>
+            <option value="buy">Buy</option>
+            <option value="rent">Rent</option>
+            <option value="sell">Sell</option>
+            <option value="invest">Invest</option>
+            <option value="browse">Just browsing</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="whatsapp_number" class="form-label"><i class="bi bi-whatsapp"></i> WhatsApp number (optional)</label>
+          <input type="tel" class="form-control" id="whatsapp_number" placeholder="+250 7XX XXX XXX" />
+        </div>
+
         <button type="submit" class="btn btn-success">Sign Up Now</button>
       </form>
 
@@ -656,6 +724,19 @@
         document.getElementById('signupPassword').required = false;
         document.getElementById('emailLinkInfo').style.display = 'block';
       });
+
+      // Role-gated KYC toggle: show merchant/agent blocks based on selected role
+      function toggleRoleKyc() {
+        const role = document.querySelector('input[name="signupRole"]:checked')?.value || 'user';
+        const merchantKyc = document.getElementById('merchantKyc');
+        const agentKyc = document.getElementById('agentKyc');
+        if (merchantKyc) merchantKyc.style.display = (role === 'merchant') ? 'block' : 'none';
+        if (agentKyc) agentKyc.style.display = (role === 'agent') ? 'block' : 'none';
+      }
+      document.querySelectorAll('input[name="signupRole"]').forEach(function(radio) {
+        radio.addEventListener('change', toggleRoleKyc);
+      });
+      toggleRoleKyc(); // set initial state
     });
     
     // Handle email link sign-in callback
@@ -824,7 +905,27 @@
             selectedCategories.push(checkbox.value);
           }
         });
-        
+
+        // Build richer, role-gated signup metadata (keys must match DB trigger handle_new_user)
+        function buildSignupMetadata(role) {
+          const persona = Array.from(document.querySelectorAll('input[name="persona"]:checked')).map(el => el.value);
+          const q = new URLSearchParams(location.search);
+          return {
+            full_name: name,                 // reuse existing `name` var
+            role: role,
+            phone: (typeof phone !== 'undefined' ? phone : (document.getElementById('phone')?.value || '')),
+            whatsapp_number: document.getElementById('whatsapp_number')?.value || '',
+            persona: persona,                 // array
+            primary_intent: document.getElementById('primary_intent')?.value || null,
+            company_name: document.getElementById('company_name')?.value || null,
+            company_reg_number: document.getElementById('company_reg_number')?.value || null,
+            tin_number: document.getElementById('tin_number')?.value || null,
+            agent_license_number: document.getElementById('agent_license_number')?.value || null,
+            utm_source: q.get('utm_source'), utm_medium: q.get('utm_medium'), utm_campaign: q.get('utm_campaign'),
+            signup_platform: 'web'
+          };
+        }
+
         // Disable submit button and show loading
         submitBtn.disabled = true;
         const originalBtnText = submitBtn.innerHTML;
@@ -851,11 +952,7 @@
             const { data, error } = await supabase.auth.signInWithOtp({
               email: email,
               options: {
-                data: {
-                  full_name: name,
-                  role: selectedRole,
-                  merchant_categories: selectedCategories
-                },
+                data: { ...buildSignupMetadata(selectedRole), merchant_categories: selectedCategories },
                 emailRedirectTo: window.location.origin + '/signup.html?email=' + encodeURIComponent(email)
               }
             });
@@ -889,10 +986,7 @@
               email: email,
               password: password,
               options: {
-                data: {
-                  full_name: name,
-                  role: signupRole
-                }
+                data: buildSignupMetadata(signupRole)
               }
             });
             

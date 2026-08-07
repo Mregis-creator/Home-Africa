@@ -57,6 +57,46 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS updated_at          TIMESTAMPT
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS last_login          TIMESTAMPTZ;
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS last_seen_at        TIMESTAMPTZ;
 
+-- --- Real-estate intent (segmentation / matching / lead scoring) ---
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS persona             TEXT[]  DEFAULT '{}';   -- buyer/seller/renter/landlord/investor/agent/developer
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS primary_intent      TEXT;                    -- buy/rent/sell/invest/browse
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS property_interests  TEXT[]  DEFAULT '{}';   -- apartment/house/land/commercial/car/driving_school
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS budget_min          NUMERIC;                 -- RWF
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS budget_max          NUMERIC;                 -- RWF
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS purchase_timeline   TEXT;                    -- immediate/1_3_months/3_6_months/6_12_months/browsing
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS preferred_districts TEXT[]  DEFAULT '{}';
+
+-- --- KYC / trust (role-gated; heavier for merchants & agents) ---
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS kyc_status          TEXT    DEFAULT 'unverified'; -- unverified/pending/verified/rejected
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS id_document_type    TEXT;                    -- national_id/passport/driving_license
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS id_document_number  TEXT;                    -- PII (RLS-protected)
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS nationality         TEXT    DEFAULT 'Rwandan';
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS company_name        TEXT;                    -- merchants
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS company_reg_number  TEXT;                    -- merchants
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS tin_number          TEXT;                    -- Rwanda business tax id
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS agent_license_number TEXT;                   -- agents
+
+-- --- Contact preferences (Rwanda-specific) ---
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS whatsapp_number         TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS preferred_contact_method TEXT DEFAULT 'whatsapp'; -- whatsapp/call/sms/email
+
+-- --- Demographics & acquisition analytics ---
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS occupation          TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS income_bracket      TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS utm_source          TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS utm_medium          TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS utm_campaign        TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS signup_platform     TEXT    DEFAULT 'web';   -- web/android/ios
+
+-- --- Lifecycle & scoring (analytics backbone) ---
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS lifecycle_stage     TEXT    DEFAULT 'lead';  -- lead/active/dormant/churned
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS lead_score          INT     DEFAULT 0;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS profile_completion  INT     DEFAULT 0;       -- 0-100 %
+
+-- --- Flexible attributes (evolve without re-migrating) ---
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS preferences         JSONB   DEFAULT '{}'::jsonb;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS kyc                 JSONB   DEFAULT '{}'::jsonb; -- doc urls, verification meta
+
 -- --- Constraints (drop+add so re-runs don't error) ---
 ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_role_check;
 ALTER TABLE public.users ADD  CONSTRAINT users_role_check
@@ -69,6 +109,26 @@ ALTER TABLE public.users ADD  CONSTRAINT users_account_status_check
 ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_gender_check;
 ALTER TABLE public.users ADD  CONSTRAINT users_gender_check
   CHECK (gender IS NULL OR gender IN ('male','female','other','prefer_not_to_say'));
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_kyc_status_check;
+ALTER TABLE public.users ADD  CONSTRAINT users_kyc_status_check
+  CHECK (kyc_status IN ('unverified','pending','verified','rejected'));
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_primary_intent_check;
+ALTER TABLE public.users ADD  CONSTRAINT users_primary_intent_check
+  CHECK (primary_intent IS NULL OR primary_intent IN ('buy','rent','sell','invest','browse'));
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_purchase_timeline_check;
+ALTER TABLE public.users ADD  CONSTRAINT users_purchase_timeline_check
+  CHECK (purchase_timeline IS NULL OR purchase_timeline IN ('immediate','1_3_months','3_6_months','6_12_months','browsing'));
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_contact_method_check;
+ALTER TABLE public.users ADD  CONSTRAINT users_contact_method_check
+  CHECK (preferred_contact_method IS NULL OR preferred_contact_method IN ('whatsapp','call','sms','email'));
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_lifecycle_stage_check;
+ALTER TABLE public.users ADD  CONSTRAINT users_lifecycle_stage_check
+  CHECK (lifecycle_stage IN ('lead','active','dormant','churned'));
 
 -- FK id -> auth.users(id). Guarded: skip silently if it already exists or if
 -- legacy orphan rows would block it (the trigger keeps ids valid going forward).
@@ -100,17 +160,56 @@ CREATE TRIGGER trg_users_updated_at
 -- ============================================================
 -- 3. Auto-create a backbone row for EVERY signup (server-side, unskippable)
 -- ============================================================
+-- Helper: pull a text[] out of a jsonb array field in the signup metadata.
+CREATE OR REPLACE FUNCTION public.meta_text_array(p_meta JSONB, p_key TEXT)
+RETURNS TEXT[] AS $$
+  SELECT CASE
+    WHEN jsonb_typeof(p_meta->p_key) = 'array'
+      THEN ARRAY(SELECT jsonb_array_elements_text(p_meta->p_key))
+    ELSE '{}'::text[]
+  END;
+$$ LANGUAGE sql IMMUTABLE;
+
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  m JSONB := COALESCE(NEW.raw_user_meta_data, '{}'::jsonb);
 BEGIN
-  INSERT INTO public.users (id, email, full_name, role, created_at, email_verified)
+  INSERT INTO public.users (
+    id, email, full_name, role, created_at, email_verified,
+    phone, whatsapp_number, persona, primary_intent, property_interests,
+    preferred_districts, budget_min, budget_max, purchase_timeline,
+    preferred_contact_method, nationality, occupation,
+    company_name, company_reg_number, tin_number, agent_license_number,
+    utm_source, utm_medium, utm_campaign, signup_platform
+  )
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'user'),
+    COALESCE(m->>'full_name', split_part(NEW.email, '@', 1)),
+    COALESCE(m->>'role', 'user'),
     COALESCE(NEW.created_at, NOW()),
-    (NEW.email_confirmed_at IS NOT NULL)
+    (NEW.email_confirmed_at IS NOT NULL),
+    m->>'phone',
+    m->>'whatsapp_number',
+    public.meta_text_array(m, 'persona'),
+    m->>'primary_intent',
+    public.meta_text_array(m, 'property_interests'),
+    public.meta_text_array(m, 'preferred_districts'),
+    NULLIF(m->>'budget_min','')::numeric,
+    NULLIF(m->>'budget_max','')::numeric,
+    m->>'purchase_timeline',
+    COALESCE(m->>'preferred_contact_method','whatsapp'),
+    COALESCE(m->>'nationality','Rwandan'),
+    m->>'occupation',
+    m->>'company_name',
+    m->>'company_reg_number',
+    m->>'tin_number',
+    m->>'agent_license_number',
+    m->>'utm_source',
+    m->>'utm_medium',
+    m->>'utm_campaign',
+    COALESCE(m->>'signup_platform','web')
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
@@ -171,6 +270,43 @@ DROP TRIGGER IF EXISTS trg_guard_users_role ON public.users;
 CREATE TRIGGER trg_guard_users_role
   BEFORE INSERT OR UPDATE ON public.users
   FOR EACH ROW EXECUTE FUNCTION public.guard_users_role();
+
+
+-- ============================================================
+-- 5b. Auto-compute profile_completion (0-100%) on every insert/update.
+--     Drives the "complete your profile" progress bar and lead scoring.
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.compute_profile_completion()
+RETURNS TRIGGER AS $$
+DECLARE
+  filled INT := 0;
+  total  INT := 12;
+BEGIN
+  IF NEW.full_name        IS NOT NULL AND NEW.full_name        <> '' THEN filled := filled + 1; END IF;
+  IF NEW.phone            IS NOT NULL AND NEW.phone            <> '' THEN filled := filled + 1; END IF;
+  IF NEW.whatsapp_number  IS NOT NULL AND NEW.whatsapp_number  <> '' THEN filled := filled + 1; END IF;
+  IF NEW.avatar_url       IS NOT NULL AND NEW.avatar_url       <> '' THEN filled := filled + 1; END IF;
+  IF NEW.city             IS NOT NULL AND NEW.city             <> '' THEN filled := filled + 1; END IF;
+  IF NEW.occupation       IS NOT NULL AND NEW.occupation       <> '' THEN filled := filled + 1; END IF;
+  IF NEW.primary_intent   IS NOT NULL                                THEN filled := filled + 1; END IF;
+  IF NEW.budget_max       IS NOT NULL                                THEN filled := filled + 1; END IF;
+  IF COALESCE(array_length(NEW.persona, 1), 0)             > 0       THEN filled := filled + 1; END IF;
+  IF COALESCE(array_length(NEW.property_interests, 1), 0)  > 0       THEN filled := filled + 1; END IF;
+  IF COALESCE(array_length(NEW.preferred_districts, 1), 0) > 0       THEN filled := filled + 1; END IF;
+  IF NEW.kyc_status = 'verified'                                     THEN filled := filled + 1; END IF;
+
+  NEW.profile_completion := ROUND((filled::numeric / total) * 100);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_users_profile_completion ON public.users;
+CREATE TRIGGER trg_users_profile_completion
+  BEFORE INSERT OR UPDATE ON public.users
+  FOR EACH ROW EXECUTE FUNCTION public.compute_profile_completion();
+
+-- Recompute for existing rows (fires the BEFORE UPDATE trigger above).
+UPDATE public.users SET lifecycle_stage = lifecycle_stage;
 
 
 -- ============================================================

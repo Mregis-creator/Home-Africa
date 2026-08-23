@@ -48,6 +48,7 @@
             '<li class="nav-item"><a class="' + cls('post') + '" href="post.html">Post your property</a></li>' +
             '<li class="nav-item" id="loginNavItem"><a class="nav-link active" href="signin.html">Log In</a></li>' +
             '<li class="nav-item" id="signupNavItem"><a class="nav-link active" href="signup.html">Buy a Merchant Account</a></li>' +
+            '<li class="nav-item" id="profileNavItem" style="display:none;"><a class="nav-link active" href="profile-complete.html"><i class="bi bi-person-badge"></i> My Profile</a></li>' +
             '<li class="nav-item" id="logoutNavItem" style="display:none;"><a class="nav-link active" href="#" onclick="handleLogout(); return false;">Log Out</a></li>' +
             '<li class="nav-item" id="adminPaymentsNavItem" style="display:none;"><a class="nav-link active" href="admin-payments.html" style="color:#dc3545;font-weight:700;"><i class="bi bi-shield-lock"></i> Payments <span class="badge bg-danger rounded-pill ms-1" id="pending-payments-badge" style="display:none;">0</span></a></li>' +
             '<li class="nav-item"><a class="nav-link active" href="favorites.html"><i class="bi bi-heart"></i> Favorites <span class="badge bg-danger rounded-pill ms-1" id="favorites-count-badge" style="display:none;">0</span></a></li>' +

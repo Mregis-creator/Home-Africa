@@ -88,6 +88,7 @@ class NavbarAuthStatus {
               <li><h6 class="dropdown-header" style="color: #00e6d8;">${name}</h6></li>
               <li><hr class="dropdown-divider" style="border-color: rgba(0,230,216,0.3);"></li>
               <li><a class="dropdown-item" href="profile.html" style="color: #e2e8f0;"><i class="bi bi-person"></i> My Profile</a></li>
+              <li><a class="dropdown-item" href="profile-complete.html" style="color: #e2e8f0;"><i class="bi bi-person-badge"></i> Complete profile</a></li>
               <li><a class="dropdown-item" href="dashboard.html" style="color: #e2e8f0;"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
               <li><hr class="dropdown-divider" style="border-color: rgba(0,230,216,0.3);"></li>
               <li><a class="dropdown-item" href="#" onclick="NavbarAuthStatus.logout(); return false;" style="color: #ff6b6b;"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
@@ -125,10 +126,12 @@ class NavbarAuthStatus {
     const loginNav = document.getElementById('loginNavItem');
     const signupNav = document.getElementById('signupNavItem');
     const logoutNav = document.getElementById('logoutNavItem');
-    
+    const profileNav = document.getElementById('profileNavItem');
+
     if (loginNav) loginNav.style.display = isLoggedIn ? 'none' : 'block';
     if (signupNav) signupNav.style.display = isLoggedIn ? 'none' : 'block';
     if (logoutNav) logoutNav.style.display = isLoggedIn ? 'block' : 'none';
+    if (profileNav) profileNav.style.display = isLoggedIn ? 'block' : 'none';
   }
 
   static async logout() {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Complete your HOME AFRICA profile to get matched with the right apartments, land, and cars across Rwanda — and unlock a verified, trusted account." />
+  <meta name="robots" content="noindex, nofollow" />
   <title>Complete Your Profile - HOME AFRICA</title>
   <link rel="icon" type="image/png" href="homeafricabanneralternative_III.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -29,10 +29,11 @@
 
   <div class="container py-4" style="max-width: 860px;">
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <h2 class="fw-bold mb-0"><i class="bi bi-person-badge" style="color:#0ff;"></i> Complete Your Profile</h2>
+      <h2 class="fw-bold mb-0"><i class="bi bi-person-badge" style="color:#0ff;"></i> <span id="pageHeading">Complete Your Profile</span></h2>
       <span id="kycBadge" class="badge bg-secondary">KYC: —</span>
     </div>
-    <p class="muted">The more we know, the better we match you with the right listings — and a complete, verified profile builds trust with sellers and agents.</p>
+    <p class="muted" id="pageIntro">The more we know, the better we match you with the right listings — and a complete, verified profile builds trust with sellers and agents.</p>
+    <p id="skipRow" style="display:none;"><a href="#" id="skipLink" class="text-info">Skip for now →</a></p>
 
     <!-- Completion bar -->
     <div class="card-glass">
@@ -136,6 +137,8 @@
   <script src="js/components.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/navbar-auth-status.js"></script>
+  <script src="js/profile-nudge.js"></script>
   <script>
     const ARRAY_GROUPS = ['persona', 'property_interests', 'preferred_districts'];
     const TEXT_FIELDS = ['full_name','display_name','phone','whatsapp_number','occupation','avatar_url','city','district',
@@ -143,7 +146,29 @@
       'company_name','company_reg_number','tin_number','agent_license_number'];
     const NUM_FIELDS = ['budget_min','budget_max'];
 
-    let sb = null, currentUser = null;
+    let sb = null, currentUser = null, currentRole = null;
+
+    const QS = new URLSearchParams(location.search);
+    const IS_WELCOME = QS.get('welcome') === '1';
+
+    /**
+     * Where to send the user when they're done here.
+     * `next` comes from the completion nudge banner. Only same-origin relative
+     * paths are honoured, so a crafted link can't bounce anyone off-site.
+     */
+    function safeNext() {
+      const raw = QS.get('next');
+      if (!raw) return null;
+      const decoded = decodeURIComponent(raw);
+      if (decoded.includes('://') || decoded.startsWith('//') || decoded.startsWith('/')) return null;
+      return decoded;
+    }
+
+    function dashboardFor(role) {
+      return (window.HAProfile && window.HAProfile.dashboardFor)
+        ? window.HAProfile.dashboardFor(role)
+        : 'profile.html';
+    }
 
     async function waitForClient(tries = 30) {
       while (tries-- > 0) {
@@ -188,14 +213,29 @@
       if (!session?.user) { window.location.href = 'signin.html?redirect=' + encodeURIComponent(location.href); return; }
       currentUser = session.user;
 
-      const { data: row, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
+      const { data: row, error } = await sb.from('users').select('*').eq('id', currentUser.id).maybeSingle();
       if (error) { console.warn('load profile:', error.message); }
       const u = row || {};
+      currentRole = u.role;
       TEXT_FIELDS.forEach(f => { const el = document.getElementById(f); if (el && u[f] != null) el.value = u[f]; });
       NUM_FIELDS.forEach(f => { const el = document.getElementById(f); if (el && u[f] != null) el.value = u[f]; });
       ARRAY_GROUPS.forEach(g => setArray(g, u[g]));
       toggleRoleKyc(u.role);
       renderCompletion(u.profile_completion, u);
+
+      // Straight from signup: welcome them, and make the exit obvious. Nobody
+      // should ever feel stuck on an onboarding form.
+      if (IS_WELCOME) {
+        document.getElementById('pageHeading').textContent = 'Welcome to HOME AFRICA';
+        document.getElementById('pageIntro').textContent =
+          "Tell us what you're looking for and we'll match you with the right apartments, land, and cars. You can change any of this later.";
+      }
+      if (IS_WELCOME || safeNext()) {
+        const skipRow = document.getElementById('skipRow');
+        const skipLink = document.getElementById('skipLink');
+        skipLink.href = safeNext() || dashboardFor(u.role);
+        skipRow.style.display = 'block';
+      }
     }
 
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
@@ -206,14 +246,37 @@
       TEXT_FIELDS.forEach(f => { const el = document.getElementById(f); if (el) update[f] = el.value.trim() || null; });
       NUM_FIELDS.forEach(f => { const el = document.getElementById(f); if (el) update[f] = el.value ? Number(el.value) : null; });
       ARRAY_GROUPS.forEach(g => { update[g] = getArray(g); });
-      update.updated_at = new Date().toISOString();
+      // No updated_at here — trg_users_updated_at sets it server-side.
       try {
-        const { error } = await sb.from('users').update(update).eq('id', currentUser.id);
+        // Upsert, not update: legacy accounts predating the auto-create trigger
+        // have no backbone row, and .update() would affect zero rows while still
+        // reporting success. None of these fields are privileged, so this passes
+        // both the insert RLS policy and guard_users_privileged_columns.
+        const { error } = await sb.from('users')
+          .upsert({ id: currentUser.id, ...update }, { onConflict: 'id' });
         if (error) throw error;
+
         // Re-read to pick up the DB-computed profile_completion.
-        const { data: row } = await sb.from('users').select('profile_completion, kyc_status, role').eq('id', currentUser.id).single();
+        const { data: row } = await sb.from('users')
+          .select('profile_completion, kyc_status, role').eq('id', currentUser.id).maybeSingle();
         renderCompletion(row?.profile_completion, row);
-        status.innerHTML = '<span class="text-success">Saved ✓</span>';
+        currentRole = row?.role ?? currentRole;
+
+        const pct = row?.profile_completion || 0;
+        const next = safeNext();
+
+        if (next) {
+          status.innerHTML = '<span class="text-success">Saved ✓</span>';
+          setTimeout(() => { window.location.href = next; }, 800);
+        } else if (pct >= 60) {
+          status.innerHTML = '<span class="text-success">Saved ✓</span>';
+          setTimeout(() => { window.location.href = dashboardFor(currentRole); }, 800);
+        } else {
+          // Below the threshold: stay put so they can keep filling in, but always
+          // offer a way out rather than holding them here.
+          status.innerHTML = '<span class="text-success">Saved ✓</span> ' +
+            `<a href="${dashboardFor(currentRole)}" class="ms-2 text-info">Continue to dashboard →</a>`;
+        }
       } catch (err) {
         status.innerHTML = '<span class="text-danger">Failed: ' + err.message + '</span>';
       }

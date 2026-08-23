@@ -629,6 +629,11 @@
         </div>
 
         <div class="mb-3">
+          <label for="signupPhone" class="form-label"><i class="bi bi-telephone"></i> Phone number (optional)</label>
+          <input type="tel" class="form-control" id="signupPhone" placeholder="+250 7XX XXX XXX" />
+        </div>
+
+        <div class="mb-3">
           <label for="whatsapp_number" class="form-label"><i class="bi bi-whatsapp"></i> WhatsApp number (optional)</label>
           <input type="tel" class="form-control" id="whatsapp_number" placeholder="+250 7XX XXX XXX" />
         </div>
@@ -775,35 +780,25 @@
             userId: user.id
           };
           
-          // Save to Supabase (primary database)
-          try {
-            if (window.supabaseMerchants) {
-              await window.supabaseMerchants.createMerchant(user.id, merchantData);
-              console.log('✅ Merchant saved to Supabase');
+          // Only merchants get a merchants row. A failure here must never block
+          // account creation — the account already exists at this point.
+          if (localStorage.getItem('pendingSignupRole') === 'merchant') {
+            try {
+              if (window.supabaseMerchants) {
+                await window.supabaseMerchants.createMerchant(user.id, merchantData);
+                console.log('✅ Merchant saved to Supabase');
+              }
+            } catch (supabaseError) {
+              console.error('⚠️ Merchant record save failed (account still created):', supabaseError);
             }
-          } catch (supabaseError) {
-            console.error('⚠️ Supabase save failed:', supabaseError);
-            throw supabaseError;
           }
-          
-          // Sync user to Supabase users table with merchant role
-          try {
-            await supabase
-              .from('users')
-              .upsert({
-                id: user.id,
-                email: user.email,
-                full_name: name,
-                role: localStorage.getItem('pendingSignupRole') || 'user',
-                created_at: user.created_at || new Date().toISOString()
-              }, {
-                onConflict: 'id'
-              });
-            console.log('✅ User synced to Supabase users table');
-          } catch (syncError) {
-            console.warn('⚠️ User sync failed:', syncError);
-          }
-          
+
+          // The public.users row is created by the on_auth_user_created trigger
+          // from the metadata passed to signInWithOtp, with all ~26 columns.
+          // A client upsert here used to overwrite the correct role with
+          // localStorage's default of 'user', silently downgrading merchants
+          // and agents who signed up by magic link.
+
           // Save to localStorage
           localStorage.setItem('merchantRegistered', 'true');
           localStorage.setItem('isMerchant', 'true');
@@ -913,9 +908,13 @@
           return {
             full_name: name,                 // reuse existing `name` var
             role: role,
-            phone: (typeof phone !== 'undefined' ? phone : (document.getElementById('phone')?.value || '')),
+            // Fall back to WhatsApp so users.phone is never empty when the user
+            // gave us a reachable number. They stay separate columns because
+            // compute_profile_completion scores them as two distinct points.
+            phone: phone || document.getElementById('whatsapp_number')?.value || '',
             whatsapp_number: document.getElementById('whatsapp_number')?.value || '',
             persona: persona,                 // array
+            merchant_categories: selectedCategories,
             primary_intent: document.getElementById('primary_intent')?.value || null,
             company_name: document.getElementById('company_name')?.value || null,
             company_reg_number: document.getElementById('company_reg_number')?.value || null,
@@ -1015,34 +1014,26 @@
               userId: user.id
             };
             
-            // Save to Supabase (primary database) - FREE ACCESS: No payment required
-            try {
-              if (window.supabaseMerchants) {
-                await window.supabaseMerchants.createMerchant(user.id, merchantData);
-                console.log('✅ Merchant saved to Supabase');
+            // Only merchants get a merchants row - FREE ACCESS: No payment required.
+            // A failure here must never block account creation.
+            if (signupRole === 'merchant') {
+              try {
+                if (window.supabaseMerchants) {
+                  await window.supabaseMerchants.createMerchant(user.id, merchantData);
+                  console.log('✅ Merchant saved to Supabase');
+                }
+              } catch (supabaseError) {
+                console.error('⚠️ Merchant record save failed (account still created):', supabaseError);
               }
-            } catch (supabaseError) {
-              console.error('❌ Failed to save merchant to Supabase:', supabaseError);
             }
-            
-            // Sync user to Supabase users table with merchant role
-            try {
-              await supabase
-                .from('users')
-                .upsert({
-                  id: user.id,
-                  email: user.email,
-                  full_name: name,
-                  role: signupRole,
-                  created_at: user.created_at || new Date().toISOString()
-                }, {
-                  onConflict: 'id'
-                });
-              console.log('✅ User synced to Supabase users table');
-            } catch (syncError) {
-              console.warn('⚠️ User sync failed:', syncError);
-            }
-            
+
+            // The public.users row is created server-side by the
+            // on_auth_user_created trigger from the signUp metadata, with all
+            // ~26 columns. A client upsert here wrote only 5 of them, was
+            // rejected by RLS whenever email confirmation left us without a
+            // session, and swallowed that failure silently (supabase-js returns
+            // errors rather than throwing, so the catch never fired).
+
             // Save to localStorage for backward compatibility
             localStorage.setItem('merchantRegistered', signupRole === 'merchant' ? 'true' : 'false');
             localStorage.setItem('isMerchant', signupRole === 'merchant' ? 'true' : 'false');
@@ -1067,18 +1058,23 @@
               }
             }
             
-            // Show success message
-            alert('Account created successfully! You can now log in.');
-            
-            // Check if redirected from post page
             const urlParams = new URLSearchParams(window.location.search);
-            const redirectPage = urlParams.get('redirect') || 'signin.html';
-            
-            // Redirect to login page (user needs to confirm email if required)
+            const redirectPage = urlParams.get('redirect');
+
+            // When email confirmation is required, signUp returns no session —
+            // the user must confirm before they can do anything, so send them to
+            // the login page. When it isn't, they're already signed in: take them
+            // straight into onboarding rather than making them log in again.
+            const { data: { session: newSession } } = await supabase.auth.getSession();
+
             if (redirectPage === 'post.html') {
               window.location.href = 'signin.html?registered=true&redirect=post.html';
-            } else {
+            } else if (redirectPage) {
               window.location.href = redirectPage;
+            } else if (newSession) {
+              window.location.href = 'profile-complete.html?welcome=1';
+            } else {
+              window.location.href = 'signin.html?registered=true';
             }
           }
         } catch (error) {

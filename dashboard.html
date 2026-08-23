@@ -790,6 +790,7 @@
           }
         }
       });
+      */
     }
 
     // Load on page load
@@ -801,38 +802,27 @@
         
         const { data: { session } } = await supabase.auth.getSession();
         if (session && session.user) {
-          // Sync user to database
-          const { data: existingUser } = await supabase
+          // Touch last_login only. The public.users row is created server-side by
+          // the on_auth_user_created trigger with all its columns — a client
+          // insert here would be a fourth partial duplicate of that.
+          await supabase
             .from('users')
-            .select('id, role')
+            .update({ last_login: new Date().toISOString() })
+            .eq('id', session.user.id);
+
+          // Refresh the cached role from the database. This direction is safe:
+          // the DB is the source of truth and localStorage is a UI cache. Never
+          // write a role INTO the database from these flags.
+          const { data: row } = await supabase
+            .from('users')
+            .select('role')
             .eq('id', session.user.id)
-            .single();
-          
-          if (!existingUser) {
-            // Create user if doesn't exist
-            await supabase
-              .from('users')
-              .insert([{
-                id: session.user.id,
-                email: session.user.email,
-                full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
-                role: session.user.user_metadata?.role || 'user',
-                created_at: session.user.created_at || new Date().toISOString()
-              }]);
-          } else {
-            // Update last login
-            await supabase
-              .from('users')
-              .update({ last_login: new Date().toISOString() })
-              .eq('id', session.user.id);
-            
-            // Update role if different
-            const currentRole = localStorage.getItem('userRole');
-            if (existingUser.role && existingUser.role !== currentRole) {
-              localStorage.setItem('userRole', existingUser.role);
-              localStorage.setItem('merchantRegistered', existingUser.role === 'merchant' ? 'true' : 'false');
-              localStorage.setItem('isMerchant', existingUser.role === 'merchant' ? 'true' : 'false');
-            }
+            .maybeSingle();
+
+          if (row?.role) {
+            localStorage.setItem('userRole', row.role);
+            localStorage.setItem('merchantRegistered', row.role === 'merchant' ? 'true' : 'false');
+            localStorage.setItem('isMerchant', row.role === 'merchant' ? 'true' : 'false');
           }
         }
       } catch (error) {
@@ -976,6 +966,7 @@
       }
     }
   </script>
+  <script src="js/profile-nudge.js"></script>
 </body>
 </html>
 

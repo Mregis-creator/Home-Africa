@@ -129,11 +129,16 @@ class HomeAfricaSearch {
     if (!this.supabase) return [];
 
     try {
-      // Search in users table
+      // Query the public_user_cards view, not the users table directly:
+      //  - the "Users read own row" RLS policy filters public.users to zero rows
+      //    for anyone but the owner, so searching it returned nothing at all
+      //  - the view exposes only non-PII columns (no email, phone, or KYC fields)
+      //  - .ilike() passes the value as a parameter; the previous interpolated
+      //    .or() filter string let a stray , ) or . rewrite the PostgREST filter
       const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
+        .from('public_user_cards')
+        .select('id, full_name, display_name, avatar_url, role, is_verified, is_vip, city, district')
+        .ilike('full_name', `%${query}%`)
         .limit(20);
 
       if (error) throw error;
@@ -255,16 +260,23 @@ class HomeAfricaSearch {
   }
 
   renderUserCard(user) {
-    const role = user.role === 'merchant' ? 'Merchant' : 'User';
-    const name = user.full_name || user.email || 'Unknown User';
+    // Fields come from the public_user_cards view — deliberately no email/phone.
+    const role = user.role === 'merchant' ? 'Merchant'
+      : user.role === 'agent' ? 'Agent' : 'User';
+    const name = user.display_name || user.full_name || 'Unknown User';
+    const location = [user.district, user.city].filter(Boolean).join(', ');
 
     return `
-      <div class="result-card" onclick="window.location.href='profile-personal.html?userId=${user.id}'">
+      <div class="result-card" onclick="window.location.href='profile.html?userId=${user.id}'">
         <span class="result-type-badge badge-user">👤 ${role}</span>
-        <h5 class="result-title">${this.highlightQuery(name, document.getElementById('searchInput').value)}</h5>
-        <p class="result-description">${user.email || ''}</p>
+        <h5 class="result-title">
+          ${this.highlightQuery(name, document.getElementById('searchInput').value)}
+          ${user.is_verified ? '<i class="bi bi-patch-check-fill" title="Verified" style="color:#0ff;"></i>' : ''}
+          ${user.is_vip ? '<i class="bi bi-star-fill" title="VIP" style="color:#ffc107;"></i>' : ''}
+        </h5>
+        <p class="result-description">${location || 'Rwanda'}</p>
         <div class="result-meta">
-          <span><i class="bi bi-envelope"></i> ${user.email || 'No email'}</span>
+          ${location ? `<span><i class="bi bi-geo-alt"></i> ${location}</span>` : ''}
           ${user.role === 'merchant' ? '<span><i class="bi bi-shop"></i> Merchant Account</span>' : ''}
         </div>
       </div>

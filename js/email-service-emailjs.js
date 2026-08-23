@@ -337,7 +337,17 @@ class HomeAfricaEmailService {
     });
   }
 
-  // Send password reset
+  /**
+   * Send password reset.
+   *
+   * @deprecated Password reset now uses Supabase's built-in recovery flow
+   * (supabase.auth.resetPasswordForEmail → reset-password.html), which sends its
+   * own email. Only Supabase Auth can mint a link that grants the recovery
+   * session required to actually change a password — any link this method sends
+   * would carry a homegrown token that cannot change anything. Do not re-wire
+   * this into the reset path. Kept only so the branded template survives for
+   * reference when styling the Supabase email template.
+   */
   async sendPasswordReset(userEmail, userName, resetUrl, token) {
     const content = `
       <h2 style="color: #00c853; margin-top: 0; font-size: 24px; font-weight: 600;">Password Reset Request</h2>

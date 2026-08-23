@@ -1118,36 +1118,19 @@ async function loadUsers() {
     users.forEach(user => {
       const merchantData = user.merchants?.[0] || {};
       
-      // Check for temporary password
-      let tempPasswordDisplay = '<span class="text-muted">-</span>';
-      if (user.temp_password && user.temp_password_expires) {
-        const expiresAt = new Date(user.temp_password_expires);
-        if (expiresAt > new Date()) {
-          // Decrypt and show temp password
-          try {
-            const decrypted = atob(user.temp_password);
-            tempPasswordDisplay = `
-              <div>
-                <code style="color: #0ff; font-size: 0.85rem;">${decrypted}</code>
-                <br>
-                <small class="text-muted">Expires: ${expiresAt.toLocaleString()}</small>
-              </div>
-            `;
-          } catch (e) {
-            tempPasswordDisplay = '<span class="text-warning">Encrypted</span>';
-          }
-        } else {
-          tempPasswordDisplay = '<span class="text-muted">Expired</span>';
-        }
-      }
-      
+      // Admins never see user passwords. Reset sends the user a Supabase
+      // recovery link; nothing is stored in the database to display here.
+      const lastLoginDisplay = user.last_login
+        ? new Date(user.last_login).toLocaleString()
+        : '<span class="text-muted">Never</span>';
+
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${user.email || 'N/A'}</td>
         <td>${merchantData.business_name || user.full_name || 'N/A'}</td>
         <td><span class="badge badge-admin">${user.role || 'user'}</span></td>
         <td><span class="badge ${merchantData.verified ? 'bg-success' : 'bg-warning'}">${merchantData.verified ? 'Yes' : 'No'}</span></td>
-        <td>${tempPasswordDisplay}</td>
+        <td>${lastLoginDisplay}</td>
         <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
         <td>
           <button class="btn btn-sm btn-primary me-1" onclick="resetUserPassword('${user.id}', '${user.email}')" title="Reset Password">
@@ -1166,62 +1149,44 @@ async function loadUsers() {
   }
 }
 
-// Reset user password (admin function)
+/**
+ * Reset user password (admin function).
+ *
+ * Sends the user a Supabase recovery email and nothing more.
+ *
+ * This previously generated a random "temporary password", showed it to the
+ * admin, and stored it base64-encoded in users.temp_password. That never
+ * worked: base64 is not encryption, and the temporary password was never
+ * applied to the auth account — the reset email sets a different one. The admin
+ * was handed a credential that could not log anyone in, while a reversible copy
+ * of it sat in a database column.
+ */
 async function resetUserPassword(userId, userEmail) {
   if (!isSuperAdmin && currentUser?.id !== userId) {
     alert('Only super admins can reset passwords for other users.');
     return;
   }
 
-  if (!confirm(`Reset password for ${userEmail}?\n\nA temporary password will be generated and shown to you. The user will receive a password reset email.`)) {
+  if (!confirm(`Send a password reset email to ${userEmail}?\n\nThey will receive a secure link to choose a new password themselves.`)) {
     return;
   }
 
   try {
-    const supabase = getSupabase();
-
-    // Generate random password
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-    let tempPassword = '';
-    for (let i = 0; i < 12; i++) {
-      tempPassword += charset.charAt(Math.floor(Math.random() * charset.length));
-    }
-
-    // Send password reset email via Supabase Auth
     const { error: resetError } = await getSupabase().auth.resetPasswordForEmail(
       userEmail,
       {
-        redirectTo: `${window.location.origin}/signin.html?reset=true`
+        redirectTo: `${window.location.origin}/reset-password.html`
       }
     );
 
-    if (resetError) {
-      console.warn('Password reset email error (non-critical):', resetError);
-    }
+    if (resetError) throw resetError;
 
-    // Store temporary password (encrypted) in users table
-    const encryptedPassword = btoa(tempPassword); // Base64 encoding (simple encryption)
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    alert(`✅ Password reset email sent to ${userEmail}.\n\nThey can set a new password using the link in that email. The link expires — if they miss it, send another.`);
 
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({
-        temp_password: encryptedPassword,
-        temp_password_expires: expiresAt.toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId);
-
-    if (updateError) throw updateError;
-
-    // Show temporary password to admin
-    alert(`✅ Password reset initiated!\n\nTemporary Password: ${tempPassword}\n\nThis password expires in 24 hours.\n\nShare this with the user for immediate access, or they can use the reset link sent to their email.`);
-    
-    // Reload users table
     loadUsers();
   } catch (error) {
     console.error('Error resetting password:', error);
-    alert('Error resetting password: ' + error.message);
+    alert('Error sending password reset email: ' + error.message);
   }
 }
 

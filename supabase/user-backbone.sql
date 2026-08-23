@@ -358,8 +358,102 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION public.is_admin(UUID) TO anon, authenticated;
 
 -- ============================================================
+-- 9. Pin privileged columns against self-service writes.
+--
+--    The "Users update own row" policy lets a user write ANY column on their own
+--    row. guard_users_role only blocks admin/support/dev, so a non-admin could
+--    grant themselves is_vip, merchant_tier, is_verified, kyc_status, etc. with
+--    nothing more than the anon key and curl. This trigger pins those columns to
+--    their previous values for non-admins.
+--
+--    Service role (auth.uid() IS NULL) stays exempt, so admins can still be
+--    promoted from the SQL editor.
+--
+--    `role` is deliberately NOT pinned: choosing user/merchant/agent at signup is
+--    self-service by product decision, and guard_users_role already blocks the
+--    privileged role values.
+--
+--    Trigger order: same-timing row triggers fire in alphabetical name order, so
+--    trg_guard_users_privileged runs BEFORE trg_users_profile_completion — which
+--    is what we want, since profile_completion is derived, not user-set.
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.guard_users_privileged_columns()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF auth.uid() IS NOT NULL AND NOT public.is_admin(auth.uid()) THEN
+    NEW.is_vip         := OLD.is_vip;
+    NEW.merchant_tier  := OLD.merchant_tier;
+    NEW.is_verified    := OLD.is_verified;
+    NEW.kyc_status     := OLD.kyc_status;
+    NEW.account_status := OLD.account_status;
+    NEW.lead_score     := OLD.lead_score;
+    NEW.email_verified := OLD.email_verified;
+    NEW.phone_verified := OLD.phone_verified;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trg_guard_users_privileged ON public.users;
+CREATE TRIGGER trg_guard_users_privileged
+  BEFORE UPDATE ON public.users
+  FOR EACH ROW EXECUTE FUNCTION public.guard_users_privileged_columns();
+
+-- Make the UPDATE policy's check explicit. Postgres already reuses the USING
+-- expression as the check when WITH CHECK is omitted, so this closes no live
+-- hole — it states the intent so it cannot decay in a later edit.
+DROP POLICY IF EXISTS "Users update own row" ON public.users;
+CREATE POLICY "Users update own row" ON public.users
+  FOR UPDATE
+  USING      (auth.uid() = id OR public.is_admin(auth.uid()))
+  WITH CHECK (auth.uid() = id OR public.is_admin(auth.uid()));
+
+-- NOTE: there is deliberately NO DELETE policy. With RLS enabled and no policy,
+-- every delete through PostgREST is denied — which is correct. Account removal
+-- is a soft delete via account_status = 'deleted'.
+
+
+-- ============================================================
+-- 10. Purge phantom auth columns.
+--
+--     These were written by a homegrown password-reset flow that could never
+--     work (only Supabase Auth can change an auth password) and by a dead admin
+--     module. `pending_password` held the user's chosen password in PLAINTEXT;
+--     `temp_password` held it base64-encoded, which is not encryption.
+--
+--     Password reset now uses Supabase's built-in recovery flow, so nothing
+--     writes these any more.
+--
+--     ORDER MATTERS: run this only AFTER the client fix (reset-password.html +
+--     the signin.html rewrite) is deployed. Dropping first turns a silent no-op
+--     into a visible error for anyone mid-reset.
+--
+--     If any of these held data, null them out and notify those users BEFORE
+--     dropping — see docs/USER-BACKBONE-VERIFICATION.md step 7.
+-- ============================================================
+ALTER TABLE public.users DROP COLUMN IF EXISTS pending_password;
+ALTER TABLE public.users DROP COLUMN IF EXISTS password_reset_requested;
+ALTER TABLE public.users DROP COLUMN IF EXISTS reset_token;
+ALTER TABLE public.users DROP COLUMN IF EXISTS reset_token_expires;
+ALTER TABLE public.users DROP COLUMN IF EXISTS temp_password;
+ALTER TABLE public.users DROP COLUMN IF EXISTS temp_password_expires;
+
+-- Legacy `verified` column: the canonical name is is_verified. Copy anything the
+-- old column holds, then drop it. Both guarded so this is safe either way.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema='public' AND table_name='users' AND column_name='verified') THEN
+    EXECUTE 'UPDATE public.users SET is_verified = verified
+             WHERE is_verified IS NULL AND verified IS NOT NULL';
+    EXECUTE 'ALTER TABLE public.users DROP COLUMN verified';
+  END IF;
+END $$;
+
+
+-- ============================================================
 -- Done.
--- Verify:
+-- Verify: see docs/USER-BACKBONE-VERIFICATION.md for the full check set.
 --   select count(*) from auth.users;                         -- total registered
 --   select count(*) from public.users;                      -- should now match
 --   select id,email,full_name,role,account_status,created_at from public.users

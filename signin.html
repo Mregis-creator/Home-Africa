@@ -511,71 +511,13 @@
       </div>
     </section>
 
-    <!-- 🔑 Password Reset Form Section (Hidden by default) -->
-    <section class="signup-form mt-4" id="passwordResetSection" style="display: none;">
-      <h2><i class="bi bi-key-fill"></i> Reset Your Password</h2>
-      
-      <form id="passwordResetForm" action="#" method="POST" novalidate>
-        <div class="mb-3">
-          <label for="resetEmail" class="form-label">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="resetEmail"
-            placeholder="Enter your email"
-            required
-            readonly
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="resetPassword" class="form-label">New Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="resetPassword"
-            placeholder="Enter your new password"
-            required
-            minlength="6"
-          />
-          <div class="invalid-feedback">
-            Password must be at least 6 characters.
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="resetPasswordConfirm" class="form-label">Confirm New Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="resetPasswordConfirm"
-            placeholder="Confirm your new password"
-            required
-            minlength="6"
-          />
-          <div class="invalid-feedback">
-            Passwords must match.
-          </div>
-        </div>
-
-        <div id="resetError" class="alert alert-danger mt-3" style="display: none; background: rgba(220,53,69,0.2); border: 1px solid #dc3545; color: #fff;"></div>
-        <div id="resetSuccess" class="alert alert-success mt-3" style="display: none; background: rgba(0,255,136,0.2); border: 1px solid #00c853; color: #fff;"></div>
-        <button type="submit" class="btn btn-success" style="background: linear-gradient(90deg, #0ff 0%, #8fff00 100%); color: #222; font-weight: bold; border: none; width: 100%; box-shadow: 0 2px 8px 0 rgba(0,255,136,0.15); transition: background 0.3s, color 0.3s;">Reset Password</button>
-      </form>
-
-      <div class="bottom-link mt-3">
-        <a href="signin.html">Back to Log In</a>
-      </div>
-    </section>
+    <!-- Password reset lives on reset-password.html — Supabase's recovery link
+         creates a real session, and this page redirects away when one exists. -->
   </div>
 
   <!-- 💫 Scripts -->
   <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-  <!-- EmailJS for password reset -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script src="js/email-notifications.js"></script>
-  <script src="js/email-service-emailjs.js"></script>
   <script>
     particlesJS("particles-js", {
       particles: {
@@ -784,17 +726,28 @@
           const supabase = await waitForSupabase();
           console.log('✅ Supabase loaded');
           
+          // A Supabase recovery link creates a real session, which would otherwise
+          // trip the "already logged in" redirect below and bounce the user to the
+          // homepage before they could set a new password. Hand it to the page
+          // that knows what to do with it, tokens intact.
+          const isRecoveryLink = window.location.hash.includes('type=recovery') ||
+                                 new URLSearchParams(window.location.search).get('type') === 'recovery';
+          if (isRecoveryLink) {
+            window.location.replace('reset-password.html' + window.location.search + window.location.hash);
+            return;
+          }
+
           // Check if already logged in (with error handling to prevent abort errors from breaking initialization)
           try {
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            
+
             // Ignore abort errors during session check
             if (sessionError && sessionError.message && sessionError.message.includes('aborted')) {
               console.log('⚠️ Session check aborted (non-critical), continuing...');
             } else if (sessionError) {
               console.warn('Session check error:', sessionError);
             }
-            
+
             if (session) {
               console.log('✅ User already logged in, redirecting...');
               const urlParams = new URLSearchParams(window.location.search);
@@ -814,26 +767,18 @@
             // Continue with login form setup even if session check fails
           }
           
-          // Check for password reset callback
           const urlParams = new URLSearchParams(window.location.search);
-          const resetToken = urlParams.get('token');
-          const resetEmail = urlParams.get('email');
-          
-          if (urlParams.get('reset') === 'true' && resetToken && resetEmail) {
-            // User clicked password reset link - show password reset form
-            // successDiv is already initialized above, safe to use
-            showPasswordResetForm(resetToken, resetEmail, supabase, errorDiv, successDiv);
-            return; // Don't continue with normal login flow
-          } else if (urlParams.get('registered') === 'true') {
+
+          if (urlParams.get('registered') === 'true') {
             // User just registered - show welcome message
             if (successDiv) {
               successDiv.innerHTML = '<i class="bi bi-envelope-check"></i> <strong>Welcome to HOME AFRICA!</strong><br>Your account has been created successfully. Please log in with your credentials.';
               successDiv.style.display = 'block';
             }
-          } else if (urlParams.get('reset') === 'true') {
-            // Old Supabase reset callback (without token)
+          } else if (urlParams.get('reset') === 'success') {
+            // Returned from reset-password.html after a successful change.
             if (successDiv) {
-              successDiv.innerHTML = '<i class="bi bi-check-circle"></i> <strong>Password reset link received!</strong> Please check your email and follow the instructions to reset your password.';
+              successDiv.innerHTML = '<i class="bi bi-check-circle"></i> <strong>Password updated.</strong> Log in with your new password.';
               successDiv.style.display = 'block';
             }
           }
@@ -1119,7 +1064,16 @@
         }
       }
       
-      // Forgot Password function - Using EmailJS via emailService
+      /**
+       * Forgot Password — Supabase's built-in recovery flow.
+       *
+       * Supabase mints and emails the recovery link itself. A homegrown token
+       * cannot work here: only Supabase Auth can mint a link that grants the
+       * recovery session needed to actually change the password.
+       *
+       * The response is deliberately identical whether or not the account
+       * exists, so this endpoint cannot be used to enumerate registered emails.
+       */
       async function sendPasswordReset(email, supabase, errorDiv, successDiv) {
         if (!email) {
           if (errorDiv) {
@@ -1140,295 +1094,54 @@
           successDiv.className = 'alert alert-info mt-3';
         }
 
-        try {
-          console.log('📧 Attempting to send password reset email via EmailJS to:', email);
-
-          // First, verify user exists in Supabase
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id, email, full_name')
-            .eq('email', email)
-            .single();
-
-          if (userError || !userData) {
-            throw new Error('No account found with this email address. Please check your email or sign up for a new account.');
+        const showSent = () => {
+          if (successDiv) {
+            successDiv.innerHTML = `
+              <i class="bi bi-envelope-check"></i> <strong>Check your email.</strong><br>
+              <small style="display: block; margin-top: 8px;">
+                If an account exists for <strong>${email}</strong>, we've sent a password reset link.<br>
+                Check your spam folder if it doesn't arrive within a few minutes.
+              </small>
+            `;
+            successDiv.style.display = 'block';
+            successDiv.className = 'alert alert-success mt-3';
           }
-
-          // Generate secure reset token
-          const resetToken = crypto.randomUUID() + '-' + Date.now();
-          const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
-
-          // Store reset token in Supabase
-          const { error: tokenError } = await supabase
-            .from('users')
-            .update({
-              reset_token: resetToken,
-              reset_token_expires: expiresAt.toISOString()
-            })
-            .eq('id', userData.id);
-
-          if (tokenError) {
-            console.warn('Could not store reset token, but continuing:', tokenError);
-          }
-
-          // Create reset link
-          const resetLink = `${window.location.origin}/signin.html?reset=true&token=${resetToken}&email=${encodeURIComponent(email)}`;
-
-          // Send email via EmailJS using emailService
-          if (typeof emailService !== 'undefined' && emailService) {
-            await emailService.init();
-            const result = await emailService.sendPasswordReset(
-              email,
-              userData.full_name || email.split('@')[0],
-              resetLink,
-              resetToken
-            );
-
-            if (result.success) {
-              console.log('✅ Password reset email sent via EmailJS:', result);
-
-              if (successDiv) {
-                successDiv.innerHTML = `
-                  <i class="bi bi-envelope-check"></i> <strong>Password reset email sent!</strong><br>
-                  <small style="display: block; margin-top: 8px;">
-                    Please check your inbox at <strong>${email}</strong> and click the link to reset your password.<br>
-                    The link will expire in 1 hour.
-                  </small>
-                `;
-                successDiv.style.display = 'block';
-                successDiv.className = 'alert alert-success mt-3';
-              }
-            } else {
-              throw new Error(result.error || 'EmailJS send failed');
-            }
-          } else {
-            // Fallback: Try Supabase Auth
-            console.warn('⚠️ EmailJS not loaded, falling back to Supabase Auth');
-            const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: resetLink
-            });
-
-            if (supabaseError) throw supabaseError;
-
-            if (successDiv) {
-              successDiv.innerHTML = `
-                <i class="bi bi-envelope-check"></i> <strong>Password reset email sent!</strong><br>
-                <small style="display: block; margin-top: 8px;">
-                  Please check your inbox at <strong>${email}</strong> (and spam folder).
-                </small>
-              `;
-              successDiv.style.display = 'block';
-              successDiv.className = 'alert alert-success mt-3';
-            }
-          }
-
-          // Hide error if showing
           if (errorDiv) errorDiv.style.display = 'none';
-          
+        };
+
+        try {
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/reset-password.html`
+          });
+
+          // Rate limiting and malformed addresses are worth surfacing; anything
+          // that would reveal whether the account exists is not.
+          if (error && /rate|too many|invalid email/i.test(error.message || '')) {
+            throw error;
+          }
+
+          showSent();
         } catch (error) {
           console.error('❌ Password reset error:', error);
-          
+
           if (errorDiv) {
             let errorMessage = 'Failed to send password reset email. ';
-            
-            if (error.message) {
-              if (error.message.includes('No account found') || error.message.includes('not found')) {
-                errorMessage = 'No account found with this email address. Please check your email or sign up for a new account.';
-              } else if (error.message.includes('Invalid email') || error.message.includes('invalid email')) {
-                errorMessage = 'Invalid email address. Please check and try again.';
-              } else {
-                errorMessage += error.message;
-              }
+            if (/invalid email/i.test(error.message || '')) {
+              errorMessage = 'Invalid email address. Please check and try again.';
+            } else if (/rate|too many/i.test(error.message || '')) {
+              errorMessage = 'Too many reset requests. Please wait a few minutes and try again.';
             } else {
-              errorMessage += 'Please try again later.';
+              errorMessage += error.message || 'Please try again later.';
             }
-            
+
             // Use safe error display (prevents abort errors)
             if (!window.loginRedirecting && !errorMessage.toLowerCase().includes('aborted') && !errorMessage.toLowerCase().includes('signal')) {
               errorDiv.innerHTML = `<i class="bi bi-exclamation-triangle"></i> ${errorMessage}`;
               errorDiv.style.display = 'block';
             }
           }
-          
+
           if (successDiv) successDiv.style.display = 'none';
-        }
-      }
-      
-      // Show password reset form
-      function showPasswordResetForm(token, email, supabase, errorDiv, successDiv) {
-        // Hide login form
-        const loginSection = document.querySelector('.signup-form');
-        const passwordResetSection = document.getElementById('passwordResetSection');
-        
-        if (loginSection) loginSection.style.display = 'none';
-        if (passwordResetSection) {
-          passwordResetSection.style.display = 'block';
-          document.getElementById('resetEmail').value = email;
-        }
-        
-        // Handle password reset form submission
-        const resetForm = document.getElementById('passwordResetForm');
-        if (resetForm) {
-          resetForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const resetErrorDiv = document.getElementById('resetError');
-            const resetSuccessDiv = document.getElementById('resetSuccess');
-            const submitBtn = resetForm.querySelector('button[type="submit"]');
-            
-            const newPassword = document.getElementById('resetPassword').value;
-            const confirmPassword = document.getElementById('resetPasswordConfirm').value;
-            
-            // Validate passwords match
-            if (newPassword !== confirmPassword) {
-              if (resetErrorDiv) {
-                resetErrorDiv.textContent = 'Passwords do not match. Please try again.';
-                resetErrorDiv.style.display = 'block';
-              }
-              resetForm.classList.add('was-validated');
-              return;
-            }
-            
-            if (newPassword.length < 6) {
-              if (resetErrorDiv) {
-                resetErrorDiv.textContent = 'Password must be at least 6 characters.';
-                resetErrorDiv.style.display = 'block';
-              }
-              resetForm.classList.add('was-validated');
-              return;
-            }
-            
-            // Show loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Resetting password...';
-            
-            if (resetErrorDiv) resetErrorDiv.style.display = 'none';
-            if (resetSuccessDiv) resetSuccessDiv.style.display = 'none';
-            
-            try {
-              // Verify token is valid
-              const { data: userData, error: verifyError } = await supabase
-                .from('users')
-                .select('id, reset_token, reset_token_expires')
-                .eq('email', email)
-                .single();
-              
-              if (verifyError || !userData) {
-                throw new Error('Invalid or expired reset link. Please request a new password reset.');
-              }
-              
-              // Check if token matches and is not expired
-              if (userData.reset_token !== token) {
-                throw new Error('Invalid reset token. Please request a new password reset.');
-              }
-              
-              if (userData.reset_token_expires && new Date(userData.reset_token_expires) < new Date()) {
-                throw new Error('Reset link has expired. Please request a new password reset.');
-              }
-              
-              // Update password using Supabase Auth's updateUser
-              // We need to use Supabase's built-in password reset flow
-              // Since updateUser requires a session, we'll use a workaround:
-              // Use Supabase Auth's updateUser after getting user by email
-              
-              // Get user from auth
-              const { data: { user }, error: getUserError } = await supabase.auth.admin.getUserByEmail(email);
-              
-              if (getUserError) {
-                // If admin API not available, use alternative: Update via RPC or store for sync
-                // For now, we'll update the users table and sync on next login
-                console.warn('Admin API not available, using alternative method');
-                
-                // Store password update flag (will be synced on next login)
-                const { error: updateError } = await supabase
-                  .from('users')
-                  .update({
-                    pending_password: newPassword, // Temporary storage
-                    reset_token: null,
-                    reset_token_expires: null,
-                    password_reset_requested: true
-                  })
-                  .eq('id', userData.id);
-                
-                if (updateError) {
-                  throw new Error('Failed to update password. Please try again.');
-                }
-                
-                // Show success with note
-                if (resetSuccessDiv) {
-                  resetSuccessDiv.innerHTML = '<i class="bi bi-check-circle"></i> <strong>Password reset successful!</strong> You can now log in with your new password.';
-                  resetSuccessDiv.style.display = 'block';
-                }
-              } else {
-                // Use Supabase Auth's updateUser (requires admin API or session)
-                // For client-side, we'll use Supabase's updateUser with the reset token
-                // Actually, Supabase Auth doesn't support this directly client-side
-                
-                // Best approach: Use Supabase's updateUser after creating a session
-                // But we can't create a session without password
-                
-                // Alternative: Use Supabase's RPC function to update password
-                // Or use admin API via serverless function
-                
-                // For MVP: Update password via Supabase Auth's updateUser
-                // We'll need to use admin API or create a serverless function
-                
-                // For now, let's use Supabase's updateUser with a workaround
-                // We'll update the password using Supabase Auth's API
-                
-                // Update password in Supabase Auth
-                // Note: This requires admin privileges
-                // For client-side, we'll update the users table and sync on next login
-                
-                const { error: updateError } = await supabase
-                  .from('users')
-                  .update({
-                    pending_password: newPassword,
-                    reset_token: null,
-                    reset_token_expires: null
-                  })
-                  .eq('id', userData.id);
-                
-                if (updateError) {
-                  throw new Error('Failed to update password. Please try again.');
-                }
-                
-                // Show success
-                if (resetSuccessDiv) {
-                  resetSuccessDiv.innerHTML = '<i class="bi bi-check-circle"></i> <strong>Password reset successful!</strong> You can now log in with your new password.';
-                  resetSuccessDiv.style.display = 'block';
-                }
-              }
-              
-              // Clear reset token
-              await supabase
-                .from('users')
-                .update({
-                  reset_token: null,
-                  reset_token_expires: null
-                })
-                .eq('id', userData.id);
-              
-              // Redirect to login after 3 seconds
-              setTimeout(() => {
-                window.location.href = 'signin.html';
-              }, 3000);
-              
-            } catch (error) {
-              console.error('Password reset error:', error);
-              
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = 'Reset Password';
-              
-              if (resetErrorDiv) {
-                resetErrorDiv.textContent = error.message || 'Failed to reset password. Please try again.';
-                resetErrorDiv.style.display = 'block';
-              }
-            }
-            
-            resetForm.classList.add('was-validated');
-          });
         }
       }
       
@@ -1523,16 +1236,14 @@
     }
     function selectRole(role) {
       document.getElementById('roleSelectModal').style.display = 'none';
-      var dest;
-      if (role === 'admin') dest = 'admin-payments.html';
-      else if (role === 'merchant') dest = 'merchant-dashboard.html';
-      else if (role === 'agent') dest = 'agent-dashboard.html';
-      else if (role === 'support') dest = 'support-dashboard.html';
-      else if (role === 'dev') dest = 'dev-dashboard.html';
-      else dest = 'profile.html';
-      window.location.href = dest;
+      // Single source of truth for role -> dashboard, shared with
+      // profile-complete.html so the two cannot drift apart.
+      window.location.href = (window.HAProfile && window.HAProfile.dashboardFor)
+        ? window.HAProfile.dashboardFor(role)
+        : 'profile.html';
     }
   </script>
+  <script src="js/profile-nudge.js"></script>
   <script src="js/navbar-auth-status.js"></script>
 </body>
 </html>

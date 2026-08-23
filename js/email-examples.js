@@ -174,21 +174,25 @@ async function onEngagement(merchantData, productData, engagementData) {
 
 
 // ============================================
-// EXAMPLE 7: Send Password Reset Email
-// Add to password reset flow
+// EXAMPLE 7: Password Reset
+//
+// NOT an EmailJS flow. Supabase Auth mints and sends the recovery email itself —
+// only it can produce a link that grants the recovery session needed to actually
+// change a password. emailService.sendPasswordReset() is deprecated; a link it
+// sent would carry a homegrown token that changes nothing.
+//
+// The real implementation lives in signin.html (request) and
+// reset-password.html (set the new password).
 // ============================================
 
-async function onPasswordResetRequest(userData, resetToken) {
-  const resetUrl = `https://homeafrica.it.com/reset-password.html?token=${resetToken}`;
-  
-  const result = await emailService.sendPasswordReset(
-    userData.email,
-    userData.name,
-    resetUrl,
-    resetToken
-  );
-  
-  return result;
+async function onPasswordResetRequest(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password.html`
+  });
+
+  // Respond identically whether or not the account exists — otherwise this
+  // endpoint tells an attacker which emails are registered.
+  return { success: !error, error };
 }
 
 // Usage in password reset flow:

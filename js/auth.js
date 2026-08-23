@@ -55,52 +55,29 @@ class HomeAfricaAuth {
     });
   }
 
+  /**
+   * Touch last_login on the user's backbone row.
+   *
+   * This deliberately does NOT create the row and does NOT write `role`.
+   * The public.users row is created server-side by the on_auth_user_created
+   * trigger (supabase/user-backbone.sql), which maps the full signup metadata —
+   * a client-side insert here only ever wrote 5 of ~55 columns and raced it.
+   *
+   * `role` is never derived from localStorage: those flags are user-writable and
+   * trivially spoofable, so writing them back to the database was a self-service
+   * privilege escalation. Real privilege is enforced by RLS and in-DB triggers.
+   */
   async syncUserToDatabase(supabaseUser) {
     if (!this.supabase || !supabaseUser) return;
 
     try {
-      // Check if user exists in database
-      const { data: existingUser, error: checkError } = await this.supabase
+      const { error } = await this.supabase
         .from('users')
-        .select('id, role')
-        .eq('id', supabaseUser.id)
-        .single();
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', supabaseUser.id);
 
-      if (checkError && checkError.code === 'PGRST116') {
-        // User doesn't exist, create them
-        const { data: newUser, error: createError } = await this.supabase
-          .from('users')
-          .insert([{
-            id: supabaseUser.id,
-            email: supabaseUser.email,
-            full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'User',
-            role: supabaseUser.user_metadata?.role || 'user',
-            created_at: supabaseUser.created_at || new Date().toISOString()
-          }])
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Error creating user in database:', createError);
-        } else {
-          console.log('✅ User synced to database:', newUser);
-        }
-      } else if (existingUser) {
-        // User exists, update last login
-        const isMerchant = localStorage.getItem('merchantRegistered') === 'true' || 
-                          localStorage.getItem('isMerchant') === 'true';
-        
-        const updateData = { last_login: new Date().toISOString() };
-        
-        // If user has merchant account, ensure role is merchant
-        if (isMerchant && existingUser.role !== 'merchant') {
-          updateData.role = 'merchant';
-        }
-        
-        await this.supabase
-          .from('users')
-          .update(updateData)
-          .eq('id', supabaseUser.id);
+      if (error) {
+        console.warn('Could not update last_login:', error.message);
       }
     } catch (error) {
       console.error('Error syncing user to database:', error);

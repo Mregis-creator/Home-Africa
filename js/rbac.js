@@ -165,14 +165,16 @@ class RBACSystem {
 
       const { data, error } = await this.supabase
         .from('users')
-        .select('id, role, verified, is_vip, merchant_tier')
+        .select('id, role, is_verified, is_vip, merchant_tier')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         // Fail CLOSED to least privilege. Never elevate to merchant/vip based on
         // localStorage flags — those are user-writable and were trivially
         // spoofable. Real privilege is enforced by Supabase RLS regardless.
+        // Log loudly: a silent demotion of every user is very hard to spot.
+        console.error('[rbac] role lookup failed, defaulting to "user":', error || 'no row');
         this.currentRole = 'user';
       } else {
         // Check for VIP merchant status

@@ -23,38 +23,25 @@ class SupabaseMerchants {
     }
 
     try {
-      // First, ensure user exists in users table
+      // The backbone row is created server-side by the on_auth_user_created
+      // trigger, so it already exists for any real signup. Look it up by id —
+      // not by email, which RLS ("Users read own row") filters to zero rows for
+      // anyone but the owner. There is deliberately no create-if-missing branch:
+      // an insert here cannot satisfy the primary key / auth.users foreign key.
       const { data: existingUser, error: userError } = await this.supabase
         .from('users')
         .select('id')
-        .eq('email', merchantData.email || merchantData.merchantEmail)
-        .single();
+        .eq('id', userId)
+        .maybeSingle();
 
-      let userIdUuid = null;
-
-      if (existingUser) {
-        userIdUuid = existingUser.id;
-      } else {
-        // Create user first
-        // FREE ACCESS MODE: Automatically set role to 'merchant' (no payment required)
-        const { data: newUser, error: createUserError } = await this.supabase
-          .from('users')
-          .insert([{
-            email: merchantData.email || merchantData.merchantEmail,
-            full_name: merchantData.merchantName || merchantData.name,
-            role: 'merchant', // FREE ACCESS: Automatically merchant role
-            verified: false,
-            created_at: new Date().toISOString()
-          }])
-          .select()
-          .single();
-
-        if (createUserError) {
-          throw new Error(`Failed to create user: ${createUserError.message}`);
-        }
-
-        userIdUuid = newUser.id;
+      if (userError) {
+        throw new Error(`Failed to look up user: ${userError.message}`);
       }
+      if (!existingUser) {
+        throw new Error('No user record found for this account. Cannot create merchant.');
+      }
+
+      const userIdUuid = existingUser.id;
 
       // Create merchant record
       const merchantRecord = {
